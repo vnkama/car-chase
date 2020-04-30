@@ -2,6 +2,8 @@ import pygame
 from config import *
 from GuiWindow import GuiWindow
 
+from functions import *
+
 
 class Game(GuiWindow):
 
@@ -14,7 +16,6 @@ class Game(GuiWindow):
     main_srf = pygame.display.set_mode((MAIN_WND_WIDTH, MAIN_WND_HEIGHT))
 
     def __init__(self):
-
         (w,h) = Game.main_srf.get_size()
 
 
@@ -24,7 +25,7 @@ class Game(GuiWindow):
             'rect': pygame.Rect(0,0,w,h),
             'bg_color':   MAIN_WND_BACKGROUND,
             'surface': Game.main_srf             #т.к. родительского окна у Game нет
-                                                  # subsurface вызывать не откуда, то передаем главную повехность для него как surface
+                                                 # subsurface вызывать не откуда, то передаем главную повехность для него как surface
         })
 
         self.main_timer = pygame.time.Clock()
@@ -32,6 +33,15 @@ class Game(GuiWindow):
 
         pygame.font.init()
         #self.main_font = pygame.font.SysFont('Tahoma', CONTROL_WND_FONT_SIZE)
+
+        #уставноим шрифты
+        setFonts({
+             #индекс строго в нижнем регистре
+             'arial_16': pygame.font.SysFont('Arial', 16),
+             'arial_20': pygame.font.SysFont('Arial', 20),
+             'tahoma_20': pygame.font.SysFont('Tahoma', 20),
+        })
+
 
         #mousemotion окна-обработчики перемещения мыши
         self.arr_handlers_MOUSEMOTION = []

@@ -5,6 +5,13 @@ from functions import *
 from GuiWindow import GuiWindow
 from CellWeed import *
 from CellOvalis import *
+from Tile import *
+
+import random
+
+
+TAIL_MAP_SIZE_X   = 6
+TAIL_MAP_SIZE_Y    = 20
 
 #
 # окно с органами управления игрой
@@ -19,6 +26,12 @@ class MapWnd(GuiWindow):
 
 
         super().__init__(params)    # parent - GuiWindow
+
+        #тайловая карта
+        arrTailMap = [[0 for x in range(TAIL_MAP_SIZE_X)] for y in range(TAIL_MAP_SIZE_Y)]
+
+        for tail in arrTailMap:
+            tail=random.randint(0,1)
 
 
         self.sg_cells = pg.sprite.Group()

@@ -29,12 +29,12 @@ class GameObject:
     def createChild(self,new_child):
         self.child_objects.append(new_child)
 
-    def addChildWindow(self,new_window):
-        self.child_objects.append(new_window)
+    # def addChildWindow(self,new_window):
+    #     self.child_objects.append(new_window)
 
 
     def draw(self):
-        self.draw_this()   #-метод пустой, но переопредtkbnm в классах наследниках
+        self.draw_this()   #-метод пустой, но его переопределим в классах наследниках
 
         # вызовем draw очерних окон
         for wnd in self.child_objects:
