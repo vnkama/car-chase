@@ -1,13 +1,12 @@
-import pygame
-from game import Game
+#import pygame as pg
+from fw.functions import *
+from fw.game import Game
+
 from ControlWnd import ControlWnd
 from MapWnd import MapWnd
 
-from functions import *
 
-
-
-class CarChase(Game):
+class RealApp(Game):
 
     def __init__(self):
         Game.__init__(self)
@@ -17,7 +16,3 @@ class CarChase(Game):
 
         self.createChild(ControlWnd({'parent_obj':self}))
         self.createChild(MapWnd({'parent_obj':self}))
-
-
-
-

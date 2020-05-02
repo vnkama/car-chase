@@ -111,6 +111,33 @@ class Brezenhem:
 
 
     #-------------------------------------------------------------------
+    def getSpriteDirection32(self):
+        #
+
+        vector = [self.abs_dx,self.abs_dy]
+
+        if (self.abs_dx == 0):
+            #чтобы избежать деления на ноль пр ирасчете тангенса
+            if (self.abs_dy >=0):
+                direction = 15  #строго вниз
+            else:
+                direction = 0   #строго вверх
+        else:
+            #определяем направление спрайта в пределах 1го квадранта
+            direction = int(math.atan(self.abs_dy / self.abs_dx) * 5.095 + 0.5)
+
+            #пересчитаем в 4 разных квадранта
+            if (self.dx < 0 and  self.dy > 0):
+                direction = 16 - direction
+
+            elif (self.dx < 0 and self.dy < 0):
+                direction += 16
+
+            elif (self.dx >= 0 and self.dy < 0):
+                direction = (32 - direction) & 0x1F
+
+        return direction
+
     def getSpriteDirection16(self):
         #возвращает напрвление спрайта по вектору движения, 16 возможных направлений
 
@@ -118,6 +145,8 @@ class Brezenhem:
             return self.sprite_direction_16
 
         vector = [self.abs_dx,self.abs_dy]
+
+
         max_size = max(vector[0], vector[1])
 
         while (max_size > 512):

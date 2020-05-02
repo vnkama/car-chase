@@ -1,7 +1,7 @@
-import pygame
-from CarChase import CarChase
-from functions import *
+#import pygame
+from RealApp import *
+#from fw.functions import *
 
 
 if __name__ == "__main__":
-    CarChase().run()
+    RealApp().run()

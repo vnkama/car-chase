@@ -15,7 +15,7 @@ class CellOvalis(Cell):
         srf = pg.image.load(file_name).convert_alpha()
         sprites_srf.append(srf)
 
-    max_speed       = 120      #максимальная скорость
+    #max_speed       = 120      #максимальная скорость
 #    max_speed_in_drift = 2     #максмальная скорость в дрифте (не соблюдая направление, можно плыть боком)
     #max_speed_in_rotate = 5   #максимальная скорость в повороте, на более выскоких скоростях, движение только прямо
 
@@ -34,7 +34,6 @@ class CellOvalis(Cell):
     def __init__(self,params):
         super().__init__(params)
         self.image = CellOvalis.sprites_srf[0]
-
 
 
     def setPos(self,pos):

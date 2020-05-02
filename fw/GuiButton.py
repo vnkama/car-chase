@@ -1,8 +1,8 @@
 import pygame as pg
-from GuiWindow import GuiWindow
+from fw.GuiWindow import GuiWindow
 
 from config import *
-from functions import *
+from fw.functions import *
 
 class GuiButton(GuiWindow):
     def __init__(self,params):

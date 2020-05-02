@@ -1,5 +1,5 @@
 import pygame
-from GameObject import *
+from fw.GameObject import *
 
 class GuiWindow(GameObject):
 

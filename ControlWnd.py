@@ -1,9 +1,9 @@
-import pygame
+import pygame as pg
 from config import *
 
 
-from GuiWindow import GuiWindow
-from GuiButton import GuiButton
+from fw.GuiWindow import GuiWindow
+from fw.GuiButton import GuiButton
 
 #
 # окно с органами управления игрой (форма)
@@ -21,7 +21,7 @@ class ControlWnd(GuiWindow):
             'name': 'button-start',
             'text': 'Start',
             'parent_obj':self,
-            'rect': pygame.Rect(70,430,120,32),
+            'rect': pg.Rect(70,430,120,32),
             'bg_color': CONTROL_WND_BACKGROUND,
             'bg_hover_color': THEME_BACKGROUND_HOVER_COLOR,
             'border_color': THEME_BORDER_COLOR_HIGH,

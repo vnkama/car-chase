@@ -1,5 +1,5 @@
 import pygame as pg
-from functions import *
+from fw.functions import *
 
 
 class GameObject:
