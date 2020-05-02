@@ -29,13 +29,22 @@ class MapWnd(GuiWindow):
 
         super().__init__(params)        # parent - GuiWindow
 
-        self.total_map_srf = pg.Surface(MAP_SIZE_XY)
+        self.background_srf = pg.Surface(MAP_SIZE_XY)
         self.Camera = Camera(MAIN_WND_WIDTH,MAIN_WND_HEIGHT,MAP_SIZE_X,MAP_SIZE_Y)
-        self.slid_left = 0
-        self.slid_right = 0
+        # self.slid_left = 0
+        # self.slid_right = 0
+
+
+        #группы спрайтов
+        self.arr_sprites_update_camera = pg.sprite.Group()       # для взывова draw, карта отдельно копируемся
+        self.arr_sprites_for_draw = pg.sprite.Group()       # для взывова draw, карта отдельно копируемся
+        self.arr_sprites_for_update = pg.sprite.Group()     # то что двигаетсмя
+        self.arr_sprites_for_collide = pg.sprite.Group()    # прверяиьт на столкновения с автомобилем
+
 
         #тайловая карта
-        #тайлы двух видов
+        #тайлы двух видов, определяются случайно
+        #тайлы спрайтами не являются, а копируеются один раз прямо на фон
         for x in range(MAP_TAIL_SIZE_X):
             for y in range(MAP_TAIL_SIZE_Y):
                 #номер типа тайла случайно
@@ -46,31 +55,44 @@ class MapWnd(GuiWindow):
                     Tile.SPRITE_SIZE_X,
                     Tile.SPRITE_SIZE_Y)
 
-                Tile.copyImg(self.total_map_srf, dest_rect, rand)
+                Tile.copyImg(self.background_srf, dest_rect, rand)
 
-        #нарсиуем деревья
+        #нарисуем деревья
 
-        Tree.copyImg(
-            self.total_map_srf,
-            pg.Rect(200,100,0,0)        # размер rect значения не имеет
+        self.arr_trees = []
+
+        self.arr_trees.append(
+            Tree(200, 100, (self.arr_sprites_update_camera, self.arr_sprites_for_draw, self.arr_sprites_for_collide))
         )
 
-        Tree.copyImg(
-            self.total_map_srf,
-            pg.Rect(843,243,0,0)        # размер rect значения не имеет
+        self.arr_trees.append(
+            Tree(840, 270, (self.arr_sprites_update_camera, self.arr_sprites_for_draw, self.arr_sprites_for_collide))
         )
 
-        Tree.copyImg(
-            self.total_map_srf,
-            pg.Rect(2045,614,0,0)        # размер rect значения не имеет
+        self.arr_trees.append(
+            Tree(2045, 614, (self.arr_sprites_update_camera, self.arr_sprites_for_draw, self.arr_sprites_for_collide))
         )
 
-
-        Oil.copyImg(
-            self.total_map_srf,
-            pg.Rect(400, 400, 0, 0)  # размер rect значения не имеет
-        )
-
+        # Tree.copyImg(
+        #     self.background_srf,
+        #     pg.Rect(200,100,0,0)        # размер rect значения не имеет
+        # )
+        #
+        # Tree.copyImg(
+        #     self.background_srf,
+        #     pg.Rect(843,243,0,0)        # размер rect значения не имеет
+        # )
+        #
+        # Tree.copyImg(
+        #     self.background_srf,
+        #     pg.Rect(2045,614,0,0)        # размер rect значения не имеет
+        # )
+        #
+        #
+        # Oil.copyImg(
+        #     self.background_srf,
+        #     pg.Rect(400, 400, 0, 0)  # размер rect значения не имеет
+        # )
 
 
 
@@ -126,14 +148,23 @@ class MapWnd(GuiWindow):
 
     def draw_this(self):
         #копируем карту тайлов
-        self.drawBackground()       #удалить DEBUG
+        #self.drawBackground()       #удалить DEBUG
 
+        #координаты окна показываемые камерой относительно карты
         camera_position_rect = self.Camera.getPositionRect()
-        self.getSurface().blit(
-            self.total_map_srf,
-            pg.Rect(0,0,0,0),       #копируем на все окно карты
-            camera_position_rect)
+
+        #копируем фон(тайловая карта)
+        self.surface.blit(          # копируем в окно MapWnd
+            self.background_srf,    # копируем из карты
+            pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
+            camera_position_rect)   # из карты берем то что показывает камера
         self.sg_cells.draw(self.surface)
+
+        #пересчитываем координаты в спрайтах с учетом камеры
+        for sprite in self.arr_sprites_update_camera:
+            sprite.update_camera(camera_position_rect)
+
+        self.arr_sprites_for_draw.draw(self.surface)
 
 
 

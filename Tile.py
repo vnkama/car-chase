@@ -1,35 +1,59 @@
 import pygame as pg
 from fw.functions import *
 
-class Tile(pg.sprite.Sprite):
+#
+#
+#
+class Tile():
 
     SPRITE_SIZE_X = SPRITE_SIZE_Y = 128
     SPRITE_SIZE_XY = (SPRITE_SIZE_X,SPRITE_SIZE_Y)
 
-    arrTilesPng = []
+    arr_tiles_img = []
 
-    srf = pg.image.load("./images/land_grass04.png").convert_alpha()
-    arrTilesPng.insert(1,srf)
+    srf = pg.image.load("./images/land_grass04.png").convert()
+    arr_tiles_img.insert(1,srf)
 
-    srf = pg.image.load("./images/land_grass11.png").convert_alpha()
-    arrTilesPng.insert(2,srf)
-
+    srf = pg.image.load("./images/land_grass11.png").convert()
+    arr_tiles_img.insert(2,srf)
 
     # def __init__(self,params):
     #     self.floor_type = params['floor_type']
 
+    @staticmethod
     def copyImg(dest_srf,dest_rect,sprite_num):
-        dest_srf.blit(Tile.arrTilesPng[sprite_num],dest_rect)
+        dest_srf.blit(Tile.arr_tiles_img[sprite_num],dest_rect)
 
 
 class Tree(pg.sprite.Sprite):
     SPRITE_SIZE_X = SPRITE_SIZE_Y = 141
     SPRITE_SIZE_XY = (SPRITE_SIZE_X,SPRITE_SIZE_Y)
 
-    surfaceImg = pg.image.load("./images/tree_small.png").convert_alpha()
+    image = pg.image.load("./images/tree_small.png").convert_alpha()
 
-    def copyImg(dest_srf,dest_rect):
-        dest_srf.blit(Tree.surfaceImg,dest_rect)
+    def __init__(self,x,y,groups):
+        super().__init__(groups)
+
+        # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
+        # self.rect координаты привязанные к камере, они пересчитываются при скроллинге карты
+
+        self.map_rect = pg.Rect(
+            x-Tree.SPRITE_SIZE_X/2,
+            y-Tree.SPRITE_SIZE_Y/2,
+            Tree.SPRITE_SIZE_X,
+            Tree.SPRITE_SIZE_Y
+        )
+
+        self.rect = self.map_rect.copy()
+
+    def update_camera(self,camera_rect):
+        print(self.map_rect,camera_rect,self.rect)
+        self.rect.left = self.map_rect.left - camera_rect.left
+        self.rect.top = self.map_rect.top - camera_rect.top
+
+
+    # def copyImg(dest_srf,dest_rect):
+    #     dest_srf.blit(Tree.surfaceImg,dest_rect)
 
 
 class Oil(pg.sprite.Sprite):
