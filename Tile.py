@@ -47,7 +47,6 @@ class Tree(pg.sprite.Sprite):
         self.rect = self.map_rect.copy()
 
     def update_camera(self,camera_rect):
-        print(self.map_rect,camera_rect,self.rect)
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
 
@@ -61,8 +60,60 @@ class Oil(pg.sprite.Sprite):
     SPRITE_SIZE_Y = 95
     SPRITE_SIZE_XY = (SPRITE_SIZE_X,SPRITE_SIZE_Y)
 
-    surfaceImg = pg.image.load("./images/oil.png").convert_alpha()
+    image = pg.image.load("./images/oil.png").convert_alpha()
 
-    def copyImg(dest_srf,dest_rect):
-        dest_srf.blit(Oil.surfaceImg,dest_rect)
+    def __init__(self,x,y,groups):
+        super().__init__(groups)
 
+        # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
+        # self.rect координаты привязанные к камере, они пересчитываются при скроллинге карты
+
+        self.map_rect = pg.Rect(
+            x-Tree.SPRITE_SIZE_X/2,
+            y-Tree.SPRITE_SIZE_Y/2,
+            Tree.SPRITE_SIZE_X,
+            Tree.SPRITE_SIZE_Y
+        )
+
+        self.rect = self.map_rect.copy()
+
+    def update_camera(self,camera_rect):
+        self.rect.left = self.map_rect.left - camera_rect.left
+        self.rect.top = self.map_rect.top - camera_rect.top
+
+
+class Rock(pg.sprite.Sprite):
+    SPRITE_SIZE_X = 73
+    SPRITE_SIZE_Y = 68
+    SPRITE_SIZE_XY = (SPRITE_SIZE_X,SPRITE_SIZE_Y)
+
+    image = pg.image.load("./images/rock2.png").convert_alpha()
+
+    def __init__(self,x,y,groups):
+        super().__init__(groups)
+
+        # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
+        # self.rect координаты привязанные к камере, они пересчитываются при скроллинге карты
+
+        self.dy = 1
+
+        self.map_rect = pg.Rect(
+            x-Tree.SPRITE_SIZE_X/2,
+            y-Tree.SPRITE_SIZE_Y/2,
+            Tree.SPRITE_SIZE_X,
+            Tree.SPRITE_SIZE_Y
+        )
+
+        self.rect = self.map_rect.copy()
+
+    def update_camera(self,camera_rect):
+        self.rect.left = self.map_rect.left - camera_rect.left
+        self.rect.top = self.map_rect.top - camera_rect.top
+
+    def update(self):
+        if (self.map_rect.top > 600):
+            self.dy = -1
+        elif (self.map_rect.top < 50):
+            self.dy = 1
+
+        self.map_rect.top = self.map_rect.top + self.dy

@@ -30,9 +30,22 @@ class Car(pg.sprite.Sprite):
         arr_img_srf.insert(i,srf)
 
 
-    def __init__(self,params):
-        pg.sprite.Sprite.__init__(self)
-        self.setPos(params['centr_pos'])
+    def __init__(self,x,y,groups):
+        super().__init__(groups)
+
+        # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
+        # self.rect координаты привязанные к камере, они пересчитываются при скроллинге карты
+
+        self.map_rect = pg.Rect(
+            x-Car.SPRITE_SIZE_X/2,
+            y-Car.SPRITE_SIZE_Y/2,
+            Car.SPRITE_SIZE_X,
+            Car.SPRITE_SIZE_Y
+        )
+        self.rect = self.map_rect.copy()
+
+        #self.setPos(params['centr_pos'])
+
         self.image = Car.arr_img_srf[0]
         self.brezenhem = Brezenhem()
         self.is_moving = 0
@@ -46,13 +59,16 @@ class Car(pg.sprite.Sprite):
         #
         # self.rect = pg.rect(,())
 
-    def copyImg(dest_srf,dest_rect):
-        dest_srf.blit(Oil.arr_img_srf[self.color],dest_rect)
+    # def copyImg(dest_srf,dest_rect):
+    #     dest_srf.blit(Oil.arr_img_srf[self.color],dest_rect)
 
+    def update_camera(self,camera_rect):
+        self.rect.left = self.map_rect.left - camera_rect.left
+        self.rect.top = self.map_rect.top - camera_rect.top
 
-    def setPos(self,pos):
-        self.centr_pos = pos
-        self.rect = pg.Rect(offsetPoint(pos,(-(Car.SPRITE_SIZE_X/2),-(Car.SPRITE_SIZE_Y/2))), Car.SPRITE_SIZE_XY)
+    def setPos(self,newpos_pos):
+        self.map_rect.center = newpos_pos.topleft
+        #self.rect = pg.Rect(offsetPoint(pos,(-(Car.SPRITE_SIZE_X/2),-(Car.SPRITE_SIZE_Y/2))), Car.SPRITE_SIZE_XY)
 
 
     def update(self):
@@ -73,25 +89,21 @@ class Car(pg.sprite.Sprite):
                 self.setDirectionImage(self.real_direction)
 
         else:
-            #двигаемся 22
+            #двигаемся
             if (self.brezenhem.isEnded()):
                 self.is_moving = 0
-                return
+            else:
+                self.setPos(pg.Rect(self.brezenhem.nextPoint(),(0,0)))
 
-            self.setPos(self.brezenhem.nextPoint())
+    def setTarget(self, target_rect):
+        #задает цель для движения
 
-            if (self.brezenhem.isEnded()):
-                self.is_moving = 0
-
-
-    def setTarget(self, target_pos):
-
-        self.target_pos = target_pos
+        self.target_rect = target_rect
         self.is_moving = 1
 
         # координатат конца отрезка относитльно его начала
         #self.pathsection_vector = calcAbsToOffset(self.centr_pos,self.target_pos)
-        self.brezenhem.start(self.centr_pos,self.target_pos)
+        self.brezenhem.start(self.map_rect.center,self.target_rect)
 
         #определим желаемое направление движения
         self.need_direction = self.brezenhem.getSpriteDirection32()

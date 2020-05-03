@@ -36,9 +36,9 @@ class MapWnd(GuiWindow):
 
 
         #группы спрайтов
-        self.arr_sprites_update_camera = pg.sprite.Group()       # для взывова draw, карта отдельно копируемся
-        self.arr_sprites_for_draw = pg.sprite.Group()       # для взывова draw, карта отдельно копируемся
-        self.arr_sprites_for_update = pg.sprite.Group()     # то что двигаетсмя
+        self.arr_sprites_update_camera = pg.sprite.Group()  # для взывова draw, карта отдельно копируемся
+        self.arr_sprites_draw = pg.sprite.Group()           # для взывова draw, карта отдельно копируемся
+        self.arr_sprites_update = pg.sprite.Group()         # то что двигаетсмя
         self.arr_sprites_for_collide = pg.sprite.Group()    # прверяиьт на столкновения с автомобилем
 
 
@@ -62,79 +62,70 @@ class MapWnd(GuiWindow):
         self.arr_trees = []
 
         self.arr_trees.append(
-            Tree(200, 100, (self.arr_sprites_update_camera, self.arr_sprites_for_draw, self.arr_sprites_for_collide))
+            Tree(0, 0, (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_for_collide))
         )
 
         self.arr_trees.append(
-            Tree(840, 270, (self.arr_sprites_update_camera, self.arr_sprites_for_draw, self.arr_sprites_for_collide))
+            Tree(840, 270, (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_for_collide))
         )
 
         self.arr_trees.append(
-            Tree(2045, 614, (self.arr_sprites_update_camera, self.arr_sprites_for_draw, self.arr_sprites_for_collide))
+            Tree(2045, 614, (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_for_collide))
         )
 
-        # Tree.copyImg(
-        #     self.background_srf,
-        #     pg.Rect(200,100,0,0)        # размер rect значения не имеет
-        # )
-        #
-        # Tree.copyImg(
-        #     self.background_srf,
-        #     pg.Rect(843,243,0,0)        # размер rect значения не имеет
-        # )
-        #
-        # Tree.copyImg(
-        #     self.background_srf,
-        #     pg.Rect(2045,614,0,0)        # размер rect значения не имеет
-        # )
-        #
-        #
-        # Oil.copyImg(
-        #     self.background_srf,
-        #     pg.Rect(400, 400, 0, 0)  # размер rect значения не имеет
-        # )
+        self.arr_oils = []
+
+        self.arr_oils.append(
+            Oil(400, 400, (self.arr_sprites_update_camera, self.arr_sprites_draw))
+        )
+
+        self.arr_rocks = []
+        self.arr_rocks.append(
+            Rock(600, 400, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw))
+        )
+
+        self.arr_cars = []
+        self.arr_cars.append(
+            Car(350, 100, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw))
+        )
 
 
-
-
-        self.sg_cells = pg.sprite.Group()
-        self.arr_cells = [];
+        # self.sg_cells = pg.sprite.Group()
+        # self.arr_cells = [];
 
 
         ## 0
-        cell = Car({
-            'parent_obj': self,
-            'centr_pos': (300, 60),
-        })
-        self.sg_cells.add(cell)
-        self.arr_cells.append(cell)
+
+
+        # self.sg_cells.add(cell)
+        # self.arr_cells.append(cell)
 
 
         ## 1
 
-        cell = CellWeed({
-            'parent_obj': self,
-            'centr_pos': (300, 60),
-        })
-        self.sg_cells.add(cell)
-        self.arr_cells.append(cell)
-
-        ## 2
-        cell = CellWeed({
-            'parent_obj':self,
-            'centr_pos': (130,60),
-        })
-        self.sg_cells.add(cell)
-        self.arr_cells.append(cell)
-
-
-        ## 3
-        cell = CellOvalis({
-            'parent_obj':self,
-            'centr_pos': (200,60),
-        })
-        self.sg_cells.add(cell)
-        self.arr_cells.append(cell)
+        # cell = CellWeed({
+        #     'parent_obj': self,
+        #     'centr_pos': (300, 60),
+        # })
+        # self.sg_cells.add(cell)
+        # self.arr_cells.append(cell)
+        #
+        # ## 2
+        # cell = CellWeed({
+        #     'parent_obj':self,
+        #     'centr_pos': (130,60),
+        # })
+        # self.sg_cells.add(cell)
+        # self.arr_cells.append(cell)
+        #
+        #
+        # ## 3
+        # cell = CellOvalis({
+        #     'parent_obj':self,
+        #     'centr_pos': (200,60),
+        # })
+        # self.sg_cells.add(cell)
+        # self.arr_cells.append(cell)
 
 
         getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
@@ -144,7 +135,7 @@ class MapWnd(GuiWindow):
 
     def update(self):
         self.Camera.update()
-        self.sg_cells.update()
+        # self.sg_cells.update()
 
     def draw_this(self):
         #копируем карту тайлов
@@ -158,13 +149,14 @@ class MapWnd(GuiWindow):
             self.background_srf,    # копируем из карты
             pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
             camera_position_rect)   # из карты берем то что показывает камера
-        self.sg_cells.draw(self.surface)
+        # self.sg_cells.draw(self.surface)
 
         #пересчитываем координаты в спрайтах с учетом камеры
         for sprite in self.arr_sprites_update_camera:
             sprite.update_camera(camera_position_rect)
 
-        self.arr_sprites_for_draw.draw(self.surface)
+        self.arr_sprites_update.update()
+        self.arr_sprites_draw.draw(self.surface)
 
 
 
@@ -173,13 +165,24 @@ class MapWnd(GuiWindow):
             # нажата левая кнопка
 
             if (self.isPointInWindow(event.pos)):
-                #кнопка нажата в зоне кнопки карты
+                #кнопка нажата в зоне карты
 
 
                 #абсолютные координаты мыши -> в относительные в окне
-                point_pos = calcAbsToOffset(self.surface.get_abs_offset(),event.pos)
+                # event.pos - абсолютные кордингаты клика относительно онка приложения
+                # click_mapwnd_rect - координаты относительна окна mapwnd
+                click_mapwnd_rect = pg.Rect(
+                    calcAbsToOffset(self.surface.get_abs_offset(),event.pos),
+                    (0,0)
+                )
 
-                self.arr_cells[0].setTarget(point_pos)
+                # координаты окна показываемые камерой относительно карты
+                camera_position_rect = self.Camera.getPositionRect()
+
+                #координаты клика относительно карты
+                click_map_rect =  camera_position_rect.move(click_mapwnd_rect.topleft)
+
+                self.arr_cars[0].setTarget(click_map_rect)
 
 
     def handle_KEYDOWN(self,event):
