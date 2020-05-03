@@ -4,8 +4,8 @@ from config import *
 from fw.functions import *
 
 from fw.GuiWindow import GuiWindow
-from CellWeed import *
-from CellOvalis import *
+# from CellWeed import *
+# from CellOvalis import *
 from Tile import *
 from Car import *
 from Camera import *
@@ -31,15 +31,13 @@ class MapWnd(GuiWindow):
 
         self.background_srf = pg.Surface(MAP_SIZE_XY)
         self.Camera = Camera(MAIN_WND_WIDTH,MAIN_WND_HEIGHT,MAP_SIZE_X,MAP_SIZE_Y)
-        # self.slid_left = 0
-        # self.slid_right = 0
 
 
         #группы спрайтов
         self.arr_sprites_update_camera = pg.sprite.Group()  # для взывова draw, карта отдельно копируемся
         self.arr_sprites_draw = pg.sprite.Group()           # для взывова draw, карта отдельно копируемся
         self.arr_sprites_update = pg.sprite.Group()         # то что двигаетсмя
-        self.arr_sprites_for_collide = pg.sprite.Group()    # прверяиьт на столкновения с автомобилем
+        self.arr_sprites_collide = pg.sprite.Group()        # прверяиьт на столкновения с автомобилем
 
 
         #тайловая карта
@@ -57,20 +55,23 @@ class MapWnd(GuiWindow):
 
                 Tile.copyImg(self.background_srf, dest_rect, rand)
 
+
+
         #нарисуем деревья
 
         self.arr_trees = []
+        arr_groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_collide)
 
         self.arr_trees.append(
-            Tree(0, 0, (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_for_collide))
+            Tree(0, 0, arr_groups)
         )
 
         self.arr_trees.append(
-            Tree(840, 270, (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_for_collide))
+            Tree(200, 200, arr_groups)
         )
 
         self.arr_trees.append(
-            Tree(2045, 614, (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_for_collide))
+            Tree(2045, 614, arr_groups)
         )
 
         self.arr_oils = []
@@ -86,47 +87,8 @@ class MapWnd(GuiWindow):
 
         self.arr_cars = []
         self.arr_cars.append(
-            Car(350, 100, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw))
+            Car(400, 200, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw))
         )
-
-
-        # self.sg_cells = pg.sprite.Group()
-        # self.arr_cells = [];
-
-
-        ## 0
-
-
-        # self.sg_cells.add(cell)
-        # self.arr_cells.append(cell)
-
-
-        ## 1
-
-        # cell = CellWeed({
-        #     'parent_obj': self,
-        #     'centr_pos': (300, 60),
-        # })
-        # self.sg_cells.add(cell)
-        # self.arr_cells.append(cell)
-        #
-        # ## 2
-        # cell = CellWeed({
-        #     'parent_obj':self,
-        #     'centr_pos': (130,60),
-        # })
-        # self.sg_cells.add(cell)
-        # self.arr_cells.append(cell)
-        #
-        #
-        # ## 3
-        # cell = CellOvalis({
-        #     'parent_obj':self,
-        #     'centr_pos': (200,60),
-        # })
-        # self.sg_cells.add(cell)
-        # self.arr_cells.append(cell)
-
 
         getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
         getMainWnd().registerHandler_KEYDOWN(self)
@@ -135,11 +97,12 @@ class MapWnd(GuiWindow):
 
     def update(self):
         self.Camera.update()
-        # self.sg_cells.update()
+
+
 
     def draw_this(self):
         #копируем карту тайлов
-        #self.drawBackground()       #удалить DEBUG
+        #self.drawBackground()       #оригинальная родная заливка фона -
 
         #координаты окна показываемые камерой относительно карты
         camera_position_rect = self.Camera.getPositionRect()
@@ -149,7 +112,6 @@ class MapWnd(GuiWindow):
             self.background_srf,    # копируем из карты
             pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
             camera_position_rect)   # из карты берем то что показывает камера
-        # self.sg_cells.draw(self.surface)
 
         #пересчитываем координаты в спрайтах с учетом камеры
         for sprite in self.arr_sprites_update_camera:
@@ -157,6 +119,18 @@ class MapWnd(GuiWindow):
 
         self.arr_sprites_update.update()
         self.arr_sprites_draw.draw(self.surface)
+
+        sprite_lst = pg.sprite.spritecollide(
+            self.arr_cars[0],           #машину сталикиваем
+            self.arr_sprites_collide,    #
+            False,
+            pg.sprite.collide_mask
+        )
+
+
+        # if (sprite_lst):
+        #     sprite_lst[0].kill()
+        #     print("TOUCH !!")
 
 
 

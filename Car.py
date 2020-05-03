@@ -33,18 +33,20 @@ class Car(pg.sprite.Sprite):
     def __init__(self,x,y,groups):
         super().__init__(groups)
 
-        # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
-        # self.rect координаты привязанные к камере, они пересчитываются при скроллинге карты
+        # self.map_rectpos координаты центра спрайта привязанные к карте, они неизменны (для неподвижных спрайтов)
+        # self.map_rectpos здесь только объявлен, будет переопределен в setPos
+        self.map_rectpos = pg.Rect(0,0,0,0)
 
-        self.map_rect = pg.Rect(
-            x-Car.SPRITE_SIZE_X/2,
-            y-Car.SPRITE_SIZE_Y/2,
-            Car.SPRITE_SIZE_X,
-            Car.SPRITE_SIZE_Y
-        )
-        self.rect = self.map_rect.copy()
 
-        #self.setPos(params['centr_pos'])
+        # self.wnd_rectpos координаты привязанные к камере,
+        # пересчитываются при скроллинге карты
+        # имя self.rect это хардкод PYGAME, координата topleft спрайта относительно окна на карте при копировании
+        # используется в pygame.draw !!!
+        # self.wnd_rectpos здесь только объявлен, будет переопределен в setPos
+        # self.rect и self.wnd_rectpos это просто синониы
+        self.rect = self.wnd_rect = pg.Rect(0,0,Car.SPRITE_SIZE_X,Car.SPRITE_SIZE_Y)
+
+        self.setPos(pg.Rect(x,y,0,0))
 
         self.image = Car.arr_img_srf[0]
         self.brezenhem = Brezenhem()
@@ -54,21 +56,13 @@ class Car(pg.sprite.Sprite):
         self.rotate_direction = 0   #направление вращения 0 против часовой стрелки
         self.need_direction = 0 #куда крутимся
 
-        # params["cent_pos"][0] -
-        # params["cent_pos"][1]
-        #
-        # self.rect = pg.rect(,())
-
-    # def copyImg(dest_srf,dest_rect):
-    #     dest_srf.blit(Oil.arr_img_srf[self.color],dest_rect)
 
     def update_camera(self,camera_rect):
-        self.rect.left = self.map_rect.left - camera_rect.left
-        self.rect.top = self.map_rect.top - camera_rect.top
+        self.wnd_rect.center = (self.map_rectpos.left - camera_rect.left,self.map_rectpos.top - camera_rect.top)
 
-    def setPos(self,newpos_pos):
-        self.map_rect.center = newpos_pos.topleft
-        #self.rect = pg.Rect(offsetPoint(pos,(-(Car.SPRITE_SIZE_X/2),-(Car.SPRITE_SIZE_Y/2))), Car.SPRITE_SIZE_XY)
+
+    def setPos(self,new_rectpos):
+        self.map_rectpos = new_rectpos
 
 
     def update(self):
@@ -95,6 +89,7 @@ class Car(pg.sprite.Sprite):
             else:
                 self.setPos(pg.Rect(self.brezenhem.nextPoint(),(0,0)))
 
+
     def setTarget(self, target_rect):
         #задает цель для движения
 
@@ -102,8 +97,7 @@ class Car(pg.sprite.Sprite):
         self.is_moving = 1
 
         # координатат конца отрезка относитльно его начала
-        #self.pathsection_vector = calcAbsToOffset(self.centr_pos,self.target_pos)
-        self.brezenhem.start(self.map_rect.center,self.target_rect)
+        self.brezenhem.start(self.map_rectpos.center,self.target_rect.topleft)
 
         #определим желаемое направление движения
         self.need_direction = self.brezenhem.getSpriteDirection32()
@@ -121,10 +115,9 @@ class Car(pg.sprite.Sprite):
                 else:
                     self.rotate_direction = 1
 
-
-
         self.real_speed = 0
         self.rotate_msector_s = 0          #1000
+
 
     def setDirectionImage(self,direction):
         self.image = Car.arr_img_srf[direction]

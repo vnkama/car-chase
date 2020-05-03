@@ -15,8 +15,6 @@ class GameObject:
             #есть родительское
             self.surface = self.parent_obj.getSurface().subsurface(params['rect'])
 
-            #регистрируемся в списке родителя
-            #self.parent_obj.addChildWindow(self)
 
         else:
             # нет родительсокго окна (например, это галвное окно приложения)
@@ -29,9 +27,6 @@ class GameObject:
     def createChild(self,new_child):
         self.child_objects.append(new_child)
 
-    # def addChildWindow(self,new_window):
-    #     self.child_objects.append(new_window)
-
 
     def draw(self):
         self.draw_this()   #-метод пустой, но его переопределим в классах наследниках
@@ -40,12 +35,12 @@ class GameObject:
         for wnd in self.child_objects:
             wnd.draw()
 
+
     def draw_this(self):
         pass
 
 
     def update(self):
-        #if len(self.child_objects):
 
         for child_object in self.child_objects:
             child_object.update()
