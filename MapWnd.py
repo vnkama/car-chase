@@ -90,6 +90,17 @@ class MapWnd(GuiWindow):
             Car(400, 200, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw))
         )
 
+
+        arr_road_point = [[]*3]
+
+        self.arr_road_point = [
+            (0,   200),
+            (100, 100),
+            (200, 200),
+            (300, 300),
+            (350, 400),
+        ]
+
         getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
         getMainWnd().registerHandler_KEYDOWN(self)
         getMainWnd().registerHandler_KEYUP(self)
@@ -118,7 +129,6 @@ class MapWnd(GuiWindow):
             sprite.update_camera(camera_position_rect)
 
         self.arr_sprites_update.update()
-        self.arr_sprites_draw.draw(self.surface)
 
         sprite_lst = pg.sprite.spritecollide(
             self.arr_cars[0],           #машину сталикиваем
@@ -127,11 +137,25 @@ class MapWnd(GuiWindow):
             pg.sprite.collide_mask
         )
 
+        prev = None
+        for point in self.arr_road_point:
+            if (prev != None ):
+                pg.draw.line(
+                    self.surface,
+                    (200,0,0),
+                    prev,
+                    point,
+                    1
+                )
+
+            prev = point
+
 
         # if (sprite_lst):
         #     sprite_lst[0].kill()
         #     print("TOUCH !!")
 
+        self.arr_sprites_draw.draw(self.surface)
 
 
     def handle_MOUSEBUTTONDOWN(self,event):
