@@ -5,8 +5,6 @@ from fw.functions import *
 from Vector import *
 
 from fw.GuiWindow import GuiWindow
-# from CellWeed import *
-# from CellOvalis import *
 from Tile import *
 from Car import *
 from Camera import *
@@ -64,16 +62,21 @@ class MapWnd(GuiWindow):
         arr_groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_collide)
 
         self.arr_trees.append(
-            Tree(0, 0, arr_groups)
+            Tree(100, 100, arr_groups)
         )
 
         self.arr_trees.append(
-            Tree(700, 200, arr_groups)
+            Tree(500, 600, arr_groups)
         )
 
         self.arr_trees.append(
-            Tree(2045, 614, arr_groups)
+            Tree(1000, 150, arr_groups)
         )
+
+        self.arr_trees.append(
+            Tree(1500, 180, arr_groups)
+        )
+
 
         self.arr_oils = []
 
@@ -117,36 +120,44 @@ class MapWnd(GuiWindow):
 
         self.arr_roadsections_axial_points =  np.array(
             [
-                [0, 200],
-                [100, 100],
-                [150, 100],
-                [200, 200],
+                [0, 300],
                 [300, 300],
-                [350, 400],
+                [350, 280],
+                [400, 200],
+                [500, 130],
+                [600, 100],
+                [700, 100],
 
-                [450, 430],
-                [550, 430],
-                [650, 420],
-                [680, 360],
-                [690, 260],
+                [800, 130],
+                [900, 200],
+                [1000, 300],
+
+                [1100, 320],
+                [1200, 420],
+                [1300, 490],
+                [1400, 520],
+                [1500, 520],
+                [1600, 480],
+
+                [1800, 260],
             ],
             int
         )
 
         arr_roadsections_width =  np.array(
             [
-                100,
-                100,
-                100,
-                100,
-                100,
-                100,
+                150,
+                150,
+                150,
+                150,
+                150,
+                150,
 
-                100,
-                100,
-                140,
-                140,
-                140,
+                150,
+                150,
+                150,
+                150,
+                150,
             ],
             int
         )
@@ -196,8 +207,10 @@ class MapWnd(GuiWindow):
 
             #коеффициент масштабирования
             #ширина дороги в начале и конце секции разная
-            k_width_begin = arr_roadsections_width[i] / (2 * np_vector2_len(roadsectin_axis_vector))
-            k_width_end = arr_roadsections_width[i+1] / (2 * np_vector2_len(roadsectin_axis_vector))
+            # k_width_begin = arr_roadsections_width[i] / (2 * np_vector2_len(roadsectin_axis_vector))
+            # k_width_end = arr_roadsections_width[i+1] / (2 * np_vector2_len(roadsectin_axis_vector))
+            k_width_begin = 150 / (2 * np_vector2_len(roadsectin_axis_vector))
+            k_width_end = 150 / (2 * np_vector2_len(roadsectin_axis_vector))
 
             #матрица масштабирования начала и конца секции
             matrix_scaling_begin = np_d2_getScaleMatrix(k_width_begin)
@@ -232,10 +245,6 @@ class MapWnd(GuiWindow):
             # b = Ny, берем из нормального вектора
             # c = -(a x1  + b y1)       x1 y1 - любая точка через которую проходит прямая
 
-            # print(i,arr_N_left[i])
-            # a = arr_N_left[i][0]
-            # arr_A_left[i]=a
-
             arr_A_left[i] = N_left[0]
             arr_B_left[i] = N_left[1]
             arr_C_left[i] = -(arr_A_left[i] * arr_P[i][0][0] +  arr_B_left[i] * arr_P[i][0][1])
@@ -244,7 +253,7 @@ class MapWnd(GuiWindow):
             arr_B_right[i] = N_right[1]
             arr_C_right[i] = -(arr_A_right[i] * arr_P[i][3][0] +  arr_B_right[i] * arr_P[i][3][1])
 
-        self.arr_roadsections_corners = arr_P
+
 
         #просчитаем все реальные углы
         #в последней секции не просчитываем
@@ -265,7 +274,6 @@ class MapWnd(GuiWindow):
                 self.arr_roadsections_corners[road_len - 2][1] = arr_P[road_len - 2][1]
                 self.arr_roadsections_corners[road_len - 2][2] = arr_P[road_len - 2][2]
             else:
-                #pass
                 #считаем реальные 1й 2й углы секции
                 # self.arr_roadsections_corners[i][1] = arr_P[i][1]
                 # self.arr_roadsections_corners[i][2] = arr_P[i][2]
