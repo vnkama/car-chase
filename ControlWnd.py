@@ -4,6 +4,8 @@ from config import *
 
 from fw.GuiWindow import GuiWindow
 from fw.GuiButton import GuiButton
+from fw.GuiLabel import GuiLabel
+
 
 #
 # окно с органами управления игрой (форма)
@@ -15,13 +17,14 @@ class ControlWnd(GuiWindow):
         params['rect'] = CONTROL_WND_RECT
         params['bg_color'] = CONTROL_WND_BACKGROUND
         params['name'] = 'ControlWnd'
+
         super().__init__(params)        # parent - GuiWindow
 
         self.createChild(GuiButton({
             'name': 'button-start',
-            'text': 'Start',
+            'text': 'quit',
             'parent_obj':self,
-            'rect': pg.Rect(70,430,120,32),
+            'rect': pg.Rect(20,430,120,32),
             'bg_color': CONTROL_WND_BACKGROUND,
             'bg_hover_color': THEME_BACKGROUND_HOVER_COLOR,
             'border_color': THEME_BORDER_COLOR_HIGH,
@@ -29,12 +32,56 @@ class ControlWnd(GuiWindow):
             'font': 'arial_20',
         }))
 
+        ############################################
+        #
+        self.createChild(GuiLabel({
+            'parent_obj':self,
+            'rect': pg.Rect(0,100,100,32),
+            'text': 'Angle:',
+            'font': 'arial_20',
+        }))
+
+
+        #
+        self.lbl_speed = GuiLabel({
+            'parent_obj': self,
+            'rect': pg.Rect(80, 100, 100, 32),
+            'text': '0',
+            'font': 'arial_20',
+        })
+        self.createChild(self.lbl_speed)
+
+        ############################################
+        #
+        self.createChild(GuiLabel({
+            'parent_obj':self,
+            'rect': pg.Rect(0,140,100,32),
+            'text': 'ticks:',
+            'font': 'arial_20',
+        }))
+
+
+        #
+        self.lbl_ticks = GuiLabel({
+            'parent_obj': self,
+            'rect': pg.Rect(80, 140, 100, 32),
+            'text': '0',
+            'font': 'arial_20',
+        })
+        self.createChild(self.lbl_ticks)
+
+
 
     def update(self):
         pass
 
 
+    def sendMessage(self,code,param1,param2=0):
+        if (code == "WM_SET_SPEED"):
+            self.lbl_speed.setText(param1)
 
+        elif (code == "WM_SET_TICKS"):
+            self.lbl_ticks.setText(param1)
 
 
 

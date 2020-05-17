@@ -117,3 +117,52 @@ class Rock(pg.sprite.Sprite):
             self.dy = 1
 
         self.map_rect.top = self.map_rect.top + self.dy
+
+
+
+#
+#
+#
+class RoadBorder(pg.sprite.Sprite):
+
+    def __init__(self,p0_xy,p1_xy,groups):
+        super().__init__(groups)
+
+        #левый верхний угол спрайта, относительно карты
+        pos_xy = (
+            min(p0_xy[0],p1_xy[0]),
+            min(p0_xy[1],p1_xy[1])
+        )
+
+        #размер спрайта
+        size_xy = (
+            int(abs(p0_xy[0]-p1_xy[0]) + 1),
+            int(abs(p0_xy[1]-p1_xy[1]) + 1)
+        )
+        self.map_rect = pg.Rect(pos_xy,size_xy)
+        self.rect = self.map_rect.copy()
+
+
+        self.image = pg.Surface(size_xy)
+        self.image.set_alpha(0)   #0- прозрачный
+
+        COLORKEY = (255,255,255)
+        self.image.fill(COLORKEY)
+        self.image.set_colorkey(COLORKEY)
+
+        color = (200, 55, 25)
+
+        #рисуем линию - границу дороги sss
+        if (
+            ((p0_xy[0] <= p1_xy[0]) and (p0_xy[1] <= p1_xy[1])) or
+            ((p1_xy[0] <= p0_xy[0]) and (p1_xy[1] <= p0_xy[1]))
+        ):
+            pg.draw.line(self.image, color, (0, 0), (self.rect.size[0] - 1, self.rect.size[1] - 1), 1)
+
+        else:
+            pg.draw.line(self.image, color, (0,self.rect.size[1] - 1), (self.rect.size[0] - 1,0), 1)
+
+
+    def update_camera(self,camera_rect):
+        self.rect.left = self.map_rect.left - camera_rect.left
+        self.rect.top = self.map_rect.top - camera_rect.top

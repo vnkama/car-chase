@@ -92,7 +92,7 @@ def np_d2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
     #ищет точку пересечения двух прямых
     # a1, b1, c1 -уравнение прямой в общем виде
 
-    print(a1,b1,c1,a2,b2,c2)
+    #print(a1,b1,c1,a2,b2,c2)
 
     matrix_D = np.array([
         [a1, b1],
@@ -112,8 +112,7 @@ def np_d2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
     D = np_detD2(matrix_D)
     Dx = np_detD2(matrix_Dx)
     Dy = np_detD2(matrix_Dy)
-    print(D,Dx,Dy)
-
+    
     return [Dx / D, Dy / D ,1]
 
 

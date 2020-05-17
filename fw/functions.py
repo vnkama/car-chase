@@ -31,6 +31,11 @@ def calcAbsToOffset(base_point_xy,point_xy):
     # получим координатфы точки относилььно опорной
     return (point_xy[0] - base_point_xy[0],point_xy[1] - base_point_xy[1])
 
+def calcPointMinusPoint(p1_xy,p2_xy):
+    return (p1_xy[0] - p2_xy[0],p1_xy[1] - p2_xy[1])
+
+
+
 
 def offsetPoint(point_xy,offset_xy):
     return (point_xy[0]+offset_xy[0],point_xy[1]+offset_xy[1])

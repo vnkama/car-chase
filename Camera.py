@@ -3,6 +3,9 @@ import pygame as pg
 # from config import *
 # from functions import *
 
+#
+#
+#
 class Camera:
     def __init__(self, size_w, size_h,map_size_w,map_size_h):
         self.position = pg.Rect(0, 0, size_w, size_h)

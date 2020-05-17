@@ -13,7 +13,12 @@ class Game(GuiWindow):
 
     pg.init()
     pg.display.set_caption(MAIN_WND_TITLE)
-    main_srf = pg.display.set_mode((MAIN_WND_WIDTH, MAIN_WND_HEIGHT))
+    #main_srf = pg.display.set_mode((MAIN_WND_WIDTH, MAIN_WND_HEIGHT))
+
+    main_srf = pg.display.set_mode(
+        (1600, 900),
+        pg.FULLSCREEN
+    )
 
     def __init__(self):
         (w,h) = Game.main_srf.get_size()
@@ -102,8 +107,9 @@ class Game(GuiWindow):
 
 
 
-    #def update(self):
-        #цикл по всем графическим объектам
+    # def update(self):
+    #     pass
+
 
 
     def draw(self):

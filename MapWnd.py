@@ -25,18 +25,20 @@ class MapWnd(GuiWindow):
         params['bg_color'] = MAP_WND_BACKGROUND
         params['name'] = 'MapWnd'
 
-
         super().__init__(params)        # parent - GuiWindow
+
+        self.control_wnd = params['control_wnd']    #для вывода ссобщений
 
         self.background_srf = pg.Surface(MAP_SIZE_XY)
         self.Camera = Camera(MAIN_WND_WIDTH,MAIN_WND_HEIGHT,MAP_SIZE_X,MAP_SIZE_Y)
 
 
         #группы спрайтов
-        self.arr_sprites_update_camera = pg.sprite.Group()  # для взывова draw, карта отдельно копируемся
+        self.arr_sprites_update_camera = pg.sprite.Group()
         self.arr_sprites_draw = pg.sprite.Group()           # для взывова draw, карта отдельно копируемся
         self.arr_sprites_update = pg.sprite.Group()         # то что двигаетсмя
         self.arr_sprites_collide = pg.sprite.Group()        # прверяиьт на столкновения с автомобилем
+        self.arr_sprites_road = pg.sprite.Group()
 
 
         #тайловая карта
@@ -91,24 +93,12 @@ class MapWnd(GuiWindow):
 
         self.arr_cars = []
         self.arr_cars.append(
-            Car(400, 200, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw))
+            Car(400, 200, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw),self.control_wnd)
         )
-
 
         #формирует дорогу
         self.init_road()
 
-        for section in self.arr_roadsections_corners:
-
-            polygon_points = []
-            for point in section:
-                polygon_points.append((int(point[0]),int(point[1])))
-
-            pg.draw.polygon(
-                    self.background_srf,
-                    (20, 20, 220),
-                    polygon_points
-                )
 
         getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
         getMainWnd().registerHandler_KEYDOWN(self)
@@ -127,18 +117,15 @@ class MapWnd(GuiWindow):
                 [500, 130],
                 [600, 100],
                 [700, 100],
-
                 [800, 130],
                 [900, 200],
                 [1000, 300],
-
                 [1100, 320],
                 [1200, 420],
                 [1300, 490],
                 [1400, 520],
                 [1500, 520],
                 [1600, 480],
-
                 [1800, 260],
             ],
             int
@@ -151,11 +138,19 @@ class MapWnd(GuiWindow):
                 150,
                 150,
                 150,
+
+                150,
+                150,
+                150,
+                150,
                 150,
 
                 150,
                 150,
                 150,
+                150,
+                150,
+
                 150,
                 150,
             ],
@@ -258,8 +253,7 @@ class MapWnd(GuiWindow):
         #просчитаем все реальные углы
         #в последней секции не просчитываем
         for i in range(road_len - 1):
-        #     #print(self.arr_roadsections_corners)
-        #
+
             if (i == 0):
                 # в 0й сейкции, реальные 0й и 3й углы совпадают с прямоугольными, тк. "минус первой" секции не сущесвует
                 self.arr_roadsections_corners[i][0] = arr_P[i][0]
@@ -273,25 +267,61 @@ class MapWnd(GuiWindow):
                 # в последней сейкции, реальные 1й и 2й углы совпадают с прямоугольными, тк. "после последней " секции не сущесвует
                 self.arr_roadsections_corners[road_len - 2][1] = arr_P[road_len - 2][1]
                 self.arr_roadsections_corners[road_len - 2][2] = arr_P[road_len - 2][2]
+
             else:
                 #считаем реальные 1й 2й углы секции
-                # self.arr_roadsections_corners[i][1] = arr_P[i][1]
-                # self.arr_roadsections_corners[i][2] = arr_P[i][2]
                 # continue
                 # 1й угол
 
-                 self.arr_roadsections_corners[i][1] = np_d2_getLinesIntersectPoint(
-                     arr_A_left[i], arr_B_left[i], arr_C_left[i],
-                     arr_A_left[i+1], arr_B_left[i+1], arr_C_left[i+1]
-                 )
+                self.arr_roadsections_corners[i][1] = np_d2_getLinesIntersectPoint(
+                    arr_A_left[i], arr_B_left[i], arr_C_left[i],
+                    arr_A_left[i+1], arr_B_left[i+1], arr_C_left[i+1]
+                )
 
-                 self.arr_roadsections_corners[i][2] = np_d2_getLinesIntersectPoint(
-                     arr_A_right[i], arr_B_right[i], arr_C_right[i],arr_A_right[i+1], arr_B_right[i+1], arr_C_right[i+1]
-                 )
+                self.arr_roadsections_corners[i][2] = np_d2_getLinesIntersectPoint(
+                    arr_A_right[i], arr_B_right[i], arr_C_right[i],
+                    arr_A_right[i+1], arr_B_right[i+1], arr_C_right[i+1]
+                )
 
-        print(self.arr_roadsections_corners)
 
 
+        self.arr_road_sprites = []
+
+        #рисуем полигоны на дороге
+        for arr_roadsection in self.arr_roadsections_corners:
+
+            polygon_corners = []
+
+            for corner_xy in arr_roadsection:
+                polygon_corners.append((int(corner_xy[0]),int(corner_xy[1])))
+
+            pg.draw.polygon(
+                    self.background_srf,
+                    (20, 20, 220),
+                    polygon_corners
+                )
+
+            groups = (self.arr_sprites_update_camera, self.arr_sprites_draw,self.arr_sprites_road)
+
+            #ставим спрайт на левую сторону дороги
+            self.arr_road_sprites.append(
+                RoadBorder(
+                    arr_roadsection[0],
+                    arr_roadsection[1],
+                    groups
+                )
+            )
+
+            #ставим спрайт на правую сторону дороги
+            self.arr_road_sprites.append(
+                RoadBorder(
+                    arr_roadsection[2],
+                    arr_roadsection[3],
+                    groups
+                )
+            )
+
+            #генерируем спрайт abs
 
 
 
@@ -329,69 +359,26 @@ class MapWnd(GuiWindow):
             pg.sprite.collide_mask
         )
 
-        # prev_pos = None
-        # for i,point_desc in enumerate(self.arr_roadsections_axial_points):
-        #     cur_pos = point_desc
-        #
-        #     if (i != 0 ):
-        #         pg.draw.line(
-        #             self.surface,
-        #             (180,80,80),             #цивет
-        #             prev_pos,
-        #             cur_pos,
-        #             2
-        #         )
-        #     prev_pos = cur_pos
-        #
-        # for roadsection_corners in self.arr_roadsection_corners:
-        #
-        #     points = (
-        #         (int(roadsection_corners[0][0]),int(roadsection_corners[0][1])),
-        #         (int(roadsection_corners[1][0]),int(roadsection_corners[1][1])),
-        #         (int(roadsection_corners[2][0]),int(roadsection_corners[2][1])),
-        #         (int(roadsection_corners[3][0]),int(roadsection_corners[3][1])),
-        #     )
-        #
-        #
-        #     pg.draw.polygon(
-        #         self.surface,
-        #         (20, 20, 220),
-        #         points
-        #     )
-        #
-        #     for corner in range(4):
-        #         pg.draw.circle(
-        #             self.surface,
-        #             (80, 80, 180),
-        #             (int(roadsection_corners[corner][0]),int(roadsection_corners[corner][1])),
-        #             2
-        #         )
+        if (sprite_lst):
+            sprite_lst[0].kill()
+            print("TOUCH !!")
 
-
-
-
-
-        # prev = None
-        # for point_desc in self.arr_road_centrum_line:
-        #     pos = point_desc[0]
-        #     if (prev != None ):
-        #         pg.draw.line(
-        #             self.surface,
-        #             (80,80,80),             #цивет
-        #             (prev[0],prev[1]),
-        #             (pos[0],pos[1]),
-        #             1
-        #         )
-        #     prev = point
-
-
-
-
-        # if (sprite_lst):
-        #     sprite_lst[0].kill()
-        #     print("TOUCH !!")
 
         self.arr_sprites_draw.draw(self.surface)
+
+        #столкновение машины с краем дороги
+        sprite_lst = pg.sprite.spritecollide(
+            self.arr_cars[0],           #машину сталикиваем
+            self.arr_sprites_road,      #с краями дороги
+            False,
+            pg.sprite.collide_mask
+        )
+
+        if (sprite_lst):
+            self.arr_oils[0].kill()
+            #print("ROAD !!")
+
+
 
 
     def handle_MOUSEBUTTONDOWN(self,event):
@@ -422,8 +409,6 @@ class MapWnd(GuiWindow):
     def handle_KEYDOWN(self,event):
         if (event.key == pg.K_LEFT):
             self.Camera.moveLeft()
-
-
 
         elif (event.key == pg.K_RIGHT):
             self.Camera.moveRight()

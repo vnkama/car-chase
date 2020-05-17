@@ -4,12 +4,15 @@ from fw.functions import *
 
 from Brezenhem import Brezenhem
 
+#
+#
+#
 class Car(pg.sprite.Sprite):
     CAR_RED=2
     CAR_GREEN=1
 
-    SPRITE_SIZE_X = 150
-    SPRITE_SIZE_Y = 150
+    SPRITE_SIZE_X = 80
+    SPRITE_SIZE_Y = 80
     SPRITE_SIZE_XY = (SPRITE_SIZE_X,SPRITE_SIZE_Y)
 
     arr_img_srf = []
@@ -30,7 +33,7 @@ class Car(pg.sprite.Sprite):
         arr_img_srf.insert(i,srf)
 
 
-    def __init__(self,x,y,groups):
+    def __init__(self,x,y,groups,message):
         super().__init__(groups)
 
         # self.map_rectpos координаты центра спрайта привязанные к карте, они неизменны (для неподвижных спрайтов)
@@ -56,6 +59,8 @@ class Car(pg.sprite.Sprite):
         self.rotate_direction = 0   #направление вращения 0 против часовой стрелки
         self.need_direction = 0 #куда крутимся
 
+        self.message = message
+
 
     def update_camera(self,camera_rect):
         self.wnd_rect.center = (self.map_rectpos.left - camera_rect.left,self.map_rectpos.top - camera_rect.top)
@@ -75,7 +80,7 @@ class Car(pg.sprite.Sprite):
                 #повернулись на 1 румб
                 self.rotate_msector_s %= 1000   #копейки оставим на следющий румб
 
-                self.real_direction = (self.real_direction + self.rotate_direction) #поворачиваем на 1 румб
+                self.real_direction = self.real_direction + self.rotate_direction #поворачиваем на 1 румб
                 self.real_direction = self.real_direction if (self.real_direction <= 31) else 0
                 self.real_direction = self.real_direction if (self.real_direction >= 0) else 31
 
@@ -88,6 +93,8 @@ class Car(pg.sprite.Sprite):
                 self.is_moving = 0
             else:
                 self.setPos(pg.Rect(self.brezenhem.nextPoint(),(0,0)))
+
+        self.message.sendMessage("WM_SET_SPEED",self.real_direction)
 
 
     def setTarget(self, target_rect):

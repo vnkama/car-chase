@@ -65,3 +65,9 @@ class GuiWindow(GameObject):
         #
 
         return pg.Rect(self.surface.get_abs_offset(),self.surface.get_size()).collidepoint(point)
+
+    #
+    #
+    #
+    def setText(self,new_text):
+        self.text = new_text
