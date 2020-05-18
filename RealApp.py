@@ -19,13 +19,18 @@ class RealApp(Game):
 
         self.control_wnd = ControlWnd({'parent_obj':self})
         self.createChild(self.control_wnd)
-        self.createChild(MapWnd({
+
+        self.map_wnd = MapWnd({
             'parent_obj':self,
             'control_wnd':self.control_wnd
-        }))
+        })
+        self.createChild(self.map_wnd)
 
 
     def update(self):
         super().update()
-        t = self.main_timer.get_time()
-        self.control_wnd.sendMessage("WM_SET_TICKS",t)
+
+        dt = self.main_timer.get_time()
+        self.control_wnd.sendMessage("WM_SET_TICKS",dt)
+        self.map_wnd.dt = dt
+

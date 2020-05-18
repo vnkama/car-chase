@@ -3,9 +3,17 @@ import math
 def HRGB(hex):    #hex_rgb
     return [(hex & 0xFF0000) >> 16, (hex & 0xFF00) >> 8 ,hex & 0xFF]
 
+def grad2rad(grad):
+    return grad * 0.0174532922
+
+def rad2grad(grad):
+    return grad * 57.29578049
+
+
 
 g_arr_fonts = {}
 g_main_game = None
+g_conrol_wnd = None
 
 def setFonts(arr_fonts):
     global g_arr_fonts
@@ -15,6 +23,7 @@ def getFont(name):
     global g_arr_fonts
     return g_arr_fonts.get(name.lower(), g_arr_fonts['tahoma_20'])
 
+########################################
 def getMainWnd():
     global g_main_game
     return g_main_game
@@ -22,6 +31,16 @@ def getMainWnd():
 def setMainWnd(main_wnd):
     global g_main_game
     g_main_game = main_wnd
+
+########################################
+def getControlWnd():
+    global g_conrol_wnd
+    return g_conrol_wnd
+
+def setControlWnd(conrol_wnd):
+    global g_conrol_wnd
+    g_conrol_wnd = conrol_wnd
+
 
 
 

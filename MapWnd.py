@@ -30,7 +30,8 @@ class MapWnd(GuiWindow):
         self.control_wnd = params['control_wnd']    #для вывода ссобщений
 
         self.background_srf = pg.Surface(MAP_SIZE_XY)
-        self.Camera = Camera(MAIN_WND_WIDTH,MAIN_WND_HEIGHT,MAP_SIZE_X,MAP_SIZE_Y)
+        self.Camera = Camera(MAP_WND_RECT.width,MAP_WND_RECT.height,MAP_SIZE_X,MAP_SIZE_Y)
+        self.dt = 0
 
 
         #группы спрайтов
@@ -61,39 +62,41 @@ class MapWnd(GuiWindow):
         #нарисуем деревья
 
         self.arr_trees = []
-        arr_groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_collide)
+        groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_collide)
 
         self.arr_trees.append(
-            Tree(100, 100, arr_groups)
+            Tree(100, 100, groups)
         )
 
         self.arr_trees.append(
-            Tree(500, 600, arr_groups)
+            Tree(500, 600, groups)
         )
 
         self.arr_trees.append(
-            Tree(1000, 150, arr_groups)
+            Tree(1000, 150, groups)
         )
 
         self.arr_trees.append(
-            Tree(1500, 180, arr_groups)
+            Tree(1500, 180, groups)
         )
 
 
         self.arr_oils = []
-
+        groups = (self.arr_sprites_update_camera, self.arr_sprites_draw)
         self.arr_oils.append(
-            Oil(400, 400, (self.arr_sprites_update_camera, self.arr_sprites_draw))
+            Oil(400, 400, groups)
         )
 
         self.arr_rocks = []
+        groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_rocks.append(
-            Rock(600, 400, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw))
+            Rock(600, 400, groups)
         )
 
         self.arr_cars = []
+        groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(400, 200, (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw),self.control_wnd)
+            Car(self,400, 200, groups, self.control_wnd)
         )
 
         #формирует дорогу
@@ -166,7 +169,7 @@ class MapWnd(GuiWindow):
         #индексы 0..road_len
         arr_roadsections_axial_turn_coords = np.zeros((road_len,3),int)
         for i in range(road_len): #
-            arr_roadsections_axial_turn_coords[i] = np_d2_getMatrix(self.arr_roadsections_axial_points[i])
+            arr_roadsections_axial_turn_coords[i] = nd2_getMatrix(self.arr_roadsections_axial_points[i])
 
 
         #секция дороги в прмяоугольном виде. 4 угла
@@ -329,7 +332,7 @@ class MapWnd(GuiWindow):
 
 
     def update(self):
-        self.Camera.update()
+        self.Camera.update(self.arr_cars[0].map_rectpos)
 
 
 
@@ -406,18 +409,31 @@ class MapWnd(GuiWindow):
                 self.arr_cars[0].setTarget(click_map_rect)
 
 
+
     def handle_KEYDOWN(self,event):
         if (event.key == pg.K_LEFT):
-            self.Camera.moveLeft()
+            self.arr_cars[0].setSpeering(-1)
 
         elif (event.key == pg.K_RIGHT):
-            self.Camera.moveRight()
+            self.arr_cars[0].setSpeering(1)
+
+        elif (event.key == pg.K_UP):
+            self.arr_cars[0].setAcceleration(1)
+
+        elif (event.key == pg.K_DOWN):
+            self.arr_cars[0].setBreaking(1)
 
 
 
     def handle_KEYUP(self,event):
         if (event.key == pg.K_LEFT):
-            self.Camera.moveStop()
+            self.arr_cars[0].setSpeering(0)
 
         elif (event.key == pg.K_RIGHT):
-            self.Camera.moveStop()
+            self.arr_cars[0].setSpeering(0)
+
+        elif (event.key == pg.K_UP):
+            self.arr_cars[0].setAcceleration(0)
+
+        elif (event.key == pg.K_DOWN):
+            self.arr_cars[0].setBreaking(0)

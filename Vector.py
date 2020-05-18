@@ -37,7 +37,9 @@ def vector2_calcAngle(a,b):
 
 ###########################################
 
-def np_d2_getMatrix(pos,w=0):
+#w=1 координата
+#w=0 направление
+def nd2_getMatrix(pos,w=0):
     return np.array(
         [
             pos[0],
@@ -56,6 +58,19 @@ def np_d2_getScaleMatrix(k):
             [0, 0, 1],
         ],
         float)
+
+#матрица поворот
+def nd2_getRotateMatrix(alfa_rad):
+    cos_alfa = math.cos(alfa_rad)
+    sin_alfa = math.sin(alfa_rad)
+    return np.array(
+        [
+            [cos_alfa,     -sin_alfa,     0],
+            [sin_alfa,     cos_alfa,      0],
+            [0,     0,      1],
+        ],
+        float)
+
 
 
 #поворотная матрица поворот на 90 по часовой стрелки (ось Y на экране вниз)
