@@ -1,23 +1,24 @@
 import math
 import numpy as np
+from fw.functions import *
 
-class Vector2d:
-    def __init__(self, x=0, y=0):
-        self.x, self.y = x, y
-
-
-    def summ_v(self,vector_b):
-        pass
-
-    def scalar_mult(self,vector_b):
-        pass
-
-    #угол между векторами
-    def angle(self,vb):
-        retrun (self.x * vb.x + self.y * vb.y) / (sqrt(self.x ** 2 + self.y ** 2) * sqrt(vb.x ** 2 + vb.y ** 2))
-
-    def len(self):
-        return sqrt(self.x ** 2 + self.y ** 2)
+# class Vector2d:
+#     def __init__(self, x=0, y=0):
+#         self.x, self.y = x, y
+#
+#
+#     def summ_v(self,vector_b):
+#         pass
+#
+#     def scalar_mult(self,vector_b):
+#         pass
+#
+#     #угол между векторами
+#     def angle(self,vb):
+#         retrun (self.x * vb.x + self.y * vb.y) / (sqrt(self.x ** 2 + self.y ** 2) * sqrt(vb.x ** 2 + vb.y ** 2))
+#
+#     def len(self):
+#         return sqrt(self.x ** 2 + self.y ** 2)
 
 
 #
@@ -50,7 +51,7 @@ def nd2_getMatrix(pos,w=0):
 
 
 #матрица масштабирвания 2D
-def np_d2_getScaleMatrix(k):
+def nd2_getScaleMatrix(k):
     return np.array(
         [
             [k, 0, 0],
@@ -71,10 +72,20 @@ def nd2_getRotateMatrix(alfa_rad):
         ],
         float)
 
+#матрица поворот 180
+def nd2_getRotateMatrix180():
+    return np.array(
+        [
+            [-1,     0,     0],
+            [0,     -1,      0],
+            [0,     0,      1],
+        ],
+        float)
+
 
 
 #поворотная матрица поворот на 90 по часовой стрелки (ось Y на экране вниз)
-def np_d2_getRotateMatrixRight90():
+def nd2_getRotateMatrixRight90():
     return np.array(
         [
             [0,     -1,     0],
@@ -85,7 +96,7 @@ def np_d2_getRotateMatrixRight90():
 
 
 #поворотная матрица поворот на 90 против часовой стрелки (ось Y на экране вниз)
-def np_d2_getRotateMatrixLeft90():
+def nd2_getRotateMatrixLeft90():
     return np.array(
         [
             [0,     1,      0],
@@ -96,11 +107,42 @@ def np_d2_getRotateMatrixLeft90():
 
 
 #детерминант матрицы
-def np_detD2(a):
+def np2_detD2(a):
     return a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]
 
 def np_vector2_len(a):
     return math.sqrt(a[0] ** 2 + a[1] ** 2)
+
+#Нормализовать вектор
+def np2_normalize(a):
+    len = math.sqrt(a[0] ** 2 + a[1] ** 2)
+    a[0] = a[0] / len
+    a[1] = a[1] / len
+    return a
+
+
+#
+# угол поворта вектора относительно оси X
+# дает только положительные значения
+#
+def np2_getAngle(a):
+    if (abs(a[0]) < 0.0000001):
+        #x=0
+        return (PI_d2) if a[1] > 0 else -(PI_d2)
+    else:
+        if (a[0] >= 0):
+            if (a[1] >= 0):
+                return math.atan(a[1] / a[0])
+            else:
+                #(a[1] < 0):
+                return PI_m2 + math.atan(a[1] / a[0])
+        else:
+            if (a[1] >= 0):
+                return PI  + math.atan(a[1] / a[0])
+            else:
+                #(a[1] < 0):
+                return PI  + math.atan(a[1] / a[0])
+
 
 #=========================================================
 def np_d2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
@@ -124,52 +166,15 @@ def np_d2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
         [a2, -c2],
     ])
 
-    D = np_detD2(matrix_D)
-    Dx = np_detD2(matrix_Dx)
-    Dy = np_detD2(matrix_Dy)
+    D = np2_detD2(matrix_D)
+    Dx = np2_detD2(matrix_Dx)
+    Dy = np2_detD2(matrix_Dy)
     
     return [Dx / D, Dy / D ,1]
 
 
 
 
-# class DirectLine():
-#
-#     # общее уравнение прямой
-#     # a*x1 + b*y1 + c1 = 0
-#
-#     def setPN(self,P,N):
-#         #P - точка через которую проходит Прямая
-#         #N - нормальнаый вектор прямой. (длинна любая)
-#
-#         self.a = self.Nx = Nx[0]
-#         self.b = self.Ny = Nx[1]
-#         self.c = -(self.a * P[0] + self.b * P[1])       #P[0] = Px,P[1] = Py
-#
-#     def getIntersectPoint(self,line2):
-#         matrix_D = np.array([
-#             [self.a,    self.b],
-#             [line2.a,   line2.b],
-#         ])
-#
-#         matrix_Dx = np.array([
-#             [-self.c,   self.b],
-#             [-line2.c,  line2.b],
-#         ])
-#
-#         matrix_Dy = np.array([
-#             [self.a,    -self.c],
-#             [line2.a,   -line2.c],
-#         ])
-#
-#
-#         D = np_detD2(matrix_D)
-#         Dx = np_detD2(matrix_Dx)
-#         Dy = np_detD2(matrix_Dy)
-#
-#         intersect_x = Dx / D
-#         intersect_y = Dy / D
-#
-#         return [intersect_x,intersect_Y,1]
+
 
 

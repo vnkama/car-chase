@@ -96,7 +96,7 @@ class MapWnd(GuiWindow):
         self.arr_cars = []
         groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(self,400, 200, groups, self.control_wnd)
+            Car(self,100, 100, groups, self.control_wnd)
         )
 
         #формирует дорогу
@@ -191,8 +191,8 @@ class MapWnd(GuiWindow):
 
 
         # матрицы поворота
-        matrix_rotate_left = np_d2_getRotateMatrixLeft90()
-        matrix_rotate_right = np_d2_getRotateMatrixRight90()
+        matrix_rotate_left = nd2_getRotateMatrixLeft90()
+        matrix_rotate_right = nd2_getRotateMatrixRight90()
 
         self.arr_roadsections_corners = np.zeros((road_len-1,4,3),float)
 
@@ -205,14 +205,12 @@ class MapWnd(GuiWindow):
 
             #коеффициент масштабирования
             #ширина дороги в начале и конце секции разная
-            # k_width_begin = arr_roadsections_width[i] / (2 * np_vector2_len(roadsectin_axis_vector))
-            # k_width_end = arr_roadsections_width[i+1] / (2 * np_vector2_len(roadsectin_axis_vector))
             k_width_begin = 150 / (2 * np_vector2_len(roadsectin_axis_vector))
             k_width_end = 150 / (2 * np_vector2_len(roadsectin_axis_vector))
 
             #матрица масштабирования начала и конца секции
-            matrix_scaling_begin = np_d2_getScaleMatrix(k_width_begin)
-            matrix_scaling_end = np_d2_getScaleMatrix(k_width_end)
+            matrix_scaling_begin = nd2_getScaleMatrix(k_width_begin)
+            matrix_scaling_end = nd2_getScaleMatrix(k_width_end)
 
             #масшиабируем вектор направления до нужной длины
             roadsection_direction_begin = matrix_scaling_begin @ roadsectin_axis_vector
@@ -329,10 +327,21 @@ class MapWnd(GuiWindow):
 
 
 
-
-
     def update(self):
+        self.arr_sprites_update.update()
+        self.update_camera()
+
+
+    def update_camera(self):
         self.Camera.update(self.arr_cars[0].map_rectpos)
+
+        #координаты окна показываемые камерой относительно карты
+        camera_position_rect = self.Camera.getPositionRect()
+
+        #пересчитываем координаты в спрайтах с учетом камеры
+        for sprite in self.arr_sprites_update_camera:
+            sprite.update_camera(camera_position_rect)
+
 
 
 
@@ -349,24 +358,8 @@ class MapWnd(GuiWindow):
             pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
             camera_position_rect)   # из карты берем то что показывает камера
 
-        #пересчитываем координаты в спрайтах с учетом камеры
-        for sprite in self.arr_sprites_update_camera:
-            sprite.update_camera(camera_position_rect)
 
-        self.arr_sprites_update.update()
-
-        sprite_lst = pg.sprite.spritecollide(
-            self.arr_cars[0],           #машину сталикиваем
-            self.arr_sprites_collide,    #
-            False,
-            pg.sprite.collide_mask
-        )
-
-        if (sprite_lst):
-            sprite_lst[0].kill()
-            print("TOUCH !!")
-
-
+        self.arr_cars[0].draw_sensors()
         self.arr_sprites_draw.draw(self.surface)
 
         #столкновение машины с краем дороги
@@ -381,7 +374,16 @@ class MapWnd(GuiWindow):
             self.arr_oils[0].kill()
             #print("ROAD !!")
 
+        sprite_lst = pg.sprite.spritecollide(
+            self.arr_cars[0],           #машину сталикиваем
+            self.arr_sprites_collide,    #
+            False,
+            pg.sprite.collide_mask
+        )
 
+        if (sprite_lst):
+            sprite_lst[0].kill()
+            print("TOUCH !!")
 
 
     def handle_MOUSEBUTTONDOWN(self,event):
@@ -406,7 +408,7 @@ class MapWnd(GuiWindow):
                 #координаты клика относительно карты
                 click_map_rect =  camera_position_rect.move(click_mapwnd_rect.topleft)
 
-                self.arr_cars[0].setTarget(click_map_rect)
+                #self.arr_cars[0].setTarget(click_map_rect)
 
 
 

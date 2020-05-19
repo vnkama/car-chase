@@ -9,6 +9,10 @@ def grad2rad(grad):
 def rad2grad(grad):
     return grad * 57.29578049
 
+PI=3.1415926535
+PI_m2 = PI*2
+PI_d2 = PI/2
+
 
 
 g_arr_fonts = {}

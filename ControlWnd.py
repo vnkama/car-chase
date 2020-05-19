@@ -36,7 +36,7 @@ class ControlWnd(GuiWindow):
         #
         self.createChild(GuiLabel({
             'parent_obj':self,
-            'rect': pg.Rect(0,100,100,32),
+            'rect': pg.Rect(0,100,60,32),
             'text': 'Angle:',
             'font': 'arial_20',
         }))
@@ -45,7 +45,7 @@ class ControlWnd(GuiWindow):
         #
         self.lbl_speed = GuiLabel({
             'parent_obj': self,
-            'rect': pg.Rect(80, 100, 100, 32),
+            'rect': pg.Rect(61, 100, 200, 32),
             'text': '0',
             'font': 'arial_20',
         })

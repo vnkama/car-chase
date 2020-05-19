@@ -95,7 +95,7 @@ class Rock(pg.sprite.Sprite):
         # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
         # self.rect координаты привязанные к камере, они пересчитываются при скроллинге карты
 
-        self.dy = 1
+        self.dy = 3
 
         self.map_rect = pg.Rect(
             x-Tree.SPRITE_SIZE_X/2,
@@ -112,9 +112,9 @@ class Rock(pg.sprite.Sprite):
 
     def update(self):
         if (self.map_rect.top > 600):
-            self.dy = -1
+            self.dy = -3
         elif (self.map_rect.top < 50):
-            self.dy = 1
+            self.dy = 3
 
         self.map_rect.top = self.map_rect.top + self.dy
 
