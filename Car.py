@@ -3,8 +3,8 @@ from config import *
 from fw.functions import *
 from Vector import *
 import math
+from fRect import *
 
-import sys
 
 from Brezenhem import Brezenhem
 
@@ -130,11 +130,6 @@ class Car(pg.sprite.Sprite):
             i=ai[0]
             #формируем вектор от центра машины на сенсор.
             self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(v) @ nd2_getMatrix([1,0])
-
-
-
-
-
 
 
 
@@ -295,6 +290,8 @@ class Car(pg.sprite.Sprite):
 
 
 
+
+
     #
     #
     #
@@ -323,18 +320,26 @@ class Car(pg.sprite.Sprite):
 
         all_sensors_map_rect = pg.Rect(x1,y1,x2-x1+1,y2-y1+1)
 
+
+
         ######################################################
         #
         #составим спсико спрайтов краев дороги, которые попадают (втч частично) в sensors_rect
         #с этими спрайтами в дальнейшем буди искать пересечения
         #
         counter1 = 0
-        arr_curbs_4_all_sensors = []
+        lst_curbs_4_all_sensors = []
 
         for sprite_curb in self.map.arr_sprites_curbs:
             if (all_sensors_map_rect.colliderect(sprite_curb.map_rect)):
                 counter1 += 1
-                arr_curbs_4_all_sensors.append(sprite_curb)
+                lst_curbs_4_all_sensors.append(sprite_curb)
+
+        # print("**")
+        # print(f"all_sensors_map_rect {all_sensors_map_rect}")
+        # for sprite_curb in lst_curbs_4_all_sensors:
+        #     print(sprite_curb.map_rect)
+
 
 
         # для каждого сенсора найдем спрайты краев дорог которые возможно пересекаются с сенсором
@@ -355,6 +360,7 @@ class Car(pg.sprite.Sprite):
             (1,1)
         )
 
+
         for sensor_i in range(Car.SENSOR_COUNT):
 
             sensor_rect = car_rect.union(
@@ -364,24 +370,20 @@ class Car(pg.sprite.Sprite):
                 )
             )
 
+            #print(sensor_rect)
 
-            print(arr_curbs_4_all_sensors.size)
+            # пересечем sensor_rect с прмоугольниками curbs
 
-
-            #пересечем sensor_rect с прмоугольниками curbs
-
-            for sprite_curb in arr_curbs_4_all_sensors:
-                print(sprite_curb.rect)
-                if (sensor_rect.colliderect(sprite_curb.rect)):
+            for sprite_curb in lst_curbs_4_all_sensors:
+                if (sensor_rect.colliderect(sprite_curb.map_rect)):
                     arr_sensors_lst_curbs[sensor_i].append(sprite_curb)
                     test[sensor_i] += 1
 
-        print(test)
 
-        #sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
-        #print(sss)
-        #sys.exit()
-        #self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
+
+
+        sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
+        self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
 
 
 

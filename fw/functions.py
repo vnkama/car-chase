@@ -1,4 +1,6 @@
 import math
+import sys
+
 
 def HRGB(hex):    #hex_rgb
     return [(hex & 0xFF0000) >> 16, (hex & 0xFF00) >> 8 ,hex & 0xFF]
@@ -9,9 +11,16 @@ def grad2rad(grad):
 def rad2grad(grad):
     return grad * 57.29578049
 
+# def f2i(f):
+#     return int(round(f))
+
 PI=3.1415926535
 PI_m2 = PI*2
 PI_d2 = PI/2
+
+# D2_0 = [0,0]
+# D2_1 = [1,1]
+
 
 
 
@@ -71,3 +80,9 @@ def getPointDistanse_Float(point_xy):
 
 
 
+def quit(text=''):
+    print("\033[31mcalled by QUIT() *********************************************")
+    if (len(text)):
+        print(f"\033[31m{text}\033[0m")
+
+    sys.exit()

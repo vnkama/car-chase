@@ -1,10 +1,17 @@
 import pygame as pg
+import traceback
+
 from config import *
 from fw.GuiWindow import GuiWindow
+from fw.FwError import FwError
 
 from fw.functions import *
 
 
+
+#
+#
+#
 class Game(GuiWindow):
 
     # pygame инициализируем как статический, т.к. CellWeed
@@ -67,14 +74,22 @@ class Game(GuiWindow):
 
     #основной цикл приложения
     def run(self):
-        while self.is_mainloop_run:
-            self.main_timer.tick(FPS_RATE)
 
-            self.handleEvents()
-            self.update()
-            self.draw()
+        try:
 
-            pg.display.update()
+            while self.is_mainloop_run:
+                self.main_timer.tick(FPS_RATE)
+
+                self.handleEvents()
+                self.update()
+                self.draw()
+
+                pg.display.update()
+
+        except FwError as e:
+            print("\033[35m\033[1mgame.py except FwError")
+            e.out()
+            traceback.print_exc()
 
 
 
