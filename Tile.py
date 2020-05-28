@@ -166,3 +166,8 @@ class RoadBorder(pg.sprite.Sprite):
     def update_camera(self,camera_rect):
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
+
+    # #проверяем пере
+    # def is_intersect_rect(self,rect):
+
+

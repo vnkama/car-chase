@@ -38,6 +38,19 @@ def vector2_calcAngle(a,b):
 
 ###########################################
 
+#
+# просто возвращает констанцу, размер массива
+#
+def nd2_getMatrixSize():
+    return 3
+
+def nd2_getPoint(nd2):
+    return [nd2[0],nd2[1]]
+
+def nd2_getPointInt(nd2):
+    return [int(nd2[0]),int(nd2[1])]
+
+
 #w=1 координата
 #w=0 направление
 def nd2_getMatrix(pos,w=0):
@@ -110,11 +123,11 @@ def nd2_getRotateMatrixLeft90():
 def np2_detD2(a):
     return a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]
 
-def np_vector2_len(a):
+def nd2_vector_len(a):
     return math.sqrt(a[0] ** 2 + a[1] ** 2)
 
 #Нормализовать вектор
-def np2_normalize(a):
+def nd2_normalize(a):
     len = math.sqrt(a[0] ** 2 + a[1] ** 2)
     a[0] = a[0] / len
     a[1] = a[1] / len
@@ -144,8 +157,15 @@ def np2_getAngle(a):
                 return PI  + math.atan(a[1] / a[0])
 
 
-#=========================================================
-def np_d2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
+#вектор минус вектор
+def nd2_minus(v1,v2):
+    return [
+        v1[0]-v2[0],
+        v1[1]-v2[1],
+        v1[2]-v2[2]]
+
+
+def nd2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
     #ищет точку пересечения двух прямых
     # a1, b1, c1 -уравнение прямой в общем виде
 
@@ -171,6 +191,31 @@ def np_d2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
     Dy = np2_detD2(matrix_Dy)
     
     return [Dx / D, Dy / D ,1]
+
+####################################################
+
+
+def d2_plus(p1,p2):
+    return [p1[0]+p2[0],p1[1]+p2[1]]
+
+
+def d2_minus(p1,p2):
+    return [p1[0]-p2[0],p1[1]-p2[1]]
+
+def d2_minusAndInc(p1,p2):
+    return [p1[0]-p2[0]+1,p1[1]-p2[1]+1]
+
+
+
+
+def d2_getInt(p1):
+    return [int(p1[0]),int(p1[1])]
+
+def d2_zero():
+    return [0,0]
+
+def d2_one():
+    return [1,1]
 
 
 

@@ -39,7 +39,7 @@ class MapWnd(GuiWindow):
         self.arr_sprites_draw = pg.sprite.Group()           # для взывова draw, карта отдельно копируемся
         self.arr_sprites_update = pg.sprite.Group()         # то что двигаетсмя
         self.arr_sprites_collide = pg.sprite.Group()        # прверяиьт на столкновения с автомобилем
-        self.arr_sprites_road = pg.sprite.Group()
+        self.arr_sprites_curbs = pg.sprite.Group()
 
 
         #тайловая карта
@@ -96,7 +96,7 @@ class MapWnd(GuiWindow):
         self.arr_cars = []
         groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(self,100, 100, groups, self.control_wnd)
+            Car(self,1260, 300, groups, self.control_wnd)
         )
 
         #формирует дорогу
@@ -205,8 +205,8 @@ class MapWnd(GuiWindow):
 
             #коеффициент масштабирования
             #ширина дороги в начале и конце секции разная
-            k_width_begin = 150 / (2 * np_vector2_len(roadsectin_axis_vector))
-            k_width_end = 150 / (2 * np_vector2_len(roadsectin_axis_vector))
+            k_width_begin = 150 / (2 * nd2_vector_len(roadsectin_axis_vector))
+            k_width_end = 150 / (2 * nd2_vector_len(roadsectin_axis_vector))
 
             #матрица масштабирования начала и конца секции
             matrix_scaling_begin = nd2_getScaleMatrix(k_width_begin)
@@ -274,12 +274,12 @@ class MapWnd(GuiWindow):
                 # continue
                 # 1й угол
 
-                self.arr_roadsections_corners[i][1] = np_d2_getLinesIntersectPoint(
+                self.arr_roadsections_corners[i][1] = nd2_getLinesIntersectPoint(
                     arr_A_left[i], arr_B_left[i], arr_C_left[i],
                     arr_A_left[i+1], arr_B_left[i+1], arr_C_left[i+1]
                 )
 
-                self.arr_roadsections_corners[i][2] = np_d2_getLinesIntersectPoint(
+                self.arr_roadsections_corners[i][2] = nd2_getLinesIntersectPoint(
                     arr_A_right[i], arr_B_right[i], arr_C_right[i],
                     arr_A_right[i+1], arr_B_right[i+1], arr_C_right[i+1]
                 )
@@ -302,7 +302,7 @@ class MapWnd(GuiWindow):
                     polygon_corners
                 )
 
-            groups = (self.arr_sprites_update_camera, self.arr_sprites_draw,self.arr_sprites_road)
+            groups = (self.arr_sprites_update_camera, self.arr_sprites_draw,self.arr_sprites_curbs)
 
             #ставим спрайт на левую сторону дороги
             self.arr_road_sprites.append(
@@ -322,7 +322,7 @@ class MapWnd(GuiWindow):
                 )
             )
 
-            #генерируем спрайт abs
+
 
 
 
@@ -365,7 +365,7 @@ class MapWnd(GuiWindow):
         #столкновение машины с краем дороги
         sprite_lst = pg.sprite.spritecollide(
             self.arr_cars[0],           #машину сталикиваем
-            self.arr_sprites_road,      #с краями дороги
+            self.arr_sprites_curbs,      #с краями дороги
             False,
             pg.sprite.collide_mask
         )

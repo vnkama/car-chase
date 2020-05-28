@@ -37,7 +37,7 @@ class ControlWnd(GuiWindow):
         self.createChild(GuiLabel({
             'parent_obj':self,
             'rect': pg.Rect(0,100,60,32),
-            'text': 'Angle:',
+            'text': 'Param 1:',
             'font': 'arial_20',
         }))
 
@@ -77,7 +77,7 @@ class ControlWnd(GuiWindow):
 
 
     def sendMessage(self,code,param1,param2=0):
-        if (code == "WM_SET_SPEED"):
+        if (code == "WM_SET_PARAM_1"):
             self.lbl_speed.setText(param1)
 
         elif (code == "WM_SET_TICKS"):
