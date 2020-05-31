@@ -123,7 +123,7 @@ class Rock(pg.sprite.Sprite):
 #
 #
 #
-class RoadBorder(pg.sprite.Sprite):
+class Curb(pg.sprite.Sprite):
 
     def __init__(self,p0_xy,p1_xy,groups):
         super().__init__(groups)
@@ -133,6 +133,13 @@ class RoadBorder(pg.sprite.Sprite):
             min(p0_xy[0],p1_xy[0]),
             min(p0_xy[1],p1_xy[1])
         )
+
+        #начало и конец. храним отдельно от map_rect, для быстродействия
+        self.start_2fdot = p0_xy
+        self.end_2fdot = p1_xy
+
+        #print(self.start_2fdot,self.end_2fdot)
+
 
         #размер спрайта
         size_xy = (
@@ -152,7 +159,7 @@ class RoadBorder(pg.sprite.Sprite):
 
         color = (200, 55, 25)
 
-        #рисуем линию - границу дороги sss
+        #рисуем линию - границу дороги
         if (
             ((p0_xy[0] <= p1_xy[0]) and (p0_xy[1] <= p1_xy[1])) or
             ((p1_xy[0] <= p0_xy[0]) and (p1_xy[1] <= p0_xy[1]))
@@ -167,7 +174,6 @@ class RoadBorder(pg.sprite.Sprite):
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
 
-    # #проверяем пере
-    # def is_intersect_rect(self,rect):
+
 
 

@@ -75,7 +75,7 @@ class Car(pg.sprite.Sprite):
 
         self.message = message
 
-        self.velocity = 0.0         #сколоксть начальная
+        self.velocity = 10.0         #сколоксть начальная
 
 
 
@@ -91,11 +91,11 @@ class Car(pg.sprite.Sprite):
         self.K_braking = 0.4
 
 
-        self.K_friction = 0.05          #коефициент торможения (об воздузх :)
+        self.K_friction = 0          #коефициент торможения (об воздузх :)       #
 
 
 
-        self.course_nd2 = nd2_getMatrix((1,0))  #матрица курса
+        self.course_nd2 = nd2_getMatrix((0.8,0.2))  #матрица курса
         self.speering_wheel_alfa = 0.0          #положение руля     0-прямой
 
         self.speering_direction = 0     # -1 0 1 куда крутим руль
@@ -121,7 +121,7 @@ class Car(pg.sprite.Sprite):
         self.arr_sensors_value = np.zeros(5,float)
 
         self.arr_sensors_car_pos = np.empty(shape=[Car.SENSOR_COUNT],dtype = object)       #координаты относительно машины (константа), при курсе 0
-        self.arr_nd2_sensors_map_pos = np.zeros(shape=(Car.SENSOR_COUNT,nd2_getMatrixSize()),dtype = float)       #координаты относительно карты, с учетом курса
+        self.arr_sensors_end_3mfdot = np.zeros(shape=(Car.SENSOR_COUNT,nd2_getMatrixSize()),dtype = float)       #координаты относительно карты, с учетом курса
         self.arr_sensors_wnd_pos = np.empty(shape=[Car.SENSOR_COUNT],dtype = list)         #координаты относительно окна
 
         #расчитаем координаты сенсоров , относительно машины
@@ -161,8 +161,8 @@ class Car(pg.sprite.Sprite):
         # #пересчитаем положение сенсоров в окне
         for i in range(Car.SENSOR_COUNT):
             self.arr_sensors_wnd_pos[i] = (
-                int(self.arr_nd2_sensors_map_pos[i][0]) - camera_rect.left,
-                int(self.arr_nd2_sensors_map_pos[i][1]) - camera_rect.top
+                int(self.arr_sensors_end_3mfdot[i][0]) - camera_rect.left,
+                int(self.arr_sensors_end_3mfdot[i][1]) - camera_rect.top
             )
 
 
@@ -177,29 +177,6 @@ class Car(pg.sprite.Sprite):
         self.update_sensors()
 
     def update_movement(self):
-        # if (self.need_direction != self.real_direction):
-        #
-        #     #добавляем небольшой поворот
-        #     self.rotate_msector_s += self.rotate_msector_v
-        #
-        #     if (self.rotate_msector_s >= 1000):
-        #         #повернулись на 1 румб
-        #         self.rotate_msector_s %= 1000   #копейки оставим на следющий румб
-        #
-        #         self.real_direction = self.real_direction + self.rotate_direction #поворачиваем на 1 румб
-        #         self.real_direction = self.real_direction if (self.real_direction <= 31) else 0
-        #         self.real_direction = self.real_direction if (self.real_direction >= 0) else 31
-        #
-        #         #меняем спрайт
-        #         self.setDirectionImage(self.real_direction)
-        #
-        # else:
-        #     #двигаемся
-        #     if (self.brezenhem.isEnded()):
-        #         self.is_moving = 0
-        #     else:
-        #         self.setPos(pg.Rect(self.brezenhem.nextPoint(),(0,0)))
-
 
         #пересчитаем скорость print
         dts = self.map.dt / 1000
@@ -276,7 +253,7 @@ class Car(pg.sprite.Sprite):
              #движение по прямой
              self.map_pos_nd2 = self.map_pos_nd2 + (self.velocity * dts) * self.course_nd2
 
-        angle = np2_getAngle(self.course_nd2)
+        angle = nd2_getAngle(self.course_nd2)
         rumb_angle = PI / 16        # = 2 * PI / 32
 
         self.setDirectionImage((int ((angle + rumb_angle / 2) / rumb_angle)) & 0x1F)
@@ -298,11 +275,14 @@ class Car(pg.sprite.Sprite):
     def update_sensors(self):
         #print("update_sensors")
 
-        rotate_nd2 = nd2_getRotateMatrix(np2_getAngle(self.course_nd2))
+        rotate_nd2 = nd2_getRotateMatrix(nd2_getAngle(self.course_nd2))
         for ai,sensor_car_pos in np.ndenumerate(self.arr_sensors_car_pos):
             i=ai[0]
+
             #повернем сенсор по курсу машины и разместим на карте
-            self.arr_nd2_sensors_map_pos[i] = rotate_nd2 @ sensor_car_pos + self.map_pos_nd2
+            self.arr_sensors_end_3mfdot[i] = rotate_nd2 @ sensor_car_pos + self.map_pos_nd2
+
+
 
 
         ############################################################
@@ -310,79 +290,189 @@ class Car(pg.sprite.Sprite):
         # определим прмоугольник (его края парралелны карте) в который попадают все сенcоры (сенсор - это отрезок)
 
 
-        arr_x = self.arr_nd2_sensors_map_pos[...,0]
-        arr_y = self.arr_nd2_sensors_map_pos[...,1]
+        arr_x = self.arr_sensors_end_3mfdot[...,0]
+        arr_y = self.arr_sensors_end_3mfdot[...,1]
 
         x1 = np.amin(arr_x)
         x2 = np.amax(arr_x)
         y1 = np.amin(arr_y)
         y2 = np.amax(arr_y)
 
-        all_sensors_map_rect = pg.Rect(x1,y1,x2-x1+1,y2-y1+1)
+        # arr_sensors_irect -
+        # rect закрывающий ВСЕ сенсоры-отрезки разом
+        # УВЕЛИЧИМ НА 2 ПИКСЕЛЯ ВО ВСЕ СТОРОНЫ чтобы убрать краевые эффекты
+        # было до увеличения arr_sensors_irect = pg.Rect(x1,y1,x2-x1+1,y2-y1+1)
+        arr_sensors_irect = pg.Rect(x1-2,y1-2,x2-x1+3,y2-y1+3)
+
+
 
 
 
         ######################################################
-        #
-        #составим спсико спрайтов краев дороги, которые попадают (втч частично) в sensors_rect
+
+        #составим спсико спрайтов краев дороги, которые попадают (втч частично) в arr_sensors_irect
         #с этими спрайтами в дальнейшем буди искать пересечения
         #
-        counter1 = 0
         lst_curbs_4_all_sensors = []
 
         for sprite_curb in self.map.arr_sprites_curbs:
-            if (all_sensors_map_rect.colliderect(sprite_curb.map_rect)):
-                counter1 += 1
+            if (arr_sensors_irect.colliderect(sprite_curb.map_rect)):
                 lst_curbs_4_all_sensors.append(sprite_curb)
 
-        # print("**")
-        # print(f"all_sensors_map_rect {all_sensors_map_rect}")
-        # for sprite_curb in lst_curbs_4_all_sensors:
-        #     print(sprite_curb.map_rect)
 
 
 
-        # для каждого сенсора найдем спрайты краев дорог которые возможно пересекаются с сенсором
+        # для каждого сенсора найдем все sprite_curb у которого rect Пересекается с rect которые возможно пересекаются с сенсором
         # пересечение ищем по rect-rect
+        # этим мы минимизируес число спрайтов c котороыми
+
 
         #инициируем массив пустыми листами
         arr_sensors_lst_curbs = np.empty(shape=[Car.SENSOR_COUNT],dtype=list)
         for i in range(arr_sensors_lst_curbs.size):
-            arr_sensors_lst_curbs[i] = []
+            arr_sensors_lst_curbs[i] = np.array([])
+
 
 
         test = np.full(shape=[Car.SENSOR_COUNT],fill_value=0,dtype = int)
 
-        #sensor_rect = pg.Rect(0,0,0,0)
-
-        car_rect = pg.Rect(
+        # общее начало отрезков-сенсоров
+        car_irectpos = pg.Rect(
             nd2_getPoint(self.map_pos_nd2),
             (1,1)
         )
 
+        sensor_start_point_3mf = self.map_pos_nd2
+
+        #длинна сенсра фактическая (текущее найденная длинна, после обхода всех перечений сенсора здесь будет самое короткое значение )
+        arr_sensor_len_f = np.full(shape=[Car.SENSOR_COUNT], dtype=float,fill_value=float(Car.SENSOR_MAX_LEN))
+
+        arr_sensor_end_point_f2 = np.full(shape=(Car.SENSOR_COUNT, 2), fill_value=0, dtype=float)
+
+
+
+
 
         for sensor_i in range(Car.SENSOR_COUNT):
 
-            sensor_rect = car_rect.union(
+            # arr_sensor_end_point_f2[sensor_i] = self.arr_sensors_end_3mfdot[sensor_i][0:1]
+            # arr_sensor_len_f[sensor_i] =
+
+
+
+            #rect сенсора
+            #объеденим точку начала сенсоров (в авто) и тотчку конца сенсора в одном рект
+            sensor_irect = car_irectpos.union(
                 pg.Rect(
-                    nd2_getPoint(self.arr_nd2_sensors_map_pos[sensor_i]),
+                    nd2_getPoint(self.arr_sensors_end_3mfdot[sensor_i]),
                     (1,1)
                 )
             )
 
-            #print(sensor_rect)
+            #увеличим рект для сенсора, иначе возникают краевые эффекты
+            sensor_irect.move_ip(-2, -2)
+            sensor_irect.w += 4
+            sensor_irect.h += 4
 
-            # пересечем sensor_rect с прмоугольниками curbs
+            sensor_leABC = None
+            sensor_end_point_f2 = self.arr_sensors_end_3mfdot[sensor_i]
+
+            # пересекем rect текущего сенсора и rect текущего curb
 
             for sprite_curb in lst_curbs_4_all_sensors:
-                if (sensor_rect.colliderect(sprite_curb.map_rect)):
-                    arr_sensors_lst_curbs[sensor_i].append(sprite_curb)
-                    test[sensor_i] += 1
 
+                #для избежания кравеых эффектов увеличим рект спрайта во всех направлениях на 2
+                curb_wrapper_irect = sprite_curb.map_rect.move(-2,-2)
+                curb_wrapper_irect.w += 4
+                curb_wrapper_irect.h += 4
+
+
+
+                if (not sensor_irect.colliderect(curb_wrapper_irect)):
+                    continue
+
+                # пересекаются sensor_irect с curbs rect
+                # пока не факт что пересекаюся сами отрезки
+
+                curb_start_2fdot = sprite_curb.start_2fdot
+                curb_end_2fdot = sprite_curb.end_2fdot
+
+
+
+
+                # проверим сенсор и curb на коллинеарность
+
+                vl = nd2_getVectorLen4VectorsMult(
+                    (d2_minus(curb_start_2fdot, curb_end_2fdot)),                              # отрезок curb
+                    (d2_minus(sensor_start_point_3mf, sensor_end_point_f2))   # отрезок
+                )
+
+                #если vl = 0 то сенсор и curb на коллинеарны, считаем что это
+                # CASTLE ну ввобще совпадение надо проверять отдельно , но пока этот код не написан
+                if (abs(vl) < 1e-6):
+                    continue
+
+
+
+
+                # прмяые содеражащие сенсор и curb непарралельны, несовпадают и следовательно где то пересекаются
+                # но это прямяые, насчет отрезков пока неясно
+
+                # получим Общее Уравнение Прямой для обоих прямых
+                curb_leABC = nd2_convert_2Points_2_LineEquationABC(curb_start_2fdot,curb_end_2fdot)
+
+                if (sensor_leABC is None):
+                    sensor_leABC = nd2_convert_2Points_2_LineEquationABC(sensor_start_point_3mf,sensor_end_point_f2)
+
+
+                # найдем пересечение прямых, содержащих отрезки
+                # нам известно, что прямые точно пересекаются
+                # пока не известно пересекаются ли сами отрезки
+                intersect_point_2f = nd2_getLinesIntersectPoint(
+                    curb_leABC[0],curb_leABC[1],curb_leABC[2],          # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
+                    sensor_leABC[0], sensor_leABC[1], sensor_leABC[2],  #коеффиценты A B C, для сенсора
+                )
+
+
+
+                s1 = signFloat(intersect_point_2f[0] - curb_start_2fdot[0])
+                s2 = signFloat(intersect_point_2f[0] - curb_end_2fdot[0])
+                s3 = signFloat(intersect_point_2f[1] - curb_start_2fdot[1])
+                s4 = signFloat(intersect_point_2f[1] - curb_end_2fdot[1])
+
+                s5 = signFloat(intersect_point_2f[0] - sensor_start_point_3mf[0])
+                s6 = signFloat(intersect_point_2f[0] - sensor_end_point_f2[0])
+                s7 = signFloat(intersect_point_2f[1] - sensor_start_point_3mf[1])
+                s8 = signFloat(intersect_point_2f[1] - sensor_end_point_f2[1])
+
+                if (
+                    not (
+                        (abs(s1 + s2) < 2 ) and      #пары s1 s2 должны быть или с разынм занком (-1 1) или (0 0) или (1 0) или (-1 0)
+                        (abs(s3 + s4) < 2 ) and      #если пари s1 s2 имееет вид (-1 -1) или (1 1) занчит отрезки не пересекаются
+                        (abs(s5 + s6) < 2 ) and      # для прверки abs(s1 + s2) < 2
+                        (abs(s7 + s8) < 2 )
+                    )
+                ):
+                    #отрезки не пересекаются
+                    continue
+
+                #установлен факт пересечения сенсора с curb
+                test[sensor_i] += 1
+
+                #измерим расстояние от машины до точки пересечения
+                intersect_len = d2_caclDistance2Points(intersect_point_2f,sensor_start_point_3mf)
+
+                #если найденная точка пересечения ближе
+                if (intersect_len < arr_sensor_len_f[sensor_i]):
+                    arr_sensor_len_f[sensor_i] = intersect_len
+                    self.arr_sensors_end_3mfdot[sensor_i] = intersect_point_2f
+
+                # arr_sensor_end_point_f2[sensor_i]
 
 
 
         sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
+        # print (sss)
         self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
 
 

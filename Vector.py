@@ -119,9 +119,7 @@ def nd2_getRotateMatrixLeft90():
         float)
 
 
-#детерминант матрицы
-def np2_detD2(a):
-    return a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]
+
 
 def nd2_vector_len(a):
     return math.sqrt(a[0] ** 2 + a[1] ** 2)
@@ -138,7 +136,7 @@ def nd2_normalize(a):
 # угол поворта вектора относительно оси X
 # дает только положительные значения
 #
-def np2_getAngle(a):
+def nd2_getAngle(a):
     if (abs(a[0]) < 0.0000001):
         #x=0
         return (PI_d2) if a[1] > 0 else -(PI_d2)
@@ -167,7 +165,12 @@ def nd2_minus(v1,v2):
 
 def nd2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
     #ищет точку пересечения двух прямых
-    # a1, b1, c1 -уравнение прямой в общем виде
+    # a1, b1, c1 -общее уравение прямой
+
+    #ВНИМАНИЕ. Если прямые парралельны то мы получим деление на ноль !!!!!
+    # прверяем заранее
+    #
+
 
     #print(a1,b1,c1,a2,b2,c2)
 
@@ -186,11 +189,45 @@ def nd2_getLinesIntersectPoint(a1,b1,c1,a2,b2,c2):
         [a2, -c2],
     ])
 
-    D = np2_detD2(matrix_D)
-    Dx = np2_detD2(matrix_Dx)
-    Dy = np2_detD2(matrix_Dy)
+    D = d2_deterD2(matrix_D)
+    Dx = d2_deterD2(matrix_Dx)
+    Dy = d2_deterD2(matrix_Dy)
     
-    return [Dx / D, Dy / D ,1]
+    return np.array((Dx / D, Dy / D ,1))
+
+
+#
+# проверяет что два вектора коллинеарны
+# считаем модуль произведения векторов
+#
+def nd2_getVectorLen4VectorsMult(v1,v2):
+    # print(type(v1), v1)
+    # print(type(v2), v2)
+    # quit()
+    return v1[0] * v2[1] - v1[1] * v2[0]
+
+
+#
+# конвертируем две точки прямой в коефыфиценты прямой ABC (общее уранвение прямой)
+#
+def nd2_convert_2Points_2_LineEquationABC(p1,p2):
+    # 1я точка прямой -p1 соотвтетствует [x1,y1]
+    # 2я точка прямой -p2 соотвтетствует [x2,y2]
+
+    A = p2[1] - p1[1]       # y2-y1
+    B = p1[0] - p2[0]       # x1-x2
+    C = p1[0]*(p1[1]-p2[1]) + p1[1]*(p2[0]-p1[0])   #x1(y1-y2) + y1(x2-x1)
+
+    return (A,B,C)
+
+
+
+def isLinesIntersect(start1, end1, start2, end2):
+    vector1 = (end2[0] - start2[0]) * (start1[1] - start2[1]) - (end2[1] - start2[1]) * (start1[0] - start2[0])
+    vector2 = (end2[0] - start2[0]) * (end1[1] - start2[1]) - (end2[1] - start2[1]) * (end1[0] - start2[0])
+    vector3 = (end1[0] - start1[0]) * (start2[1] - start1[1]) - (end1[1] - start1[1]) * (start2[0] - start1[0])
+    vector4 = (end1[0] - start1[0]) * (end2[1] - start1[1]) - (end1[1] - start1[1]) * (end2[0] - start1[0])
+    return (vector1 * vector2 <= 0) and (vector3 * vector4 <= 0)
 
 ####################################################
 
@@ -218,8 +255,17 @@ def d2_one():
     return [1,1]
 
 
+#детерминант матрицы
+def d2_deterD2(a):
+    return a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]
+
+def signFloat(f):
+    return (1 if (f > 1e-6) else (-1 if (f < -1e-6) else 0))
 
 
+#расстояние между двумя точками
 
+def d2_caclDistance2Points(p1,p2):
+    return math.sqrt(((p1[0]-p2[0]) ** 2) + ((p1[1]-p2[1]) ** 2))
 
 
