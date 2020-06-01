@@ -59,8 +59,8 @@ class Car(pg.sprite.Sprite):
         # пересчитываются при скроллинге карты
         # имя self.rect это хардкод PYGAME, координата topleft спрайта относительно окна на карте при копировании
         # используется в pygame.draw !!!
-        # self.wnd_rectpos здесь только объявлен, будет переопределен в setPos
-        # self.rect и self.wnd_rectpos это просто синониы
+        # self.wnd_rect здесь только объявлен, будет переопределен в setPos
+        # self.rect и self.wnd_rect это просто синониы
         self.rect = self.wnd_rect = pg.Rect(0,0,Car.SPRITE_SIZE_X,Car.SPRITE_SIZE_Y)
 
         self.setPos(pg.Rect(x,y,0,0))
@@ -75,14 +75,13 @@ class Car(pg.sprite.Sprite):
 
         self.message = message
 
-        self.velocity = 10.0         #сколоксть начальная
+        self.velocity = 10.0                #сколоксть начальная
 
 
 
         self.max_velocity = 100.0          #максимальная скорость пиксель в секунду
-        #self.velocity_nd2 = nd2_getMatrix((5,0),0)
 
-        self.CAR_LEN = 70           #длинна машины , точнее расстояние между осями
+        self.CAR_LEN = 70                   #длинна машины , точнее расстояние между осями
 
         self.is_engine_on = 0
         self.engine_acceleration_dv = 10.0   #разгон под двигателем
@@ -131,8 +130,7 @@ class Car(pg.sprite.Sprite):
             #формируем вектор от центра машины на сенсор.
             self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(v) @ nd2_getMatrix([1,0])
 
-
-
+        self.arr_sensors_value = np.full(shape=Car.SENSOR_COUNT,dtype=float,fill_value=Car.SENSOR_MAX_LEN)
 
 
     def setAcceleration(self,on):
@@ -347,16 +345,13 @@ class Car(pg.sprite.Sprite):
         #длинна сенсра фактическая (текущее найденная длинна, после обхода всех перечений сенсора здесь будет самое короткое значение )
         arr_sensor_len_f = np.full(shape=[Car.SENSOR_COUNT], dtype=float,fill_value=float(Car.SENSOR_MAX_LEN))
 
-        arr_sensor_end_point_f2 = np.full(shape=(Car.SENSOR_COUNT, 2), fill_value=0, dtype=float)
+        #arr_sensor_end_point_f2 = np.full(shape=(Car.SENSOR_COUNT, 2), fill_value=0, dtype=float)
 
 
 
 
 
         for sensor_i in range(Car.SENSOR_COUNT):
-
-            # arr_sensor_end_point_f2[sensor_i] = self.arr_sensors_end_3mfdot[sensor_i][0:1]
-            # arr_sensor_len_f[sensor_i] =
 
 
 
@@ -419,7 +414,8 @@ class Car(pg.sprite.Sprite):
                 # но это прямяые, насчет отрезков пока неясно
 
                 # получим Общее Уравнение Прямой для обоих прямых
-                curb_leABC = nd2_convert_2Points_2_LineEquationABC(curb_start_2fdot,curb_end_2fdot)
+                #curb_leABC = nd2_convert_2Points_2_LineEquationABC(curb_start_2fdot,curb_end_2fdot)
+
 
                 if (sensor_leABC is None):
                     sensor_leABC = nd2_convert_2Points_2_LineEquationABC(sensor_start_point_3mf,sensor_end_point_f2)
@@ -429,7 +425,8 @@ class Car(pg.sprite.Sprite):
                 # нам известно, что прямые точно пересекаются
                 # пока не известно пересекаются ли сами отрезки
                 intersect_point_2f = nd2_getLinesIntersectPoint(
-                    curb_leABC[0],curb_leABC[1],curb_leABC[2],          # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
+                    #curb_leABC[0],curb_leABC[1],curb_leABC[2],          # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
+                    sprite_curb.arr_lineEqualABC[0], sprite_curb.arr_lineEqualABC[1], sprite_curb.arr_lineEqualABC[2],          # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
                     sensor_leABC[0], sensor_leABC[1], sensor_leABC[2],  #коеффиценты A B C, для сенсора
                 )
 
@@ -467,12 +464,13 @@ class Car(pg.sprite.Sprite):
                     arr_sensor_len_f[sensor_i] = intersect_len
                     self.arr_sensors_end_3mfdot[sensor_i] = intersect_point_2f
 
-                # arr_sensor_end_point_f2[sensor_i]
 
+            self.arr_sensors_value[sensor_i] = arr_sensor_len_f[sensor_i]
+
+        # for sensor_i ....
 
 
         sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
-        # print (sss)
         self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
 
 

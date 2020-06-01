@@ -125,8 +125,10 @@ class Rock(pg.sprite.Sprite):
 #
 class Curb(pg.sprite.Sprite):
 
-    def __init__(self,p0_xy,p1_xy,groups):
+    def __init__(self,p0_xy,p1_xy,arr_lineEqualABC,groups):
         super().__init__(groups)
+
+        self.arr_lineEqualABC = arr_lineEqualABC
 
         #левый верхний угол спрайта, относительно карты
         pos_xy = (

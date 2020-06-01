@@ -96,7 +96,7 @@ class MapWnd(GuiWindow):
         self.arr_cars = []
         groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(self,0, 300, groups, self.control_wnd)
+            Car(self,1800, 300, groups, self.control_wnd)
         )
 
         #формирует дорогу
@@ -119,23 +119,31 @@ class MapWnd(GuiWindow):
                 [350, 280],
                 [400, 200],
                 [500, 130],
+
                 [600, 100],
                 [700, 100],
                 [800, 130],
                 [900, 200],
                 [1000, 300],
+
                 [1100, 320],
                 [1200, 420],
                 [1300, 490],
                 [1400, 520],
                 [1500, 520],
+
                 [1600, 480],
-                [1800, 260],
+                [1760, 300],
+                [1840, 260],
+                [2000, 240],
+                [2100, 240],
+
+                [2250, 270],
             ],
             int
         )
 
-        arr_roadsections_width =  np.array(
+        arr_roadsections_width_i =  np.array(
             [
                 150,
                 150,
@@ -152,11 +160,16 @@ class MapWnd(GuiWindow):
                 150,
                 150,
                 150,
+                120,
+                100,
+
+                100,
+                100,
+                120,
                 150,
                 150,
 
-                150,
-                150,
+                150
             ],
             int
         )
@@ -180,12 +193,10 @@ class MapWnd(GuiWindow):
 
         #нормальные вектора левого-правого краев дороги
 
-        #arr_N_left = np.zeros((road_len-1,3),float)
         arr_A_left = np.zeros((road_len-1),float)
         arr_B_left = np.zeros((road_len-1),float)
         arr_C_left = np.zeros((road_len-1),float)
 
-        #arr_N_right = np.zeros((road_len-1,3),float)
         arr_A_right = np.zeros((road_len-1),float)
         arr_B_right = np.zeros((road_len-1),float)
         arr_C_right = np.zeros((road_len-1),float)
@@ -208,8 +219,8 @@ class MapWnd(GuiWindow):
 
             #коеффициент масштабирования
             #ширина дороги в начале и конце секции разная
-            k_width_begin = 150 / (2 * nd2_vector_len(roadsection_axis_3mf))
-            k_width_end = 150 / (2 * nd2_vector_len(roadsection_axis_3mf))
+            k_width_begin = arr_roadsections_width_i[i] / (2 * nd2_vector_len(roadsection_axis_3mf))
+            k_width_end = arr_roadsections_width_i[i+1] / (2 * nd2_vector_len(roadsection_axis_3mf))
 
             #матрица масштабирования начала и конца секции
             matrix_scaling_begin = nd2_getScaleMatrix(k_width_begin)
@@ -293,7 +304,9 @@ class MapWnd(GuiWindow):
 
         #рисуем полигоны на дороге
 
-        for arr_roadsection in arr_roadsections_corners_3mf:
+        for i in range(road_len - 1):
+            #for arr_roadsection in arr_roadsections_corners_3mf:
+            arr_roadsection = arr_roadsections_corners_3mf[i]
             #цикл для каждого 4х угольного полигона дороги
             #arr_roadsection - содержит 4 угла полигона
 
@@ -316,6 +329,7 @@ class MapWnd(GuiWindow):
                 Curb(
                     arr_roadsection[0],
                     arr_roadsection[1],
+                    (arr_A_left[i], arr_B_left[i], arr_C_left[i]),
                     groups
                 )
             )
@@ -325,6 +339,7 @@ class MapWnd(GuiWindow):
                 Curb(
                     arr_roadsection[2],
                     arr_roadsection[3],
+                    (arr_A_right[i], arr_B_right[i], arr_C_right[i]),
                     groups
                 )
             )
