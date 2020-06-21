@@ -1,42 +1,37 @@
-import pygame as pg
+#import pygame as pg
 from config import *
 from fw.functions import *
-from fw.GuiWindow import GuiWindow
+from fw.GuiControl import GuiControl
+
 
 #
 #
 #
-class GuiButton(GuiWindow):
+class GuiButton(GuiControl):
+
     def __init__(self,params):
-        super().__init__(params)
 
-        self.bg_color_hover = params.get('bg_hover_color',self.bg_color)
+        params['background_color'] = params.get('background_color',THEME_BUTTON_BACKGROUND)
+        params['background_color_hover'] = params.get('background_color_hover',THEME_BUTTON_BACKGROUND_HOVER)
+        params['border_color'] = params.get('border_color',THEME_BUTTON_BORDER_COLOR)
+        params['border_width'] = params.get('border_width',1)
+
+        super().__init__(params)
 
         getMainWnd().registerHandler_MOUSEMOTION(self)
         getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
 
+        self.on_button_func =  params.get('on_button_func', None)
 
-    def __del__(self):
-        getMainWnd().unregHandler_MOUSEMOTION(self)
-        getMainWnd().unregHandler_MOUSEBUTTONDOWN(self)
-
-
-
-    def handle_MOUSEMOTION(self,event):
-        #
-        # обработчик перемещения мыши
-        # координаты приходят абсолютные, относительно окна приложения
-        #
-        self.mouse_hover_flag = self.isPointInWindow(event.pos)
 
 
     def handle_MOUSEBUTTONDOWN(self,event):
         if (event.button == 1):
             # нажата левая кнопка
 
-            if (self.isPointInWindow(event.pos)):
+            if (self.isPointInWindow(event.pos) and self.on_button_func is not None):
                 #кнопка нажата в зоне кнопки
-                getMainWnd().is_mainloop_run = False
+                self.on_button_func()
 
 
 
@@ -44,12 +39,12 @@ class GuiButton(GuiWindow):
         if (not self.mouse_hover_flag):
             self.drawBackground()
         else:
-            self.drawBackground(self.bg_color_hover)
+            self.drawBackground(self.background_color_hover)
 
         self.drawBorder()
 
-        global getFont
-        f = getFont('arial_16')
+        #global getFont
+        f = getMainWnd().getFont('arial_16')
         text1_srf = f.render(self.text, 1, HRGB(CONTROL_WND_FONT_COLOR))
 
 

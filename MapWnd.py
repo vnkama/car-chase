@@ -4,7 +4,7 @@ from config import *
 from fw.functions import *
 from Vector import *
 
-from fw.GuiWindow import GuiWindow
+from fw.fwWindow import fwWindow
 from Tile import *
 from Car import *
 from Camera import *
@@ -17,15 +17,16 @@ import random
 #
 # окно с органами управления игрой
 #
-class MapWnd(GuiWindow):
+class MapWnd(fwWindow):
 
     def __init__(self,params):
 
+
         params['rect'] = MAP_WND_RECT
-        params['bg_color'] = MAP_WND_BACKGROUND
+        params['background_color'] = MAP_WND_BACKGROUND
         params['name'] = 'MapWnd'
 
-        super().__init__(params)        # parent - GuiWindow
+        super().__init__(params)        # parent - fwWindow
 
         self.control_wnd = params['control_wnd']    #для вывода ссобщений
 
@@ -93,15 +94,14 @@ class MapWnd(GuiWindow):
             Rock(600, 400, groups)
         )
 
-        self.arr_cars = []
-        groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
-        self.arr_cars.append(
-            Car(self,1800, 300, groups, self.control_wnd)
-        )
+
+
 
         #формирует дорогу
         self.init_road()
 
+        self.arr_cars = []
+        self.newGame()
 
         getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
         getMainWnd().registerHandler_KEYDOWN(self)
@@ -345,11 +345,21 @@ class MapWnd(GuiWindow):
             )
 
 
+    #начало новой игры (нажата кнопка new)
+    def newGame(self):
 
+        if (len(self.arr_cars)):
+            self.arr_cars[0].kill()
+            del (self.arr_cars[0])
 
+        groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
+        self.arr_cars.append(
+            Car(self,0, 300, groups, self.control_wnd)
+        )
 
 
     def update(self):
+        #self.update_child()    #у карты нет чайлдов
         self.arr_sprites_update.update()
         self.update_camera()
 
@@ -365,9 +375,8 @@ class MapWnd(GuiWindow):
             sprite.update_camera(camera_position_rect)
 
 
-
-
     def draw_this(self):
+
         #копируем карту тайлов
         #self.drawBackground()       #оригинальная родная заливка фона -
 

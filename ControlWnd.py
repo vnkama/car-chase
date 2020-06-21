@@ -1,35 +1,54 @@
 import pygame as pg
 from config import *
 
-
-from fw.GuiWindow import GuiWindow
+from fw.functions import *
+from fw.fwControlWnd import fwControlWnd
 from fw.GuiButton import GuiButton
+from fw.GuiCombobox import GuiCombobox
 from fw.GuiLabel import GuiLabel
 
 
 #
 # окно с органами управления игрой (форма)
 #
-class ControlWnd(GuiWindow):
+class ControlWnd(fwControlWnd):
 
     def __init__(self,params):
 
-        params['rect'] = CONTROL_WND_RECT
-        params['bg_color'] = CONTROL_WND_BACKGROUND
-        params['name'] = 'ControlWnd'
+        # params['rect'] = CONTROL_WND_RECT
+        # params['background_color'] = CONTROL_WND_BACKGROUND
+        # params['name'] = 'ControlWnd'
 
-        super().__init__(params)        # parent - GuiWindow
+        super().__init__(params)        # parent - fwWindow
+
+        ############################################
 
         self.createChild(GuiButton({
             'name': 'button-start',
-            'text': 'quit',
+            'text': 'New',
+            'parent_obj':self,
+            'rect': pg.Rect(20,380,120,32),
+            'font': 'arial_20',
+            'on_button_func': self.start_onButton
+        }))
+
+
+        self.createChild(GuiButton({
+            'name': 'button-quit',
+            'text': 'Quit',
             'parent_obj':self,
             'rect': pg.Rect(20,430,120,32),
-            'bg_color': CONTROL_WND_BACKGROUND,
-            'bg_hover_color': THEME_BACKGROUND_HOVER_COLOR,
-            'border_color': THEME_BORDER_COLOR_HIGH,
-            'border_width': 1,
             'font': 'arial_20',
+            'on_button_func': self.quit_onButton
+        }))
+
+        self.createChild(GuiCombobox({
+            'name': 'combo-test',
+            'text': 'combo',
+            'parent_obj':self,
+            'rect': pg.Rect(20,480,120,22),
+            'font': 'arial_20',
+            #'on_button_func': self.quit_onButton
         }))
 
         ############################################
@@ -72,10 +91,6 @@ class ControlWnd(GuiWindow):
 
 
 
-    def update(self):
-        pass
-
-
     def sendMessage(self,code,param1,param2=0):
         if (code == "WM_SET_PARAM_1"):
             self.lbl_speed.setText(param1)
@@ -84,4 +99,8 @@ class ControlWnd(GuiWindow):
             self.lbl_ticks.setText(param1)
 
 
+    def quit_onButton(self):
+        getMainWnd().is_mainloop_run = False
 
+    def start_onButton(self):
+        getMainWnd().newGame()

@@ -1,22 +1,21 @@
 import pygame as pg
 import traceback
-
+from fw.functions import *
 from config import *
-from fw.GuiWindow import GuiWindow
+from fw.fwWindow import fwWindow
 from fw.FwError import FwError
 
-from fw.functions import *
 
 
 
 #
 #
 #
-class Game(GuiWindow):
+class fwMainWnd(fwWindow):
 
     # pygame инициализируем как статический, т.к. CellWeed
     # грузит спрайты как статические, один набор спрайтов на все Weed
-    # а статические переменные расчитываются раньше чем конструктора
+    # а статические переменные расчитываются раньше чем запускается до __init__
 
     pg.init()
     pg.display.set_caption(MAIN_WND_TITLE)
@@ -28,15 +27,19 @@ class Game(GuiWindow):
     )
 
     def __init__(self):
-        (w,h) = Game.main_srf.get_size()
+
+        # укахатель на главное окно приложения
+        setMainWnd(self)
+
+        (w,h) = fwMainWnd.main_srf.get_size()
 
 
         super().__init__({
-            'name': 'Game class',
+            'name': 'fwMainWnd class',
             'parent_obj': None,                     # родительского окна нет
             'rect': pg.Rect(0,0,w,h),
-            'bg_color':   MAIN_WND_BACKGROUND,
-            'surface': Game.main_srf             #т.к. родительского окна у Game нет
+            'background_color':   MAIN_WND_BACKGROUND,
+            'surface': fwMainWnd.main_srf             #т.к. родительского окна у fwMainWnd нет
                                                  # subsurface вызывать не откуда, то передаем главную повехность для него как surface
         })
 
@@ -44,10 +47,11 @@ class Game(GuiWindow):
         self.is_mainloop_run = True
 
         pg.font.init()
-        #self.main_font = pygame.font.SysFont('Tahoma', CONTROL_WND_FONT_SIZE)
+
+        self.arr_fonts = {}
 
         #уставноим шрифты
-        setFonts({
+        self.setFonts({
              #индекс строго в нижнем регистре
              'arial_16': pg.font.SysFont('Arial', 16),
              'arial_20': pg.font.SysFont('Arial', 20),
@@ -70,6 +74,7 @@ class Game(GuiWindow):
 
     def __del__(self):
         pg.quit()
+
 
 
     #основной цикл приложения
@@ -125,11 +130,11 @@ class Game(GuiWindow):
     # def update(self):
     #     pass
 
+    # def draw(self):
+    #     super().draw()      #fwWindow
 
-
-    def draw(self):
-        super().draw()      #GuiWindow
-
+    def unregHandler_KEYDOWN(self,wnd):
+        self.arr_handlers_KEYDOWN.remove(wnd)
 
     def registerHandler_MOUSEMOTION(self,wnd):
         #добавим обработчик перемещения мыши
@@ -147,11 +152,20 @@ class Game(GuiWindow):
     def registerHandler_KEYDOWN(self,wnd):
         self.arr_handlers_KEYDOWN.append(wnd)
 
-    def unregHandler_KEYDOWN(self,wnd):
-        self.arr_handlers_KEYDOWN.remove(wnd)
+
 
     def registerHandler_KEYUP(self,wnd):
         self.arr_handlers_KEYUP.append(wnd)
 
     def unregHandler_KEYUP(self,wnd):
         self.arr_handlers_KEYUP.remove(wnd)
+
+
+
+    def getFont(self,name):
+        # global g_arr_fonts
+        # return g_arr_fonts.get(name.lower(), g_arr_fonts['tahoma_20'])
+        return self.arr_fonts.get(name.lower(), self.arr_fonts['tahoma_20'])
+
+    def setFonts(self,arr_fonts):
+        self.arr_fonts = arr_fonts

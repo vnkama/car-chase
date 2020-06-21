@@ -24,17 +24,9 @@ PI_d2 = PI/2
 
 
 
-g_arr_fonts = {}
 g_main_game = None
 g_conrol_wnd = None
 
-def setFonts(arr_fonts):
-    global g_arr_fonts
-    g_arr_fonts = arr_fonts
-
-def getFont(name):
-    global g_arr_fonts
-    return g_arr_fonts.get(name.lower(), g_arr_fonts['tahoma_20'])
 
 ########################################
 def getMainWnd():

@@ -1,16 +1,16 @@
-import pygame as pg
+#import pygame as pg
 from config import *
 from fw.functions import *
-from fw.GuiWindow import GuiWindow
+from fw.GuiControl import GuiControl
 
 #
 #
 #
-class GuiLabel(GuiWindow):
+class GuiLabel(GuiControl):
 
     def draw_this(self):
-        global getFont
-        text1_srf = getFont('arial_16').render(str(self.text), 1, HRGB(CONTROL_WND_FONT_COLOR))
+        #global getFont
+        text1_srf = getMainWnd().getFont('arial_16').render(str(self.text), 1, HRGB(CONTROL_WND_FONT_COLOR))
 
         but_rect = self.surface.get_rect()
         text_rect = text1_srf.get_rect()

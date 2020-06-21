@@ -1,6 +1,6 @@
-import pygame as pg
+#import pygame as pg
 from fw.functions import *
-from fw.game import Game
+from fw.fwMainWnd import fwMainWnd
 
 from ControlWnd import ControlWnd
 from MapWnd import MapWnd
@@ -9,15 +9,15 @@ from MapWnd import MapWnd
 #
 #
 #
-class RealApp(Game):
+class MainWnd(fwMainWnd):
 
     def __init__(self):
-        Game.__init__(self)
+        fwMainWnd.__init__(self)
 
-        # укахатель на главное окно приложения
-        setMainWnd(self)
 
-        self.control_wnd = ControlWnd({'parent_obj':self})
+        self.control_wnd = ControlWnd({
+            'parent_obj':self
+        })
         self.createChild(self.control_wnd)
 
         self.map_wnd = MapWnd({
@@ -34,3 +34,6 @@ class RealApp(Game):
         self.control_wnd.sendMessage("WM_SET_TICKS",dt)
         self.map_wnd.dt = dt
 
+
+    def newGame(self):
+        self.map_wnd.newGame()

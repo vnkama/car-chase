@@ -50,7 +50,6 @@ class Car(pg.sprite.Sprite):
         # self.map_rectpos здесь только объявлен, будет переопределен в setPos
         #self.map_rectpos = None
         self.map_rectpos = pg.Rect(0,0,0,0)
-
         self.map_pos_nd2 = nd2_getMatrix((x,y),1)
 
 
@@ -75,7 +74,7 @@ class Car(pg.sprite.Sprite):
 
         self.message = message
 
-        self.velocity = 10.0                #сколоксть начальная
+        self.velocity = 15.0                #сколоксть начальная
 
 
 
