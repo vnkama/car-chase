@@ -2,23 +2,7 @@ import math
 import numpy as np
 from fw.functions import *
 
-# class Vector2d:
-#     def __init__(self, x=0, y=0):
-#         self.x, self.y = x, y
-#
-#
-#     def summ_v(self,vector_b):
-#         pass
-#
-#     def scalar_mult(self,vector_b):
-#         pass
-#
-#     #угол между векторами
-#     def angle(self,vb):
-#         retrun (self.x * vb.x + self.y * vb.y) / (sqrt(self.x ** 2 + self.y ** 2) * sqrt(vb.x ** 2 + vb.y ** 2))
-#
-#     def len(self):
-#         return sqrt(self.x ** 2 + self.y ** 2)
+
 
 
 #

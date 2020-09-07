@@ -15,7 +15,7 @@ import random
 
 
 #
-# окно с органами управления игрой
+# окно с органами управления игрой space
 #
 class MapWnd(fwWindow):
 
@@ -375,7 +375,7 @@ class MapWnd(fwWindow):
             sprite.update_camera(camera_position_rect)
 
 
-    def draw_this(self):
+    def drawThis(self):
 
         #копируем карту тайлов
         #self.drawBackground()       #оригинальная родная заливка фона -

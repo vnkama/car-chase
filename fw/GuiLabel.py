@@ -8,7 +8,7 @@ from fw.GuiControl import GuiControl
 #
 class GuiLabel(GuiControl):
 
-    def draw_this(self):
+    def drawThis(self):
         #global getFont
         text1_srf = getMainWnd().getFont('arial_16').render(str(self.text), 1, HRGB(CONTROL_WND_FONT_COLOR))
 

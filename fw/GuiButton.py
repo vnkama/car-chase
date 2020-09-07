@@ -35,7 +35,7 @@ class GuiButton(GuiControl):
 
 
 
-    def draw_this(self):
+    def drawThis(self):
         if (not self.mouse_hover_flag):
             self.drawBackground()
         else:

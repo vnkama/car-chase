@@ -1,6 +1,8 @@
 #import pygame as pg
 from config import *
 from fw.functions import *
+#from fw.FwError import FwError
+
 from fw.fwWindow import fwWindow
 
 
@@ -11,11 +13,15 @@ class GuiControl(fwWindow):
 
     def __init__(self,params):
 
+        params['font'] = params.get('font',THEME_WINDOW_FONT)
+
         super().__init__(params)
 
         self.value = 0
         self.is_focus = 0
         self.background_color_hover = params.get('background_color_hover',self.background_color)
+
+        self.mouse_hover_flag =0
 
 
     # def __del__(self):

@@ -1,7 +1,7 @@
 #import pygame
-from MainWnd import *
+from AppWnd import *
 #from fw.functions import *
 
 
 if __name__ == "__main__":
-    MainWnd().run()
+    AppWnd().run()

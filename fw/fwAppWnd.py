@@ -1,17 +1,20 @@
 import pygame as pg
-import traceback
-from fw.functions import *
 from config import *
-from fw.fwWindow import fwWindow
+from fw.functions import *
 from fw.FwError import FwError
 
+import h5py
+import traceback
+from fw.fwWindow import fwWindow
+
+
 
 
 
 #
 #
 #
-class fwMainWnd(fwWindow):
+class fwAppWnd(fwWindow):
 
     # pygame инициализируем как статический, т.к. CellWeed
     # грузит спрайты как статические, один набор спрайтов на все Weed
@@ -26,20 +29,24 @@ class fwMainWnd(fwWindow):
         pg.FULLSCREEN
     )
 
+
+    #
+    #
+    #
     def __init__(self):
 
         # укахатель на главное окно приложения
         setMainWnd(self)
 
-        (w,h) = fwMainWnd.main_srf.get_size()
+        (w,h) = fwAppWnd.main_srf.get_size()
 
 
         super().__init__({
-            'name': 'fwMainWnd class',
-            'parent_obj': None,                     # родительского окна нет
+            'name': 'fwAppWnd class',
+            'parent_wnd': None,                     # родительского окна нет
             'rect': pg.Rect(0,0,w,h),
             'background_color':   MAIN_WND_BACKGROUND,
-            'surface': fwMainWnd.main_srf             #т.к. родительского окна у fwMainWnd нет
+            'surface': fwAppWnd.main_srf             #т.к. родительского окна у fwAppWnd нет
                                                  # subsurface вызывать не откуда, то передаем главную повехность для него как surface
         })
 
@@ -72,12 +79,18 @@ class fwMainWnd(fwWindow):
         self.arr_handlers_KEYUP = []
 
 
+
+    #
+    #
+    #
     def __del__(self):
         pg.quit()
 
 
 
+    #
     #основной цикл приложения
+    #
     def run(self):
 
         try:
@@ -98,7 +111,9 @@ class fwMainWnd(fwWindow):
 
 
 
-
+    #
+    #
+    #
     def handleEvents(self):
         for event in pg.event.get():
 
@@ -133,15 +148,15 @@ class fwMainWnd(fwWindow):
     # def draw(self):
     #     super().draw()      #fwWindow
 
-    def unregHandler_KEYDOWN(self,wnd):
-        self.arr_handlers_KEYDOWN.remove(wnd)
 
+    # добавим обработчик перемещения мыши
     def registerHandler_MOUSEMOTION(self,wnd):
-        #добавим обработчик перемещения мыши
         self.arr_handlers_MOUSEMOTION.append(wnd)
 
     def unregHandler_MOUSEMOTION(self,wnd):
         self.arr_handlers_MOUSEMOTION.remove(wnd)
+
+
 
     def registerHandler_MOUSEBUTTONDOWN(self,wnd):
         self.arr_handlers_MOUSEBUTTONDOWN.append(wnd)
@@ -149,8 +164,13 @@ class fwMainWnd(fwWindow):
     def unregHandler_MOUSEBUTTONDOWN(self,wnd):
         self.arr_handlers_MOUSEBUTTONDOWN.remove(wnd)
 
+
+
     def registerHandler_KEYDOWN(self,wnd):
         self.arr_handlers_KEYDOWN.append(wnd)
+
+    def unregHandler_KEYDOWN(self,wnd):
+        self.arr_handlers_KEYDOWN.remove(wnd)
 
 
 
@@ -163,7 +183,7 @@ class fwMainWnd(fwWindow):
 
 
     def getFont(self,name):
-        # global g_arr_fonts
+        # global g_arr_fonts;
         # return g_arr_fonts.get(name.lower(), g_arr_fonts['tahoma_20'])
         return self.arr_fonts.get(name.lower(), self.arr_fonts['tahoma_20'])
 

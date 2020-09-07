@@ -1,6 +1,6 @@
 #import pygame as pg
 from fw.functions import *
-from fw.fwMainWnd import fwMainWnd
+from fw.fwAppWnd import fwAppWnd
 
 from ControlWnd import ControlWnd
 from MapWnd import MapWnd
@@ -9,22 +9,22 @@ from MapWnd import MapWnd
 #
 #
 #
-class MainWnd(fwMainWnd):
+class AppWnd(fwAppWnd):
 
     def __init__(self):
-        fwMainWnd.__init__(self)
+        fwAppWnd.__init__(self)
 
 
         self.control_wnd = ControlWnd({
-            'parent_obj':self
+            'parent_wnd':self
         })
-        self.createChild(self.control_wnd)
+        self.addChildWnd(self.control_wnd)
 
         self.map_wnd = MapWnd({
-            'parent_obj':self,
+            'parent_wnd':self,
             'control_wnd':self.control_wnd
         })
-        self.createChild(self.map_wnd)
+        self.addChildWnd(self.map_wnd)
 
 
     def update(self):

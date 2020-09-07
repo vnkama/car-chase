@@ -1,7 +1,8 @@
 import pygame as pg
 from config import *
-
 from fw.functions import *
+#from fw.FwError import FwError
+
 from fw.fwControlWnd import fwControlWnd
 from fw.GuiButton import GuiButton
 from fw.GuiCombobox import GuiCombobox
@@ -23,80 +24,80 @@ class ControlWnd(fwControlWnd):
 
         ############################################
 
-        self.createChild(GuiButton({
+        self.addChildWnd(GuiButton({
             'name': 'button-start',
             'text': 'New',
-            'parent_obj':self,
+            'parent_wnd':self,
             'rect': pg.Rect(20,380,120,32),
-            'font': 'arial_20',
             'on_button_func': self.start_onButton
         }))
 
 
-        self.createChild(GuiButton({
+        self.addChildWnd(GuiButton({
             'name': 'button-quit',
             'text': 'Quit',
-            'parent_obj':self,
+            'parent_wnd':self,
             'rect': pg.Rect(20,430,120,32),
-            'font': 'arial_20',
             'on_button_func': self.quit_onButton
         }))
 
-        self.createChild(GuiCombobox({
+        self.addChildWnd(GuiCombobox({
             'name': 'combo-test',
-            'text': 'combo',
-            'parent_obj':self,
+            'text': ["one","two","three","four"],
+            'value' : "two",
+            'parent_wnd':self,
             'rect': pg.Rect(20,480,120,22),
-            'font': 'arial_20',
             #'on_button_func': self.quit_onButton
         }))
 
         ############################################
-        #
-        self.createChild(GuiLabel({
-            'parent_obj':self,
+
+        self.addChildWnd(GuiLabel({
+            'parent_wnd':self,
             'rect': pg.Rect(0,100,60,32),
             'text': 'Param 1:',
-            'font': 'arial_20',
         }))
 
 
-        #
+
         self.lbl_speed = GuiLabel({
-            'parent_obj': self,
+            'parent_wnd': self,
             'rect': pg.Rect(61, 100, 200, 32),
             'text': '0',
-            'font': 'arial_20',
         })
-        self.createChild(self.lbl_speed)
+        self.addChildWnd(self.lbl_speed)
 
         ############################################
-        #
-        self.createChild(GuiLabel({
-            'parent_obj':self,
+
+        self.addChildWnd(GuiLabel({
+            'parent_wnd':self,
             'rect': pg.Rect(0,140,100,32),
             'text': 'ticks:',
-            'font': 'arial_20',
         }))
 
 
-        #
         self.lbl_ticks = GuiLabel({
-            'parent_obj': self,
+            'parent_wnd': self,
             'rect': pg.Rect(80, 140, 100, 32),
             'text': '0',
-            'font': 'arial_20',
         })
-        self.createChild(self.lbl_ticks)
+        self.addChildWnd(self.lbl_ticks)
 
 
 
-    def sendMessage(self,code,param1,param2=0):
+    def sendMessage(self,code,param1=None,param2=None):
         if (code == "WM_SET_PARAM_1"):
             self.lbl_speed.setText(param1)
 
         elif (code == "WM_SET_TICKS"):
             self.lbl_ticks.setText(param1)
+
+        else:
+            #если не обработали здесь то отправляем наверх
+            super().sendMessage(code,param1,param2)
+
+
+
 
 
     def quit_onButton(self):
@@ -104,3 +105,6 @@ class ControlWnd(fwControlWnd):
 
     def start_onButton(self):
         getMainWnd().newGame()
+
+
+
