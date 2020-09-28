@@ -5,7 +5,8 @@ import pygame as pg
 
 
 #
-#
+# базовый класс окна.
+# класс абстрактный, напрямую  объект от него не создаетсмя
 #
 class fwWindow:
 
@@ -62,9 +63,9 @@ class fwWindow:
 
 
     def update(self):
-        self.update_child()
+        self.updateChildWnds()
 
-    def update_child(self):
+    def updateChildWnds(self):
         for child_object in self.child_objects:
             child_object.update()
 
@@ -117,4 +118,12 @@ class fwWindow:
 
     def sendMessage(self,code,param1=None,param2=None):
         pass
+
+
+    # абстарнктные обработчики событий клавиатуры и мыши
+    # реальные нужно определять в классах наследниках, там где необходимы
+    def handle_MOUSEMOTION(self, event):        pass
+    def handle_MOUSEBUTTONDOWN(self, event):    pass
+    def handle_KEYDOWN(self, event):            pass
+    def handle_KEYUP(self, event):              pass
 

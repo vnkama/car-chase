@@ -2,7 +2,7 @@
 from fw.functions import *
 from fw.fwAppWnd import fwAppWnd
 
-from ControlWnd import ControlWnd
+from ToolWnd import ToolWnd
 from MapWnd import MapWnd
 
 
@@ -15,7 +15,7 @@ class AppWnd(fwAppWnd):
         fwAppWnd.__init__(self)
 
 
-        self.control_wnd = ControlWnd({
+        self.control_wnd = ToolWnd({
             'parent_wnd':self
         })
         self.addChildWnd(self.control_wnd)

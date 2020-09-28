@@ -4,7 +4,7 @@ from config import *
 from fw.functions import *
 from Vector import *
 
-from fw.fwWindow import fwWindow
+from fw.fwMapWnd import fwMapWnd
 from Tile import *
 from Car import *
 from Camera import *
@@ -14,10 +14,11 @@ import random
 
 
 
+
 #
-# окно с органами управления игрой space
+# окно с картой
 #
-class MapWnd(fwWindow):
+class MapWnd(fwMapWnd):
 
     def __init__(self,params):
 
@@ -359,7 +360,7 @@ class MapWnd(fwWindow):
 
 
     def update(self):
-        #self.update_child()    #у карты нет чайлдов
+        #self.updateChildWnds()    #у карты нет чайлдов
         self.arr_sprites_update.update()
         self.update_camera()
 

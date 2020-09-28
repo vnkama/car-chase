@@ -182,10 +182,16 @@ class fwAppWnd(fwWindow):
 
 
 
+    #
+    #
+    #
     def getFont(self,name):
         # global g_arr_fonts;
         # return g_arr_fonts.get(name.lower(), g_arr_fonts['tahoma_20'])
         return self.arr_fonts.get(name.lower(), self.arr_fonts['tahoma_20'])
 
+    #
+    #
+    #
     def setFonts(self,arr_fonts):
         self.arr_fonts = arr_fonts

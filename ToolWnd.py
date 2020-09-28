@@ -3,7 +3,7 @@ from config import *
 from fw.functions import *
 #from fw.FwError import FwError
 
-from fw.fwControlWnd import fwControlWnd
+from fw.fwToolWnd import fwToolWnd
 from fw.GuiButton import GuiButton
 from fw.GuiCombobox import GuiCombobox
 from fw.GuiLabel import GuiLabel
@@ -12,7 +12,7 @@ from fw.GuiLabel import GuiLabel
 #
 # окно с органами управления игрой (форма)
 #
-class ControlWnd(fwControlWnd):
+class ToolWnd(fwToolWnd):
 
     def __init__(self,params):
 

@@ -10,7 +10,7 @@ from fw.GuiSelectList import GuiSelectList
 #
 #
 #
-class fwControlWnd(fwWindow):
+class fwToolWnd(fwWindow):
 
     def __init__(self,params):
 
