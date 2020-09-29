@@ -28,7 +28,7 @@ class ToolWnd(fwToolWnd):
             'name': 'button-start',
             'text': 'New',
             'parent_wnd':self,
-            'rect': pg.Rect(20,380,120,32),
+            'rect': pg.Rect(20,380,80,24),
             'on_button_func': self.start_onButton
         }))
 
@@ -37,9 +37,29 @@ class ToolWnd(fwToolWnd):
             'name': 'button-quit',
             'text': 'Quit',
             'parent_wnd':self,
-            'rect': pg.Rect(20,430,120,32),
+            'rect': pg.Rect(120,380,80,24),
             'on_button_func': self.quit_onButton
         }))
+
+        ############################################
+
+
+        self.addChildWnd(GuiButton({
+            'name': 'button-play',
+            'text': 'Play',
+            'parent_wnd':self,
+            'rect': pg.Rect(15,430,80,24),
+            'on_button_func': self.play_onButton
+        }))
+
+        self.addChildWnd(GuiButton({
+            'name': 'button-pause',
+            'text': 'Pause',
+            'parent_wnd':self,
+            'rect': pg.Rect(100,430,80,24),
+            'on_button_func': self.play_onButton
+        }))
+
 
         self.addChildWnd(GuiCombobox({
             'name': 'combo-test',
@@ -107,4 +127,5 @@ class ToolWnd(fwToolWnd):
         getMainWnd().newGame()
 
 
-
+    def play_onButton(self):
+        pass
