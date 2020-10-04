@@ -10,7 +10,7 @@ class GuiLabel(GuiControl):
 
     def drawThis(self):
         #global getFont
-        text1_srf = getMainWnd().getFont('arial_16').render(str(self.text), 1, HRGB(CONTROL_WND_FONT_COLOR))
+        text1_srf = getAppWnd().getFont('arial_16').render(str(self.text), 1, HRGB(CONTROL_WND_FONT_COLOR))
 
         but_rect = self.surface.get_rect()
         text_rect = text1_srf.get_rect()

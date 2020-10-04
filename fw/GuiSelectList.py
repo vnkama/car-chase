@@ -23,8 +23,8 @@ class GuiSelectList(GuiControl):
         self.arr_text = params['text']
 
 
-        getMainWnd().registerHandler_MOUSEMOTION(self)
-        getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
+        getAppWnd().registerHandler_MOUSEMOTION(self)
+        getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
 
         self.is_drawed = 0  #пока ни разу не нарисован
 
@@ -33,8 +33,8 @@ class GuiSelectList(GuiControl):
     #
     #
     def desctructor(self):
-        getMainWnd().unregHandler_MOUSEMOTION(self)
-        getMainWnd().unregHandler_MOUSEBUTTONDOWN(self)
+        getAppWnd().unregHandler_MOUSEMOTION(self)
+        getAppWnd().unregHandler_MOUSEBUTTONDOWN(self)
 
 
     def drawThis(self):
@@ -47,7 +47,7 @@ class GuiSelectList(GuiControl):
 
         self.drawBorder()
 
-        font_obj = getMainWnd().getFont('arial_16')
+        font_obj = getAppWnd().getFont('arial_16')
 
         #выведем строки в выпадающем спсике
         for i,cur_string in enumerate(self.arr_text):
@@ -89,10 +89,10 @@ class GuiSelectList(GuiControl):
     # закрыть без сохранения
     #
     def closeWoSaving(self):
-        self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD")
+        self.parent_wnd.sendMessage(None, "WM_CLOSE_TMP_CHILD")
 
     #
     # закрыть без сохранения
     #
     def closeSetValue(self,value):
-        self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD",value)
+        self.parent_wnd.sendMessage(None, "WM_CLOSE_TMP_CHILD",value)

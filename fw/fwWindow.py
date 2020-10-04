@@ -116,8 +116,21 @@ class fwWindow:
     def addChildWnd(self,new_child):
         self.child_objects.append(new_child)
 
-    def sendMessage(self,code,param1=None,param2=None):
-        pass
+    # def handleMessageToChilds_handler(self, client_wnd, msg, param1, param2):
+    #     self.sendMessageToChilds(self, client_wnd, msg, param1, param2)
+
+    def sendMessageToChilds(self, client_wnd, msg, param1=None, param2=None):
+        for child_object in self.child_objects:
+            child_object.sendMessage(client_wnd, msg, param1, param2)
+
+
+    #
+    # функция пустая, переопределять
+    #   return True если сообщение обработано
+    #   False если сообщение не обработано
+    #
+    def sendMessage(self,client_wnd, msg, param1=None, param2=None):
+        return False
 
 
     # абстарнктные обработчики событий клавиатуры и мыши

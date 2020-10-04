@@ -12,9 +12,10 @@ from MapWnd import MapWnd
 class AppWnd(fwAppWnd):
 
     def __init__(self):
-        fwAppWnd.__init__(self)
+        #fwAppWnd.__init__(self)
+        super().__init__()
 
-
+        #
         self.control_wnd = ToolWnd({
             'parent_wnd':self
         })
@@ -26,14 +27,21 @@ class AppWnd(fwAppWnd):
         })
         self.addChildWnd(self.map_wnd)
 
+        self.newGame()
 
+
+
+
+    #
+    #
+    #
     def update(self):
         super().update()
 
         dt = self.main_timer.get_time()
-        self.control_wnd.sendMessage("WM_SET_TICKS",dt)
+        self.control_wnd.sendMessage(None, "WM_SET_TICKS",dt)
         self.map_wnd.dt = dt
 
 
-    def newGame(self):
-        self.map_wnd.newGame()
+
+

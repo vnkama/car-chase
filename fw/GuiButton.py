@@ -18,8 +18,8 @@ class GuiButton(GuiControl):
 
         super().__init__(params)
 
-        getMainWnd().registerHandler_MOUSEMOTION(self)
-        getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
+        getAppWnd().registerHandler_MOUSEMOTION(self)
+        getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
 
         self.on_button_func =  params.get('on_button_func', None)
 
@@ -44,7 +44,7 @@ class GuiButton(GuiControl):
         self.drawBorder()
 
         #global getFont
-        f = getMainWnd().getFont('arial_16')
+        f = getAppWnd().getFont('arial_16')
         text1_srf = f.render(self.text, 1, HRGB(CONTROL_WND_FONT_COLOR))
 
 

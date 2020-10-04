@@ -3,9 +3,19 @@ import pygame as pg     #использован pg.Rect
 
 FPS_RATE=60                             #частота кадров в сек 60
 MAIN_WND_TITLE      ='Car chase'        #имя главного окна
-MAIN_WND_HEIGHT     = 896               #768(в окне win)   # размер определен спрайтом зелени 128 * 6 = 768
-MAIN_WND_WIDTH      = 1600              #1400(в окне win)
+MAIN_WND_FULLSCREEN = 1
 MAIN_WND_BACKGROUND = 0x682828          #debug
+
+if (MAIN_WND_FULLSCREEN):
+    # MAIN_WND_HEIGHT     = 896             # для фулл скрин
+    # MAIN_WND_WIDTH      = 1600
+    MAIN_WND_HEIGHT     = 900             # для фулл скрин
+    MAIN_WND_WIDTH      = 1600
+else:
+    MAIN_WND_HEIGHT     = 768               #768(в окне win)   # размер определен спрайтом зелени 128 * 6 = 768
+    MAIN_WND_WIDTH      = 1400              #1400(в окне win)
+
+
 
 #размер игровой карты (НЕ экрана)
 MAP_SIZE_X = 2560
@@ -48,5 +58,8 @@ MAP_WND_RECT            = pg.Rect(0,0,MAIN_WND_WIDTH - CONTROL_WND_WIDTH,MAIN_WN
 MAP_WND_BACKGROUND      = 0x682848
 
 
-ERROR_CONSOLE_COLOR = "\033[35m\033[1m"
+CONSOLE_CLR_ERROR   = "\033[35m\033[1m"
+CONSOLE_CLR_RED     = "\033[31m\033[1m"
+CONSOLE_CLR_GREEN   = "\033[32m\033[1m"
+CONSOLE_CLR_RESET   = "\033[0m"
 

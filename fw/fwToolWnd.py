@@ -23,7 +23,7 @@ class fwToolWnd(fwWindow):
         self.tmp_child_wnd = None   # временное окно для всплывашек открытого комбобокса итд
 
 
-    def sendMessage(self,code,param1=None,param2=None):
+    def sendMessage(self, client_wnd, code, param1=None, param2=None):
 
         if (code == "WM_CREATE_TMP_CHILD"):
             self.createTmpChildWnd(param1,param2)
@@ -52,7 +52,7 @@ class fwToolWnd(fwWindow):
 
 
     #
-    #закрыть дочернее окно
+    # закрыть дочернее окно
     #
     def closeTmpChild(self,value):
         #value - возвращенное значение

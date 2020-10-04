@@ -29,7 +29,7 @@ g_conrol_wnd = None
 
 
 ########################################
-def getMainWnd():
+def getAppWnd():
     global g_main_game
     return g_main_game
 

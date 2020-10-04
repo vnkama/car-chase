@@ -12,10 +12,10 @@ class FwError(Exception):
 
     def out(self):
         if (self.param is not None):
-            print(ERROR_CONSOLE_COLOR +  f"FwError.out() message:")
+            print(CONSOLE_CLR_ERROR +  f"FwError.out() message:")
             print(f"{self.param}")
         else:
-            print(ERROR_CONSOLE_COLOR +  f"FwError.out() NO message.")
+            print(CONSOLE_CLR_ERROR +  f"FwError.out() NO message.")
 
 
 

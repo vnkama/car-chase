@@ -30,8 +30,8 @@ class GuiCombobox(GuiControl):
         if (len(self.arr_text) < 2 or len(self.arr_text) > 10):
             raise FwError
 
-        getMainWnd().registerHandler_MOUSEMOTION(self)
-        getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
+        getAppWnd().registerHandler_MOUSEMOTION(self)
+        getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
 
 
 
@@ -55,7 +55,7 @@ class GuiCombobox(GuiControl):
             archer_rect)
 
         #output textvalue
-        text_srf = getMainWnd().getFont('arial_16').render(self.value, 1, HRGB(CONTROL_WND_FONT_COLOR))
+        text_srf = getAppWnd().getFont('arial_16').render(self.value, 1, HRGB(CONTROL_WND_FONT_COLOR))
         self.surface.blit(
             text_srf,
             (5, 1)
@@ -112,7 +112,7 @@ class GuiCombobox(GuiControl):
             'value': self.value,
         }
 
-        self.parent_wnd.sendMessage("WM_CREATE_TMP_CHILD", params1, params2)
+        self.parent_wnd.sendMessage(None, "WM_CREATE_TMP_CHILD", params1, params2)
 
 
     #

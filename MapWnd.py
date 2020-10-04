@@ -104,9 +104,9 @@ class MapWnd(fwMapWnd):
         self.arr_cars = []
         self.newGame()
 
-        getMainWnd().registerHandler_MOUSEBUTTONDOWN(self)
-        getMainWnd().registerHandler_KEYDOWN(self)
-        getMainWnd().registerHandler_KEYUP(self)
+        getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
+        getAppWnd().registerHandler_KEYDOWN(self)
+        getAppWnd().registerHandler_KEYUP(self)
 
 
 
@@ -345,6 +345,12 @@ class MapWnd(fwMapWnd):
                 )
             )
 
+    #
+    #
+    #
+    # def sendMessage(self,client_wnd, msg, param1=None, param2=None):
+    #     if (msg == 'WM_NEW_APP'):
+    #         self.newGame
 
     #начало новой игры (нажата кнопка new)
     def newGame(self):

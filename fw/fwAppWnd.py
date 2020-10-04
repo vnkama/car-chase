@@ -3,7 +3,7 @@ from config import *
 from fw.functions import *
 from fw.FwError import FwError
 
-import h5py
+#import h5py
 import traceback
 from fw.fwWindow import fwWindow
 
@@ -16,18 +16,29 @@ from fw.fwWindow import fwWindow
 #
 class fwAppWnd(fwWindow):
 
+
+
+
     # pygame инициализируем как статический, т.к. CellWeed
     # грузит спрайты как статические, один набор спрайтов на все Weed
     # а статические переменные расчитываются раньше чем запускается до __init__
 
     pg.init()
     pg.display.set_caption(MAIN_WND_TITLE)
-    #main_srf = pg.display.set_mode((MAIN_WND_WIDTH, MAIN_WND_HEIGHT))
 
-    main_srf = pg.display.set_mode(
-        (1600, 900),
-        pg.FULLSCREEN
-    )
+    if (MAIN_WND_FULLSCREEN):
+        #вариант для FULLSCREEN
+        main_srf = pg.display.set_mode(
+            #(1600, 900),
+            (MAIN_WND_WIDTH, MAIN_WND_HEIGHT),
+            pg.FULLSCREEN
+        )
+
+    else:
+        # вариант для запуска в окне
+        main_srf = pg.display.set_mode(
+            (MAIN_WND_WIDTH, MAIN_WND_HEIGHT)
+        )
 
 
     #
@@ -35,8 +46,10 @@ class fwAppWnd(fwWindow):
     #
     def __init__(self):
 
+
         # укахатель на главное окно приложения
         setMainWnd(self)
+        print(CONSOLE_CLR_ERROR + "AppWnd.__init__" + CONSOLE_CLR_RESET)
 
         (w,h) = fwAppWnd.main_srf.get_size()
 
@@ -66,6 +79,8 @@ class fwAppWnd(fwWindow):
         })
 
 
+
+
         #mousemotion окна-обработчики перемещения мыши
         self.arr_handlers_MOUSEMOTION = []
 
@@ -80,12 +95,24 @@ class fwAppWnd(fwWindow):
 
 
 
+
+
+
     #
     #
     #
     def __del__(self):
         pg.quit()
 
+
+    def sendMessage(self,client_wnd,code,param1=None,param2=None):
+        #super().sendMessage(self, client_wnd, code, param1, param2)    #fwWindow.sendMessage - пустой метод, вызывать ненужно
+
+        if (code == "WM_QUIT_APP"):
+            self.quitApp()
+
+        elif (code == "WM_NEW_APP"):
+            self.newGame()
 
 
     #
@@ -109,6 +136,20 @@ class fwAppWnd(fwWindow):
             e.out()
             traceback.print_exc()
 
+    #
+    #
+    #
+    def quitApp(self):
+        self.is_mainloop_run = False
+        print(CONSOLE_CLR_RED + "AppWnd.quitApp" + CONSOLE_CLR_RESET)
+
+
+
+    def newGame(self):
+        print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
+        self.state = 'APP_STATE_NEW'
+        self.sendMessageToChilds(self,"WM_NEW_APP", self.state)
+        #self.map_wnd.newGame()
 
 
     #

@@ -470,7 +470,7 @@ class Car(pg.sprite.Sprite):
 
 
         sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
-        self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
+        self.message.sendMessage(None, "WM_SET_PARAM_1", f"{sss}" )
 
 
 
