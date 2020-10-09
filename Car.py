@@ -169,7 +169,6 @@ class Car(pg.sprite.Sprite):
 
 
     def update(self):
-        #print("update")
         self.update_movement()
         self.update_sensors()
 

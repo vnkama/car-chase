@@ -31,7 +31,7 @@ class Tree(pg.sprite.Sprite):
 
     image = pg.image.load("./images/tree_small.png").convert_alpha()
 
-    def __init__(self,x,y,groups):
+    def __init__(self, x, y, groups):
         super().__init__(groups)
 
         # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
@@ -46,7 +46,7 @@ class Tree(pg.sprite.Sprite):
 
         self.rect = self.map_rect.copy()
 
-    def update_camera(self,camera_rect):
+    def update_camera(self, camera_rect):
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
 

@@ -51,13 +51,16 @@ class ToolWnd(fwToolWnd):
             'on_button_func': self.play_onButton
         }))
 
-        self.addChildWnd(GuiButton({
+        btnPause = self.addChildWnd(GuiButton({
             'name': 'button-pause',
             'text': 'Pause',
             'parent_wnd':self,
             'rect': pg.Rect(138,60,60,32),
             'on_button_func': self.play_onButton
         }))
+
+        btnPause.disable()
+
 
         ############################################
 

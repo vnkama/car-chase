@@ -93,8 +93,11 @@ class fwAppWnd(fwWindow):
         #окна-обработчики окончания нажатия кнопок клавиатуры
         self.arr_handlers_KEYUP = []
 
+        self.initMainWindows()
 
-
+      # определитв классе наследнике
+    # def initMainWindows(self):
+    #     pass
 
 
 
@@ -148,7 +151,9 @@ class fwAppWnd(fwWindow):
     def newGame(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
         self.state = 'APP_STATE_NEW'
-        self.sendMessageToChilds(self,"WM_NEW_APP", self.state)
+
+        #self.sendMessageToChilds(self,"WM_NEW_APP", self.state)
+
         #self.map_wnd.newGame()
 
 

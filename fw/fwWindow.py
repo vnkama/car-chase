@@ -1,5 +1,5 @@
 import pygame as pg
-# from config import *
+from config import *
 # from fw.functions import *
 # from fw.FwError import FwError
 
@@ -13,6 +13,7 @@ class fwWindow:
     def __init__(self,params):
         self.parent_wnd = params['parent_wnd']
 
+        self.enabled = True
         self.child_objects = []
 
         if self.parent_wnd is not None:
@@ -81,13 +82,16 @@ class fwWindow:
 
     def drawBorder(self):
         #рисуем свою рамку, если есть
-        if self.border_width is not None and self.border_color is not None :
+        if self.border_width is not None and self.border_color is not None:
+
+            color = self.border_color if self.enabled else THEME_BUTTON_BORDER_DISABLED_COLOR
+
             if self.border_width > 0:
                 surface_rect = self.surface.get_rect()
 
                 pg.draw.rect(
                     self.surface,
-                    self.border_color,
+                    color,
                     surface_rect,
                     self.border_width)
 
@@ -107,14 +111,15 @@ class fwWindow:
     #
     #
     #
-    def setText(self,new_text):
+    def setText(self, new_text):
         self.text = new_text
 
     def getSurface(self):
         return self.surface
 
-    def addChildWnd(self,new_child):
+    def addChildWnd(self, new_child):
         self.child_objects.append(new_child)
+        return new_child
 
     # def handleMessageToChilds_handler(self, client_wnd, msg, param1, param2):
     #     self.sendMessageToChilds(self, client_wnd, msg, param1, param2)
@@ -139,4 +144,11 @@ class fwWindow:
     def handle_MOUSEBUTTONDOWN(self, event):    pass
     def handle_KEYDOWN(self, event):            pass
     def handle_KEYUP(self, event):              pass
+
+
+    def disable(self):
+        self.enabled = False
+
+    def enable(self):
+        self.enabled = True
 

@@ -26,26 +26,31 @@ class GuiButton(GuiControl):
 
 
     def handle_MOUSEBUTTONDOWN(self,event):
-        if (event.button == 1):
-            # нажата левая кнопка
+        if (self.enabled):
 
-            if (self.isPointInWindow(event.pos) and self.on_button_func is not None):
-                #кнопка нажата в зоне кнопки
-                self.on_button_func()
+            if (event.button == 1):
+                # нажата левая кнопка
+
+                if (self.isPointInWindow(event.pos) and self.on_button_func is not None):
+                    #кнопка нажата в зоне кнопки
+                    self.on_button_func()
 
 
 
     def drawThis(self):
-        if (not self.mouse_hover_flag):
+
+        if (not self.mouse_hover_flag or not self.enabled):
             self.drawBackground()
         else:
             self.drawBackground(self.background_color_hover)
 
         self.drawBorder()
 
-        #global getFont
         f = getAppWnd().getFont('arial_16')
-        text1_srf = f.render(self.text, 1, HRGB(CONTROL_WND_FONT_COLOR))
+        color = CONTROL_WND_FONT_COLOR if (self.enabled) else CONTROL_WND_FONT_DISABLED_COLOR;
+        text1_srf = f.render(self.text, 1, HRGB(color))
+
+
 
 
         but_rect = self.surface.get_rect()
