@@ -4,9 +4,9 @@ from fw.functions import *
 from Vector import *
 import math
 from fRect import *
-
-
 from Brezenhem import Brezenhem
+import numpy as np
+
 
 #
 #
@@ -469,7 +469,7 @@ class Car(pg.sprite.Sprite):
 
 
         sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
-        self.message.sendMessage(None, "WM_SET_PARAM_1", f"{sss}" )
+        self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
 
 
 
@@ -482,14 +482,12 @@ class Car(pg.sprite.Sprite):
     #     self.draw_sensors()
 
     def draw_sensors(self):
-
-        for ai,sensor_wnd_pos in np.ndenumerate(self.arr_sensors_wnd_pos):
-            i=ai[0] #индекс
-
+        for ai, sensor_wnd_pos in np.ndenumerate(self.arr_sensors_wnd_pos):
+            i = ai[0]  # индекс
 
             pg.draw.line(
                 self.map.surface,
-                (255,0,128,128),
+                (255, 0, 128, 128),
                 self.wnd_rect.center,
                 sensor_wnd_pos,
                 1
@@ -498,7 +496,7 @@ class Car(pg.sprite.Sprite):
 
 
     def setTarget(self, target_rect):
-        #задает цель для движения
+        # задает цель для движения
 
         self.target_rect = target_rect
         self.is_moving = 1

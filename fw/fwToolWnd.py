@@ -23,13 +23,19 @@ class fwToolWnd(fwWindow):
         self.tmp_child_wnd = None   # временное окно для всплывашек открытого комбобокса итд
 
 
-    def sendMessage(self, client_wnd, code, param1=None, param2=None):
+    def sendMessage(self, msg, param1=None, param2=None):
 
-        if (code == "WM_CREATE_TMP_CHILD"):
+        if (msg == "WM_CREATE_TMP_CHILD"):
             self.createTmpChildWnd(param1,param2)
 
-        elif (code == "WM_CLOSE_TMP_CHILD"):
+        elif (msg == "WM_CLOSE_TMP_CHILD"):
             self.closeTmpChild(param1)
+
+        elif (msg == 'WM_NEW_GAME'):
+            self.newGame()
+
+        elif (msg == 'WM_UPDATE'):
+            pass
 
 
 
@@ -74,7 +80,7 @@ class fwToolWnd(fwWindow):
     def drawChildWnds(self):
         super().drawChildWnds()
 
-        #рисуем временное окно если есть
+        # рисуем временное окно если есть
         if (self.tmp_child_wnd is not None):
             self.tmp_child_wnd.draw()
 

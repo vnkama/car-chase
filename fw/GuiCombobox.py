@@ -112,7 +112,7 @@ class GuiCombobox(GuiControl):
             'value': self.value,
         }
 
-        self.parent_wnd.sendMessage(None, "WM_CREATE_TMP_CHILD", params1, params2)
+        self.parent_wnd.sendMessage("WM_CREATE_TMP_CHILD", params1, params2)
 
 
     #

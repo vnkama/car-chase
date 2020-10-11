@@ -46,13 +46,11 @@ class fwAppWnd(fwWindow):
     #
     def __init__(self):
 
-
         # укахатель на главное окно приложения
         setMainWnd(self)
         print(CONSOLE_CLR_ERROR + "AppWnd.__init__" + CONSOLE_CLR_RESET)
 
         (w,h) = fwAppWnd.main_srf.get_size()
-
 
         super().__init__({
             'name': 'fwAppWnd class',
@@ -70,9 +68,9 @@ class fwAppWnd(fwWindow):
 
         self.arr_fonts = {}
 
-        #уставноим шрифты
+        # уставноим шрифты
         self.setFonts({
-             #индекс строго в нижнем регистре
+             # индекс строго в нижнем регистре
              'arial_16': pg.font.SysFont('Arial', 16),
              'arial_20': pg.font.SysFont('Arial', 20),
              'tahoma_20': pg.font.SysFont('Tahoma', 20),
@@ -81,21 +79,21 @@ class fwAppWnd(fwWindow):
 
 
 
-        #mousemotion окна-обработчики перемещения мыши
+        # mousemotion окна-обработчики перемещения мыши
         self.arr_handlers_MOUSEMOTION = []
 
-        #окна-обработчики нажатия кнопок мыши
+        # окна-обработчики нажатия кнопок мыши
         self.arr_handlers_MOUSEBUTTONDOWN = []
 
-        #окна-обработчики нажатия кнопок клавиатуры
+        # окна-обработчики нажатия кнопок клавиатуры
         self.arr_handlers_KEYDOWN = []
 
-        #окна-обработчики окончания нажатия кнопок клавиатуры
+        # окна-обработчики окончания нажатия кнопок клавиатуры
         self.arr_handlers_KEYUP = []
 
         self.initMainWindows()
 
-      # определитв классе наследнике
+    # # определить в классе наследнике
     # def initMainWindows(self):
     #     pass
 
@@ -108,13 +106,13 @@ class fwAppWnd(fwWindow):
         pg.quit()
 
 
-    def sendMessage(self,client_wnd,code,param1=None,param2=None):
-        #super().sendMessage(self, client_wnd, code, param1, param2)    #fwWindow.sendMessage - пустой метод, вызывать ненужно
+    def sendMessage(self, code,param1=None,param2=None):
+        #super().sendMessage(self, code, param1, param2)    #fwWindow.sendMessage - пустой метод, вызывать ненужно
 
         if (code == "WM_QUIT_APP"):
             self.quitApp()
 
-        elif (code == "WM_NEW_APP"):
+        elif (code == "WM_NEW_GAME"):
             self.newGame()
 
 
@@ -152,9 +150,10 @@ class fwAppWnd(fwWindow):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
         self.state = 'APP_STATE_NEW'
 
-        #self.sendMessageToChilds(self,"WM_NEW_APP", self.state)
+        self.sendMessageToChilds("WM_NEW_GAME")
 
-        #self.map_wnd.newGame()
+
+
 
 
     #
@@ -231,7 +230,7 @@ class fwAppWnd(fwWindow):
     #
     #
     #
-    def getFont(self,name):
+    def getFont(self, name):
         # global g_arr_fonts;
         # return g_arr_fonts.get(name.lower(), g_arr_fonts['tahoma_20'])
         return self.arr_fonts.get(name.lower(), self.arr_fonts['tahoma_20'])

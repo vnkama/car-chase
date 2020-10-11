@@ -17,7 +17,7 @@ class fwWindow:
         self.child_objects = []
 
         if self.parent_wnd is not None:
-            #есть родительское
+            # есть родительское
             self.surface = self.parent_wnd.surface.subsurface(params['rect'])
 
 
@@ -27,9 +27,10 @@ class fwWindow:
             # в таком случеа поверхность должна была быть передана при вызове
             self.surface = params['surface']
 
-        #-------
+        # -------
 
-        self.background_color = params.get('background_color',None)
+        self.background_color = params.get('background_color', None)
+        self.background_disabled_color = params.get('background_color', self.background_color)
 
 
         self.border_color = params.get('border_color',None)
@@ -39,6 +40,7 @@ class fwWindow:
         self.text = params.get('text',None)
         self.name = params.get('name',None)
 
+        #self.child_funcs_arr = {"newGame": self.newGame}
 
 
     def draw(self):
@@ -48,27 +50,20 @@ class fwWindow:
 
 
     def drawThis(self):
-        #как правило эту функцию следует переопределить
+        # как правило эту функцию следует переопределить
 
-        #закрасит свой фон (если есть)
+        # закрасит свой фон (если есть)
         self.drawBackground()
 
 
 
     def drawChildWnds(self):
-        #вызовем draw очерних окон
+        # вызовем draw очерних окон
         if len(self.child_objects):
             for wnd in self.child_objects:
                 wnd.draw()
 
 
-
-    def update(self):
-        self.updateChildWnds()
-
-    def updateChildWnds(self):
-        for child_object in self.child_objects:
-            child_object.update()
 
 
 
@@ -121,12 +116,7 @@ class fwWindow:
         self.child_objects.append(new_child)
         return new_child
 
-    # def handleMessageToChilds_handler(self, client_wnd, msg, param1, param2):
-    #     self.sendMessageToChilds(self, client_wnd, msg, param1, param2)
 
-    def sendMessageToChilds(self, client_wnd, msg, param1=None, param2=None):
-        for child_object in self.child_objects:
-            child_object.sendMessage(client_wnd, msg, param1, param2)
 
 
     #
@@ -134,8 +124,23 @@ class fwWindow:
     #   return True если сообщение обработано
     #   False если сообщение не обработано
     #
-    def sendMessage(self,client_wnd, msg, param1=None, param2=None):
+    def sendMessage(self, msg, param1=None, param2=None):
         return False
+
+    #
+    def sendMessageToChilds(self, msg, param1=None, param2=None):
+        for child_wnd in self.child_objects:
+            child_wnd.sendMessage(msg, param1, param2)
+
+
+    def update(self):
+        self.sendMessageToChilds('WM_UPDATE')
+
+
+    # def updateChildWnds(self):
+    #     for child_object in self.child_objects:
+    #         child_object.update()
+
 
 
     # абстарнктные обработчики событий клавиатуры и мыши

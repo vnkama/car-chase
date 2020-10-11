@@ -1,10 +1,24 @@
 import pygame as pg     #использован pg.Rect
 
+# =================================================================================
+# количесвто особей в поколении
+GAME_GENE_SIZE  = 100
 
-FPS_RATE=60                             #частота кадров в сек 60
-MAIN_WND_TITLE      ='Car chase'        #имя главного окна
+# максимальное количесвто поколений
+GAME_GENE_COUNT_MAX = 500
+
+
+
+
+
+
+# =================================================================================
+
+
+FPS_RATE=60                             # частота кадров в сек 60
+MAIN_WND_TITLE = 'Car chase'  # имя главного окна
 MAIN_WND_FULLSCREEN = 0
-MAIN_WND_BACKGROUND = 0x682828          #debug
+MAIN_WND_BACKGROUND = 0x682828  # debug
 
 if (MAIN_WND_FULLSCREEN):
     MAIN_WND_HEIGHT     = 900             # для фулл скрин
@@ -63,3 +77,4 @@ CONSOLE_CLR_RED     = "\033[31m\033[1m"
 CONSOLE_CLR_GREEN   = "\033[32m\033[1m"
 CONSOLE_CLR_RESET   = "\033[0m"
 
+#=================================================================================

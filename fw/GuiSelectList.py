@@ -89,10 +89,10 @@ class GuiSelectList(GuiControl):
     # закрыть без сохранения
     #
     def closeWoSaving(self):
-        self.parent_wnd.sendMessage(None, "WM_CLOSE_TMP_CHILD")
+        self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD")
 
     #
     # закрыть без сохранения
     #
     def closeSetValue(self,value):
-        self.parent_wnd.sendMessage(None, "WM_CLOSE_TMP_CHILD",value)
+        self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD",value)

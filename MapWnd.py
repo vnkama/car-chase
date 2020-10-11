@@ -348,8 +348,8 @@ class MapWnd(fwMapWnd):
     #
     #
     #
-    # def sendMessage(self,client_wnd, msg, param1=None, param2=None):
-    #     if (msg == 'WM_NEW_APP'):
+    # def sendMessage(self, msg, param1=None, param2=None):
+    #     if (msg == 'WM_NEW_GAME'):
     #         self.newGame
 
     #начало новой игры (нажата кнопка new)
@@ -366,7 +366,7 @@ class MapWnd(fwMapWnd):
 
 
     def update(self):
-        #self.updateChildWnds()    #у карты нет чайлдов
+        # self.updateChildWnds()    #у карты нет чайлдов
         self.arr_sprites_update.update()
         self.update_camera()
 
@@ -374,10 +374,10 @@ class MapWnd(fwMapWnd):
     def update_camera(self):
         self.Camera.update(self.arr_cars[0].map_rectpos)
 
-        #координаты окна показываемые камерой относительно карты
+        # координаты окна показываемые камерой относительно карты
         camera_position_rect = self.Camera.getPositionRect()
 
-        #пересчитываем координаты в спрайтах с учетом камеры
+        # пересчитываем координаты в спрайтах с учетом камеры
         for sprite in self.arr_sprites_update_camera:
             sprite.update_camera(camera_position_rect)
 
@@ -400,7 +400,7 @@ class MapWnd(fwMapWnd):
         self.arr_cars[0].draw_sensors()
         self.arr_sprites_draw.draw(self.surface)
 
-        #столкновение машины с краем дороги
+        # столкновение машины с краем дороги
         sprite_lst = pg.sprite.spritecollide(
             self.arr_cars[0],           #машину сталикиваем
             self.arr_sprites_curbs,      #с краями дороги
@@ -477,3 +477,22 @@ class MapWnd(fwMapWnd):
 
         elif (event.key == pg.K_DOWN):
             self.arr_cars[0].setBreaking(0)
+
+
+    #
+    #
+    #
+    def sendMessage(self, msg, param1=None,param2=None):
+        # if (msg == 'WM_NEW_GAME'):
+        #     self.newGame()
+        #
+        # elif (msg == 'WM_QUIT'):
+        #     pass
+        #
+        # elif (msg == 'WM_UPDATE'):
+        #     pass
+        #
+        # else:
+        #     # если не обработали здесь то отправляем наверх
+        super().sendMessage(msg, param1, param2)
+

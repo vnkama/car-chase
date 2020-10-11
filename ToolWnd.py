@@ -34,7 +34,7 @@ class ToolWnd(fwToolWnd):
 
         ############################################
 
-        self.addChildWnd(GuiButton({
+        self.btnNew = self.addChildWnd(GuiButton({
             'name': 'button-start',
             'text': 'New',
             'parent_wnd':self,
@@ -51,7 +51,7 @@ class ToolWnd(fwToolWnd):
             'on_button_func': self.play_onButton
         }))
 
-        btnPause = self.addChildWnd(GuiButton({
+        self.btnPause = self.addChildWnd(GuiButton({
             'name': 'button-pause',
             'text': 'Pause',
             'parent_wnd':self,
@@ -59,7 +59,6 @@ class ToolWnd(fwToolWnd):
             'on_button_func': self.play_onButton
         }))
 
-        btnPause.disable()
 
 
         ############################################
@@ -108,30 +107,30 @@ class ToolWnd(fwToolWnd):
 
     ############################################
 
-    def sendMessage(self, client_wnd, msg, param1=None,param2=None):
+    def sendMessage(self, msg, param1=None,param2=None):
         if (msg == "WM_SET_PARAM_1"):
             self.lbl_speed.setText(param1)
 
         elif (msg == "WM_SET_TICKS"):
             self.lbl_ticks.setText(param1)
 
-        elif (msg == 'WM_NEW_GAME'):
-            self.newGame()
 
         else:
-            #если не обработали здесь то отправляем наверх
-            super().sendMessage(None, msg, param1, param2)
+            # если не обработали здесь то отправляем наверх
+            super().sendMessage(msg, param1, param2)
 
     def newGame(self):
-        pass
+        self.btnNew.disable()
+        self.btnPause.disable()
+
 
 
 
     def quit_onButton(self):
-        getAppWnd().sendMessage(None, 'WM_QUIT_APP')
+        getAppWnd().sendMessage('WM_QUIT_APP')
 
     def new_onButton(self):
-        getAppWnd().sendMessage(None, 'WM_NEW_APP')
+        getAppWnd().sendMessage('WM_NEW_GAME')
 
 
     def play_onButton(self):
