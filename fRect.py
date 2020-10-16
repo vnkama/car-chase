@@ -4,7 +4,7 @@ from fw.FwError import FwError
 
 class fRect():
 
-    def __init__(self,*args):
+    def __init__(self, *args):
 
         args_count = len(args)
 
@@ -16,7 +16,7 @@ class fRect():
 
         elif (len == 4):
             for v in args:
-                if (not (isinstance(v,int) or isinstance(v,float))):
+                if (not (isinstance(v, int) or isinstance(v,float))):
                     raise FwError()
 
             self.left = float(args[0])

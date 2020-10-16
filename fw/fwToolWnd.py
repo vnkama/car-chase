@@ -1,6 +1,6 @@
 #import pygame as pg
 from config import *
-#from fw.functions import *
+from fw.functions import *
 from fw.FwError import FwError
 
 from fw.fwWindow import fwWindow
@@ -12,7 +12,7 @@ from fw.GuiSelectList import GuiSelectList
 #
 class fwToolWnd(fwWindow):
 
-    def __init__(self,params):
+    def __init__(self, params):
 
         params['rect'] = CONTROL_WND_RECT
         params['background_color'] = THEME_WINDOW_BACKGROUND
@@ -25,16 +25,22 @@ class fwToolWnd(fwWindow):
 
     def sendMessage(self, msg, param1=None, param2=None):
 
-        if (msg == "WM_CREATE_TMP_CHILD"):
-            self.createTmpChildWnd(param1,param2)
+        if msg == 'WM_CREATE_TMP_CHILD':
+            self.createTmpChildWnd(param1, param2)
 
-        elif (msg == "WM_CLOSE_TMP_CHILD"):
+        elif msg == 'WM_CLOSE_TMP_CHILD':
             self.closeTmpChild(param1)
 
-        elif (msg == 'WM_NEW_GAME'):
+        elif msg == 'WM_NEW_GAME':
             self.newGame()
 
-        elif (msg == 'WM_UPDATE'):
+        elif msg == 'WM_PLAY':
+            self.play()
+
+        elif msg == 'WM_PAUSE':
+            self.pause()
+
+        elif msg == 'WM_UPDATE':
             pass
 
 
@@ -84,3 +90,33 @@ class fwToolWnd(fwWindow):
         if (self.tmp_child_wnd is not None):
             self.tmp_child_wnd.draw()
 
+
+    def quit_onButton(self):
+        getAppWnd().sendMessage('WM_QUIT_APP')
+
+    def new_onButton(self):
+        getAppWnd().sendMessage('WM_NEW_GAME')
+
+
+    def play_onButton(self):
+        getAppWnd().sendMessage('WM_PLAY')
+
+    def pause_onButton(self):
+        getAppWnd().sendMessage('WM_PAUSE')
+
+
+    def newGame(self):
+        self.btnNew.disable()
+        self.btnPause.disable()
+
+    def play(self):
+        self.btnNew.disable()
+        self.btnPlay.disable()
+        self.btnPause.enable()
+        self.semaphorRun.setColor('green')
+
+    def pause(self):
+        self.btnNew.enable()
+        self.btnPlay.enable()
+        self.btnPause.disable()
+        self.semaphorRun.setColor('red')

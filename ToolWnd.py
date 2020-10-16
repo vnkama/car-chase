@@ -1,12 +1,13 @@
 import pygame as pg
 from config import *
 from fw.functions import *
-#from fw.FwError import FwError
+# from fw.FwError import FwError
 
 from fw.fwToolWnd import fwToolWnd
 from fw.GuiButton import GuiButton
 from fw.GuiCombobox import GuiCombobox
 from fw.GuiLabel import GuiLabel
+from fw.GuiSemaphor import GuiSemaphor
 
 
 #
@@ -14,7 +15,7 @@ from fw.GuiLabel import GuiLabel
 #
 class ToolWnd(fwToolWnd):
 
-    def __init__(self,params):
+    def __init__(self, params):
 
         # params['rect'] = CONTROL_WND_RECT
         # params['background_color'] = CONTROL_WND_BACKGROUND
@@ -37,46 +38,51 @@ class ToolWnd(fwToolWnd):
         self.btnNew = self.addChildWnd(GuiButton({
             'name': 'button-start',
             'text': 'New',
-            'parent_wnd':self,
-            'rect': pg.Rect(10,60,60,32),
+            'parent_wnd': self,
+            'rect': pg.Rect(10, 60, 60, 32),
             'on_button_func': self.new_onButton
         }))
 
-
-        self.addChildWnd(GuiButton({
+        self.btnPlay = self.addChildWnd(GuiButton({
             'name': 'button-play',
             'text': 'Play',
-            'parent_wnd':self,
-            'rect': pg.Rect(74,60,60,32),
+            'parent_wnd': self,
+            'rect': pg.Rect(74, 60, 60, 32),
             'on_button_func': self.play_onButton
         }))
 
         self.btnPause = self.addChildWnd(GuiButton({
             'name': 'button-pause',
             'text': 'Pause',
-            'parent_wnd':self,
-            'rect': pg.Rect(138,60,60,32),
-            'on_button_func': self.play_onButton
+            'parent_wnd': self,
+            'rect': pg.Rect(138, 60, 60, 32),
+            'on_button_func': self.pause_onButton
         }))
 
+        self.semaphorRun = self.addChildWnd(GuiSemaphor({
+            'parent_wnd': self,
+            'rect': pg.Rect(200, 60, 40, 32),
+            'radius': 8,
+            #'on_button_func': self.pause_onButton
+        }))
 
 
         ############################################
 
         self.addChildWnd(GuiCombobox({
             'name': 'combo-test',
-            'text': ["one","two","three","four"],
-            'value' : "two",
-            'parent_wnd':self,
-            'rect': pg.Rect(10,120,120,22),
-            #'on_button_func': self.quit_onButton
+            'text': ["one", "two", "three", "four"],
+            'value': "two",
+            'parent_wnd': self,
+            'rect': pg.Rect(10, 120, 120, 22),
+            # 'on_button_func': self.quit_onButton
         }))
 
         ############################################
 
         self.addChildWnd(GuiLabel({
-            'parent_wnd':self,
-            'rect': pg.Rect(0,200,60,32),
+            'parent_wnd': self,
+            'rect': pg.Rect(0, 200, 60, 32),
             'text': 'Param 1:',
         }))
 
@@ -92,8 +98,8 @@ class ToolWnd(fwToolWnd):
         ############################################
 
         self.addChildWnd(GuiLabel({
-            'parent_wnd':self,
-            'rect': pg.Rect(0,232,100,32),
+            'parent_wnd': self,
+            'rect': pg.Rect(0, 232, 100, 32),
             'text': 'ticks:',
         }))
 
@@ -107,11 +113,12 @@ class ToolWnd(fwToolWnd):
 
     ############################################
 
-    def sendMessage(self, msg, param1=None,param2=None):
-        if (msg == "WM_SET_PARAM_1"):
+    def sendMessage(self, msg, param1=None, param2=None):
+        if msg == 'WM_SET_PARAM_1':
             self.lbl_speed.setText(param1)
 
-        elif (msg == "WM_SET_TICKS"):
+
+        elif msg == 'WM_SET_TICKS':
             self.lbl_ticks.setText(param1)
 
 
@@ -119,19 +126,3 @@ class ToolWnd(fwToolWnd):
             # если не обработали здесь то отправляем наверх
             super().sendMessage(msg, param1, param2)
 
-    def newGame(self):
-        self.btnNew.disable()
-        self.btnPause.disable()
-
-
-
-
-    def quit_onButton(self):
-        getAppWnd().sendMessage('WM_QUIT_APP')
-
-    def new_onButton(self):
-        getAppWnd().sendMessage('WM_NEW_GAME')
-
-
-    def play_onButton(self):
-        pass

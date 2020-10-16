@@ -50,12 +50,12 @@ class fwAppWnd(fwWindow):
         setMainWnd(self)
         print(CONSOLE_CLR_ERROR + "AppWnd.__init__" + CONSOLE_CLR_RESET)
 
-        (w,h) = fwAppWnd.main_srf.get_size()
+        (w, h) = fwAppWnd.main_srf.get_size()
 
         super().__init__({
             'name': 'fwAppWnd class',
             'parent_wnd': None,                     # родительского окна нет
-            'rect': pg.Rect(0,0,w,h),
+            'rect': pg.Rect(0, 0, w, h),
             'background_color':   MAIN_WND_BACKGROUND,
             'surface': fwAppWnd.main_srf             #т.к. родительского окна у fwAppWnd нет
                                                  # subsurface вызывать не откуда, то передаем главную повехность для него как surface
@@ -63,6 +63,9 @@ class fwAppWnd(fwWindow):
 
         self.main_timer = pg.time.Clock()
         self.is_mainloop_run = True
+        self.control_wnd = None
+        self.map_wnd = None
+
 
         pg.font.init()
 
@@ -93,6 +96,15 @@ class fwAppWnd(fwWindow):
 
         self.initMainWindows()
 
+        self.update_last_call_ms = 0
+        self.draw_last_call_ms = 0
+
+        self.update_interval_ms = 16
+        self.draw_interval_ms = 16
+
+        self.state = None
+        self.newGame()
+
     # # определить в классе наследнике
     # def initMainWindows(self):
     #     pass
@@ -106,31 +118,97 @@ class fwAppWnd(fwWindow):
         pg.quit()
 
 
-    def sendMessage(self, code,param1=None,param2=None):
-        #super().sendMessage(self, code, param1, param2)    #fwWindow.sendMessage - пустой метод, вызывать ненужно
+    def sendMessage(self, msg, param1=None, param2=None):
+        #super().sendMessage(self, code, param1, param2)    # fwWindow.sendMessage - пустой метод, вызывать нет смысла
 
-        if (code == "WM_QUIT_APP"):
+        if msg == "WM_QUIT_APP":
             self.quitApp()
 
-        elif (code == "WM_NEW_GAME"):
+        elif msg == "WM_NEW_GAME":
             self.newGame()
 
+        elif msg == "WM_PLAY":
+            self.play()
+
+        elif msg == "WM_PAUSE":
+            self.pause()
+
 
     #
-    #основной цикл приложения
+    # основной цикл приложения
     #
+
     def run(self):
+
+        update_next_ms = 0
+        draw_next_ms = 0
+        handle_events_next_ms = 0
 
         try:
 
             while self.is_mainloop_run:
-                self.main_timer.tick(FPS_RATE)
 
-                self.handleEvents()
-                self.update()
-                self.draw()
+                if self.state == 'APP_STATE_TRAINING_NEW' \
+                        or self.state == 'APP_STATE_SHOW_PAUSE' \
+                        or self.state == 'APP_STATE_TRAINING_PAUSE':
+                    # self.main_timer.tick(FPS_RATE)
+                    delay_ms = update_next_ms - pg.time.get_ticks()
 
-                pg.display.update()
+                    if delay_ms > 0:
+                        pg.time.wait(delay_ms)
+
+                    self.handleEvents()
+                    self.update()
+                    self.draw()
+
+                    pg.display.update()
+
+                    update_next_ms = update_next_ms + self.update_interval_ms
+
+
+                elif self.state == 'APP_STATE_TRAINING_PLAY':
+
+                    cur_ms = pg.time.get_ticks()
+                    update_delay_ms = update_next_ms - cur_ms
+                    draw_delay_ms = draw_next_ms - cur_ms
+                    handle_events_delay_ms = handle_events_next_ms - cur_ms
+
+                    delay_ms = min(update_delay_ms, draw_delay_ms, handle_events_delay_ms)
+
+                    if delay_ms > 0:
+                        pg.time.wait(delay_ms)
+
+                    cur_ms = pg.time.get_ticks()
+                    update_delay_ms = update_next_ms - cur_ms
+                    draw_delay_ms = draw_next_ms - cur_ms
+                    handle_events_delay_ms = draw_next_ms - cur_ms
+
+                    if handle_events_delay_ms <= 0:
+                        self.handleEvents()
+                        handle_events_next_ms += STATE_TRAINING_PAUSE_HANDLE_EVENTS_INTERVAL_MS
+
+                    elif draw_delay_ms <= 0:
+                        self.draw()
+                        draw_next_ms += 16
+
+                    elif update_delay_ms <= 0:
+                        self.update()
+                        update_next_ms += 16
+
+
+                elif self.state == 'APP_STATE_SHOW_PLAY':
+                    pass
+
+                else:
+                    pass
+
+                #self.main_timer.tick(FPS_RATE)
+
+                # self.handleEvents()
+                # self.update()
+                # self.draw()
+                #
+                # pg.display.update()
 
         except FwError as e:
             print("\033[35m\033[1mgame.py except FwError")
@@ -148,15 +226,33 @@ class fwAppWnd(fwWindow):
 
     def newGame(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
-        self.state = 'APP_STATE_NEW'
+        self.state = 'APP_STATE_TRAINING_NEW'
+        self.update_interval_ms = 16
 
-        self.sendMessageToChilds("WM_NEW_GAME")
-
-
-
+        self.sendMessageToChilds('WM_NEW_GAME')
 
 
-    #
+    def play(self):
+        if (
+                self.state == 'APP_STATE_TRAINING_NEW' or \
+                self.state == 'APP_STATE_TRAINING_PAUSE'
+        ):
+
+            self.state = 'APP_STATE_TRAINING_PLAY'
+            self.sendMessageToChilds('WM_PLAY')
+            print("AppWnd.play")
+
+
+
+    def pause(self):
+        print("AppWnd.pause")
+        if self.state == 'APP_STATE_TRAINING_PLAY':
+
+            self.state = 'APP_STATE_TRAINING_PAUSE'
+            self.sendMessageToChilds('WM_PAUSE')
+
+
+
     #
     #
     def handleEvents(self):
@@ -203,40 +299,36 @@ class fwAppWnd(fwWindow):
 
 
 
-    def registerHandler_MOUSEBUTTONDOWN(self,wnd):
+    def registerHandler_MOUSEBUTTONDOWN(self, wnd):
         self.arr_handlers_MOUSEBUTTONDOWN.append(wnd)
 
-    def unregHandler_MOUSEBUTTONDOWN(self,wnd):
+    def unregHandler_MOUSEBUTTONDOWN(self, wnd):
         self.arr_handlers_MOUSEBUTTONDOWN.remove(wnd)
 
 
 
-    def registerHandler_KEYDOWN(self,wnd):
+    def registerHandler_KEYDOWN(self, wnd):
         self.arr_handlers_KEYDOWN.append(wnd)
 
-    def unregHandler_KEYDOWN(self,wnd):
+    def unregHandler_KEYDOWN(self, wnd):
         self.arr_handlers_KEYDOWN.remove(wnd)
 
 
 
-    def registerHandler_KEYUP(self,wnd):
+    def registerHandler_KEYUP(self, wnd):
         self.arr_handlers_KEYUP.append(wnd)
 
-    def unregHandler_KEYUP(self,wnd):
+    def unregHandler_KEYUP(self, wnd):
         self.arr_handlers_KEYUP.remove(wnd)
+        #
+        #
+        #
 
-
-
-    #
-    #
-    #
     def getFont(self, name):
-        # global g_arr_fonts;
-        # return g_arr_fonts.get(name.lower(), g_arr_fonts['tahoma_20'])
         return self.arr_fonts.get(name.lower(), self.arr_fonts['tahoma_20'])
 
     #
     #
     #
-    def setFonts(self,arr_fonts):
+    def setFonts(self, arr_fonts):
         self.arr_fonts = arr_fonts

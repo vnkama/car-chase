@@ -68,15 +68,16 @@ class fwWindow:
 
 
     def drawBackground(self, color = None):
-        if (color is not None):
+        if color is not None:
             self.surface.fill(color)
-        elif (self.background_color is not None):
+
+        elif self.background_color is not None:
             self.surface.fill(self.background_color)
 
 
 
     def drawBorder(self):
-        #рисуем свою рамку, если есть
+        # рисуем свою рамку, если есть
         if self.border_width is not None and self.border_color is not None:
 
             color = self.border_color if self.enabled else THEME_BUTTON_BORDER_DISABLED_COLOR

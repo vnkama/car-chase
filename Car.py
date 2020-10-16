@@ -12,8 +12,8 @@ import numpy as np
 #
 #
 class Car(pg.sprite.Sprite):
-    CAR_RED=2
-    CAR_GREEN=1
+    CAR_RED = 2
+    CAR_GREEN = 1
 
     SPRITE_SIZE_X = 80
     SPRITE_SIZE_Y = 80
@@ -24,12 +24,12 @@ class Car(pg.sprite.Sprite):
 
     arr_img_srf = []
 
-    #скорость вращения,
+    # скорость вращения,
     # 1000 соответсвует 1 оборот в секеунду, 2000- два оборота в секунду итп
     rotate_speed__mturn_sec = 1000
 
 
-    #скорость вращения: милли сектор в тик
+    # скорость вращения: милли сектор в тик
     # на эту переменную увеличивается счечтк вращения каждый тик FPS
     # как только наберется 1000 , то спрайт поворачивается на 1/16
     rotate_msector_v = rotate_speed__mturn_sec * 32 // FPS_RATE
@@ -351,18 +351,16 @@ class Car(pg.sprite.Sprite):
 
         for sensor_i in range(Car.SENSOR_COUNT):
 
-
-
-            #rect сенсора
-            #объеденим точку начала сенсоров (в авто) и тотчку конца сенсора в одном рект
+            # rect сенсора
+            # объеденим точку начала сенсоров (в авто) и тотчку конца сенсора в одном рект
             sensor_irect = car_irectpos.union(
                 pg.Rect(
                     nd2_getPoint(self.arr_sensors_end_3mfdot[sensor_i]),
-                    (1,1)
+                    (1, 1)
                 )
             )
 
-            #увеличим рект для сенсора, иначе возникают краевые эффекты
+            # увеличим рект для сенсора, иначе возникают краевые эффекты
             sensor_irect.move_ip(-2, -2)
             sensor_irect.w += 4
             sensor_irect.h += 4
@@ -374,8 +372,8 @@ class Car(pg.sprite.Sprite):
 
             for sprite_curb in lst_curbs_4_all_sensors:
 
-                #для избежания кравеых эффектов увеличим рект спрайта во всех направлениях на 2
-                curb_wrapper_irect = sprite_curb.map_rect.move(-2,-2)
+                # для избежания кравеых эффектов увеличим рект спрайта во всех направлениях на 2
+                curb_wrapper_irect = sprite_curb.map_rect.move(-2, -2)
                 curb_wrapper_irect.w += 4
                 curb_wrapper_irect.h += 4
 
@@ -400,7 +398,7 @@ class Car(pg.sprite.Sprite):
                     (d2_minus(sensor_start_point_3mf, sensor_end_point_f2))   # отрезок
                 )
 
-                #если vl = 0 то сенсор и curb на коллинеарны, считаем что это
+                # если vl = 0 то сенсор и curb на коллинеарны, считаем что это
                 # CASTLE ну ввобще совпадение надо проверять отдельно , но пока этот код не написан
                 if (abs(vl) < 1e-6):
                     continue
@@ -412,23 +410,22 @@ class Car(pg.sprite.Sprite):
                 # но это прямяые, насчет отрезков пока неясно
 
                 # получим Общее Уравнение Прямой для обоих прямых
-                #curb_leABC = nd2_convert_2Points_2_LineEquationABC(curb_start_2fdot,curb_end_2fdot)
+                # curb_leABC = nd2_convert_2Points_2_LineEquationABC(curb_start_2fdot,curb_end_2fdot)
 
 
                 if (sensor_leABC is None):
                     sensor_leABC = nd2_convert_2Points_2_LineEquationABC(sensor_start_point_3mf,sensor_end_point_f2)
 
-
                 # найдем пересечение прямых, содержащих отрезки
                 # нам известно, что прямые точно пересекаются
                 # пока не известно пересекаются ли сами отрезки
                 intersect_point_2f = nd2_getLinesIntersectPoint(
-                    #curb_leABC[0],curb_leABC[1],curb_leABC[2],          # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
-                    sprite_curb.arr_lineEqualABC[0], sprite_curb.arr_lineEqualABC[1], sprite_curb.arr_lineEqualABC[2],          # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
-                    sensor_leABC[0], sensor_leABC[1], sensor_leABC[2],  #коеффиценты A B C, для сенсора
+                    # curb_leABC[0],curb_leABC[1],curb_leABC[2],          # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
+                    sprite_curb.arr_lineEqualABC[0], sprite_curb.arr_lineEqualABC[1], sprite_curb.arr_lineEqualABC[2],
+
+                    # коеффиценты A B C, общего уравнения прямой Ax+Bx+C=0 для curb
+                    sensor_leABC[0], sensor_leABC[1], sensor_leABC[2],  # коеффиценты A B C, для сенсора
                 )
-
-
 
                 s1 = signFloat(intersect_point_2f[0] - curb_start_2fdot[0])
                 s2 = signFloat(intersect_point_2f[0] - curb_end_2fdot[0])
@@ -448,16 +445,16 @@ class Car(pg.sprite.Sprite):
                         (abs(s7 + s8) < 2 )
                     )
                 ):
-                    #отрезки не пересекаются
+                    # отрезки не пересекаются
                     continue
 
-                #установлен факт пересечения сенсора с curb
+                # установлен факт пересечения сенсора с curb
                 test[sensor_i] += 1
 
-                #измерим расстояние от машины до точки пересечения
+                # измерим расстояние от машины до точки пересечения
                 intersect_len = d2_caclDistance2Points(intersect_point_2f,sensor_start_point_3mf)
 
-                #если найденная точка пересечения ближе
+                # если найденная точка пересечения ближе
                 if (intersect_len < arr_sensor_len_f[sensor_i]):
                     arr_sensor_len_f[sensor_i] = intersect_len
                     self.arr_sensors_end_3mfdot[sensor_i] = intersect_point_2f
@@ -471,8 +468,6 @@ class Car(pg.sprite.Sprite):
         sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
         self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
 
-
-
     #
     #
     #
@@ -480,7 +475,6 @@ class Car(pg.sprite.Sprite):
     #     print("draw")
     #     super().draw()
     #     self.draw_sensors()
-
     def draw_sensors(self):
         for ai, sensor_wnd_pos in np.ndenumerate(self.arr_sensors_wnd_pos):
             i = ai[0]  # индекс
@@ -490,7 +484,7 @@ class Car(pg.sprite.Sprite):
                 (255, 0, 128, 128),
                 self.wnd_rect.center,
                 sensor_wnd_pos,
-                1
+                1,
             )
 
 
@@ -502,11 +496,10 @@ class Car(pg.sprite.Sprite):
         self.is_moving = 1
 
         # координатат конца отрезка относитльно его начала
-        self.brezenhem.start(self.map_rectpos.center,self.target_rect.topleft)
+        self.brezenhem.start(self.map_rectpos.center, self.target_rect.topleft)
 
-        #определим желаемое направление движения
+        # определим желаемое направление движения
         self.need_direction = self.brezenhem.getSpriteDirection32()
-
 
         if (self.need_direction != self.real_direction):
             if (self.need_direction > self.real_direction):
@@ -524,5 +517,5 @@ class Car(pg.sprite.Sprite):
         self.rotate_msector_s = 0          #1000
 
 
-    def setDirectionImage(self,direction):
+    def setDirectionImage(self, direction):
         self.image = Car.arr_img_srf[direction]

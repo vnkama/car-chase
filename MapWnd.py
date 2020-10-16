@@ -44,12 +44,12 @@ class MapWnd(fwMapWnd):
         self.arr_sprites_curbs = pg.sprite.Group()
 
 
-        #тайловая карта
-        #тайлы двух видов, определяются случайно
-        #тайлы спрайтами не являются, а копируеются один раз прямо на фон
+        # тайловая карта
+        # тайлы двух видов, определяются случайно
+        # тайлы спрайтами не являются, а копируеются один раз прямо на фон
         for x in range(MAP_TAIL_SIZE_X):
             for y in range(MAP_TAIL_SIZE_Y):
-                #номер типа тайла случайно
+                # номер типа тайла случайно
                 rand = random.randint(0, 1)
                 dest_rect = pg.Rect(
                     Tile.SPRITE_SIZE_X * x,
@@ -98,7 +98,7 @@ class MapWnd(fwMapWnd):
 
 
 
-        #формирует дорогу
+        # формирует дорогу
         self.init_road()
 
         self.arr_cars = []
@@ -211,19 +211,19 @@ class MapWnd(fwMapWnd):
 
         arr_roadsections_corners_3mf = np.zeros((road_len-1,4,3),float)
 
-                            #вектора-направляения [x y 0], это направления участков дороги.
-                            #направления из точки [road_len] нет - некуда направлять
-                            #arr_roadsections_direction = np.zeros((road_len-1,3),float)
+                            # вектора-направляения [x y 0], это направления участков дороги.
+                            # направления из точки [road_len] нет - некуда направлять
+                            # arr_roadsections_direction = np.zeros((road_len-1,3),float)
         for i in range(road_len-1):
             # вектора-направляения [x y 0], направления участков дороги, считается вдоль осевой.
             roadsection_axis_3mf = arr_roadsections_axial_turn_3mfdot[i+1] - arr_roadsections_axial_turn_3mfdot[i]
 
-            #коеффициент масштабирования
-            #ширина дороги в начале и конце секции разная
+            # коеффициент масштабирования
+            # ширина дороги в начале и конце секции разная
             k_width_begin = arr_roadsections_width_i[i] / (2 * nd2_vector_len(roadsection_axis_3mf))
             k_width_end = arr_roadsections_width_i[i+1] / (2 * nd2_vector_len(roadsection_axis_3mf))
 
-            #матрица масштабирования начала и конца секции
+            # матрица масштабирования начала и конца секции
             matrix_scaling_begin = nd2_getScaleMatrix(k_width_begin)
             matrix_scaling_end = nd2_getScaleMatrix(k_width_end)
 
@@ -231,7 +231,7 @@ class MapWnd(fwMapWnd):
             roadsection_direction_begin = matrix_scaling_begin @ roadsection_axis_3mf
             roadsection_direction_end = matrix_scaling_end @ roadsection_axis_3mf
 
-            #arr_P координаты 4х углов секции. прямоугольный формат секции
+            # arr_P координаты 4х углов секции. прямоугольный формат секции
             #0 - начало секции левый
             #1 - конец секции левый
             #2 - конец секции правый
@@ -269,22 +269,22 @@ class MapWnd(fwMapWnd):
         #в последней секции не просчитываем
         for i in range(road_len - 1):
 
-            if (i == 0):
+            if i == 0:
                 # в 0й сейкции, реальные 0й и 3й углы совпадают с прямоугольными, тк. "минус первой" секции не сущесвует
                 arr_roadsections_corners_3mf[i][0] = arr_P[i][0]
                 arr_roadsections_corners_3mf[i][3] = arr_P[i][3]
             else:
-                #все секции кроме нулевой, копируют 0й 3й углы с предыдущей секции, т.к. они совпадают
+                # все секции кроме нулевой, копируют 0й 3й углы с предыдущей секции, т.к. они совпадают
                 arr_roadsections_corners_3mf[i][0] = arr_roadsections_corners_3mf[i-1][1]
                 arr_roadsections_corners_3mf[i][3] = arr_roadsections_corners_3mf[i-1][2]
 
-            if (i == (road_len - 2)):
+            if i == (road_len - 2):
                 # в последней сейкции, реальные 1й и 2й углы совпадают с прямоугольными, тк. "после последней " секции не сущесвует
                 arr_roadsections_corners_3mf[road_len - 2][1] = arr_P[road_len - 2][1]
                 arr_roadsections_corners_3mf[road_len - 2][2] = arr_P[road_len - 2][2]
 
             else:
-                #считаем реальные 1й 2й углы секции
+                # считаем реальные 1й 2й углы секции
                 # continue
                 # 1й угол
 
@@ -303,7 +303,7 @@ class MapWnd(fwMapWnd):
 
         self.arr_road_sprites = []
 
-        #рисуем полигоны на дороге
+        # рисуем полигоны на дороге
 
         for i in range(road_len - 1):
             #for arr_roadsection in arr_roadsections_corners_3mf:
@@ -352,16 +352,17 @@ class MapWnd(fwMapWnd):
     #     if (msg == 'WM_NEW_GAME'):
     #         self.newGame
 
-    #начало новой игры (нажата кнопка new)
-    def newGame(self):
 
-        if (len(self.arr_cars)):
+    def newGame(self):
+        # начало новой игры (нажата кнопка new)
+
+        if len(self.arr_cars):
             self.arr_cars[0].kill()
             del (self.arr_cars[0])
 
-        groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
+        groups = (self.arr_sprites_update_camera, self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(self,0, 300, groups, self.control_wnd)
+            Car(self, 0, 300, groups, self.control_wnd)
         )
 
 

@@ -6,19 +6,18 @@ from ToolWnd import ToolWnd
 from MapWnd import MapWnd
 
 
+
 #
 #
 #
 class AppWnd(fwAppWnd):
 
 
-    #
-    #
+
     #
     def __init__(self):
         super().__init__()
 
-        self.newGame()
 
 
     #
@@ -45,9 +44,5 @@ class AppWnd(fwAppWnd):
         super().update()
 
         dt = self.main_timer.get_time()
-        self.control_wnd.sendMessage("WM_SET_TICKS",dt)
+        self.control_wnd.sendMessage("WM_SET_TICKS", dt)
         self.map_wnd.dt = dt
-
-
-
-
