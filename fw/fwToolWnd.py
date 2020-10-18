@@ -4,7 +4,9 @@ from fw.functions import *
 from fw.FwError import FwError
 
 from fw.fwWindow import fwWindow
+from fw.GuiButton import GuiButton
 from fw.GuiSelectList import GuiSelectList
+from fw.GuiSemaphor import GuiSemaphor
 
 
 #
@@ -14,16 +16,61 @@ class fwToolWnd(fwWindow):
 
     def __init__(self, params):
 
-        params['rect'] = CONTROL_WND_RECT
-        params['background_color'] = THEME_WINDOW_BACKGROUND
+        params['rect'] = TOOL_WND_RECT
+        params['background_color'] = THEME_BACKGROUND_CLR
         params['name'] = 'ControlWnd'
 
         super().__init__(params)        # parent - fwWindow
 
         self.tmp_child_wnd = None   # временное окно для всплывашек открытого комбобокса итд
 
+        ############################################
+
+        self.addChildWnd(GuiButton({
+            'name': 'button-quit',
+            'text': 'Quit',
+            'parent_wnd':self,
+            'rect': pg.Rect(220,20,56,32),
+            'on_button_func': self.quit_onButton
+        }))
+
+        ############################################
+
+        self.btnNew = self.addChildWnd(GuiButton({
+            'name': 'button-start',
+            'text': 'New',
+            'parent_wnd': self,
+            'rect': pg.Rect(10, 60, 60, 32),
+            'on_button_func': self.new_onButton
+        }))
+
+        self.btnPlay = self.addChildWnd(GuiButton({
+            'name': 'button-play',
+            'text': 'Play',
+            'parent_wnd': self,
+            'rect': pg.Rect(74, 60, 60, 32),
+            'on_button_func': self.play_onButton
+        }))
+
+        self.btnPause = self.addChildWnd(GuiButton({
+            'name': 'button-pause',
+            'text': 'Pause',
+            'parent_wnd': self,
+            'rect': pg.Rect(138, 60, 60, 32),
+            'on_button_func': self.pause_onButton
+        }))
+
+        self.semaphorRun = self.addChildWnd(GuiSemaphor({
+            'parent_wnd': self,
+            'rect': pg.Rect(200, 60, 40, 32),
+            'radius': 8,
+            # 'on_button_func': self.pause_onButton
+        }))
+
+
 
     def sendMessage(self, msg, param1=None, param2=None):
+        # fwWindow.sendMessage() - не определен
 
         if msg == 'WM_CREATE_TMP_CHILD':
             self.createTmpChildWnd(param1, param2)

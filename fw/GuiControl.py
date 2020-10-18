@@ -13,7 +13,7 @@ class GuiControl(fwWindow):
 
     def __init__(self,params):
 
-        params['font'] = params.get('font',THEME_WINDOW_FONT)
+        params['font'] = params.get('font',THEME_FONT)
 
         super().__init__(params)
 

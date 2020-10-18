@@ -135,7 +135,9 @@ class fwWindow:
 
 
     def update(self):
-        self.sendMessageToChilds('WM_UPDATE')
+        pass
+        # self.sendMessageToChilds('WM_UPDATE')
+
 
 
     # def updateChildWnds(self):

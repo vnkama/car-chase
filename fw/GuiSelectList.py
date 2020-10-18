@@ -51,7 +51,7 @@ class GuiSelectList(GuiControl):
 
         #выведем строки в выпадающем спсике
         for i,cur_string in enumerate(self.arr_text):
-            text_srf = font_obj.render(cur_string, 1, HRGB(CONTROL_WND_FONT_COLOR))
+            text_srf = font_obj.render(cur_string, 1, HRGB(THEME_FONT_CLR))
             self.surface.blit(
                 text_srf,
                 (5,1 + i*THEME_COMBOBOX_STRING_HEIGHT)

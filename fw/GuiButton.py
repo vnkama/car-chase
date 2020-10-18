@@ -47,7 +47,7 @@ class GuiButton(GuiControl):
         self.drawBorder()
 
         f = getAppWnd().getFont('arial_16')
-        color = CONTROL_WND_FONT_COLOR if (self.enabled) else CONTROL_WND_FONT_DISABLED_COLOR;
+        color = THEME_FONT_CLR if (self.enabled) else THEME_FONT_DISABLED_CLR;
         text1_srf = f.render(self.text, 1, HRGB(color))
 
 

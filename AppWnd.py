@@ -13,11 +13,9 @@ from MapWnd import MapWnd
 class AppWnd(fwAppWnd):
 
 
-
     #
     def __init__(self):
         super().__init__()
-
 
 
     #
@@ -30,6 +28,7 @@ class AppWnd(fwAppWnd):
         })
         self.addChildWnd(self.control_wnd)
 
+
         self.map_wnd = MapWnd({
             'parent_wnd': self,
             'control_wnd': self.control_wnd,
@@ -37,12 +36,4 @@ class AppWnd(fwAppWnd):
         self.addChildWnd(self.map_wnd)
 
 
-    #
-    #
-    #
-    def update(self):
-        super().update()
 
-        dt = self.main_timer.get_time()
-        self.control_wnd.sendMessage("WM_SET_TICKS", dt)
-        self.map_wnd.dt = dt

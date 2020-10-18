@@ -4,6 +4,7 @@ from fw.functions import *
 from fw.FwError import FwError
 
 #import h5py
+import math
 import traceback
 from fw.fwWindow import fwWindow
 
@@ -97,9 +98,9 @@ class fwAppWnd(fwWindow):
         self.initMainWindows()
 
         self.update_last_call_ms = 0
-        self.draw_last_call_ms = 0
+        #self.update_interval_ms = 16
 
-        self.update_interval_ms = 16
+        self.draw_last_call_ms = 0
         self.draw_interval_ms = 16
 
         self.state = None
@@ -144,26 +145,30 @@ class fwAppWnd(fwWindow):
         draw_next_ms = 0
         handle_events_next_ms = 0
 
+
         try:
+
+            # необходимо , т.к. иначе при первом показе не просчитаны некоторые параметры (например координаты сенсоров)
+            self.update()
 
             while self.is_mainloop_run:
 
                 if self.state == 'APP_STATE_TRAINING_NEW' \
                         or self.state == 'APP_STATE_SHOW_PAUSE' \
                         or self.state == 'APP_STATE_TRAINING_PAUSE':
-                    # self.main_timer.tick(FPS_RATE)
-                    delay_ms = update_next_ms - pg.time.get_ticks()
+
+
+                    delay_ms = draw_next_ms - pg.time.get_ticks()
 
                     if delay_ms > 0:
-                        pg.time.wait(delay_ms)
+                        pg.time.wait(math.ceil(delay_ms))
 
                     self.handleEvents()
-                    self.update()
                     self.draw()
 
                     pg.display.update()
 
-                    update_next_ms = update_next_ms + self.update_interval_ms
+                    draw_next_ms += MECH_UPDATE_INTERVAL_MS_F
 
 
                 elif self.state == 'APP_STATE_TRAINING_PLAY':
@@ -185,19 +190,23 @@ class fwAppWnd(fwWindow):
 
                     if handle_events_delay_ms <= 0:
                         self.handleEvents()
-                        handle_events_next_ms += STATE_TRAINING_PAUSE_HANDLE_EVENTS_INTERVAL_MS
+                        handle_events_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__HANDLE_EVENTS_INTERVAL_MS
 
-                    elif draw_delay_ms <= 0:
+                    if draw_delay_ms <= 0:
+
                         self.draw()
-                        draw_next_ms += 16
+                        draw_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__UPDATE_INTERVAL_MS
 
-                    elif update_delay_ms <= 0:
+                    if update_delay_ms <= 0:
                         self.update()
-                        update_next_ms += 16
+                        update_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__DRAW_INTERVAL_MS
 
 
                 elif self.state == 'APP_STATE_SHOW_PLAY':
-                    pass
+                    # это не готово !
+                    self.handleEvents()
+                    self.update_4_show()
+                    self.draw()
 
                 else:
                     pass
@@ -227,7 +236,7 @@ class fwAppWnd(fwWindow):
     def newGame(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
         self.state = 'APP_STATE_TRAINING_NEW'
-        self.update_interval_ms = 16
+        # self.update_interval_ms = 16
 
         self.sendMessageToChilds('WM_NEW_GAME')
 
@@ -283,8 +292,27 @@ class fwAppWnd(fwWindow):
 
 
 
-    # def update(self):
-    #     pass
+    #
+    #
+    #
+    def update(self):
+        # fwWindow.update() пустой
+        # super().update()
+
+        cur_ms = pg.time.get_ticks()
+        dt = cur_ms - self.update_last_call_ms
+        self.update_last_call_ms = cur_ms
+
+        # dt = self.main_timer.get_time() # time used in the previous tick
+
+        # вывод времени . прошедшем с предыдущего вызова dt
+        self.control_wnd.sendMessage("WM_SET_TICKS", dt)
+        self.map_wnd.dt = dt
+
+        self.sendMessageToChilds("WM_UPDATE")
+
+
+
 
     # def draw(self):
     #     super().draw()      #fwWindow

@@ -55,7 +55,7 @@ class GuiCombobox(GuiControl):
             archer_rect)
 
         #output textvalue
-        text_srf = getAppWnd().getFont('arial_16').render(self.value, 1, HRGB(CONTROL_WND_FONT_COLOR))
+        text_srf = getAppWnd().getFont('arial_16').render(self.value, 1, HRGB(THEME_FONT_CLR))
         self.surface.blit(
             text_srf,
             (5, 1)

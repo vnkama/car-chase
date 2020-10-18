@@ -368,6 +368,7 @@ class MapWnd(fwMapWnd):
 
     def update(self):
         # self.updateChildWnds()    #у карты нет чайлдов
+        # print('MapWnd.update')
         self.arr_sprites_update.update()
         self.update_camera()
 
@@ -384,6 +385,9 @@ class MapWnd(fwMapWnd):
 
 
     def drawThis(self):
+
+        # print('MapWnd.drawThis')
+
 
         #копируем карту тайлов
         #self.drawBackground()       #оригинальная родная заливка фона -
@@ -409,7 +413,7 @@ class MapWnd(fwMapWnd):
             pg.sprite.collide_mask
         )
 
-        if (sprite_lst):
+        if sprite_lst:
             self.arr_oils[0].kill()
             #print("ROAD !!")
 
@@ -420,13 +424,13 @@ class MapWnd(fwMapWnd):
             pg.sprite.collide_mask
         )
 
-        if (sprite_lst):
+        if sprite_lst:
             sprite_lst[0].kill()
             print("TOUCH !!")
 
 
     def handle_MOUSEBUTTONDOWN(self,event):
-        if (event.button == 1):
+        if event.button == 1:
             # нажата левая кнопка
 
             if (self.isPointInWindow(event.pos)):
@@ -467,16 +471,16 @@ class MapWnd(fwMapWnd):
 
 
     def handle_KEYUP(self,event):
-        if (event.key == pg.K_LEFT):
+        if event.key == pg.K_LEFT:
             self.arr_cars[0].setSpeering(0)
 
-        elif (event.key == pg.K_RIGHT):
+        elif event.key == pg.K_RIGHT:
             self.arr_cars[0].setSpeering(0)
 
-        elif (event.key == pg.K_UP):
+        elif event.key == pg.K_UP:
             self.arr_cars[0].setAcceleration(0)
 
-        elif (event.key == pg.K_DOWN):
+        elif event.key == pg.K_DOWN:
             self.arr_cars[0].setBreaking(0)
 
 

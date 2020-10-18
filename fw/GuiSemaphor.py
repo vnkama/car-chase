@@ -24,7 +24,7 @@ class GuiSemaphor(GuiControl):
         super().__init__(params)
 
     def drawThis(self):
-        #text1_srf = getAppWnd().getFont('arial_16').render(str(self.text), 1, HRGB(CONTROL_WND_FONT_COLOR))
+        #text1_srf = getAppWnd().getFont('arial_16').render(str(self.text), 1, HRGB(THEME_FONT_CLR))
 
         rect = self.surface.get_rect()
 

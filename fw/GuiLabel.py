@@ -9,7 +9,7 @@ from fw.GuiControl import GuiControl
 class GuiLabel(GuiControl):
 
     def drawThis(self):
-        text1_srf = getAppWnd().getFont('arial_16').render(str(self.text), 1, HRGB(CONTROL_WND_FONT_COLOR))
+        text1_srf = getAppWnd().getFont('arial_16').render(str(self.text), 1, HRGB(THEME_FONT_CLR))
 
         but_rect = self.surface.get_rect()
         text_rect = text1_srf.get_rect()
