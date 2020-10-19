@@ -23,15 +23,15 @@ class AppWnd(fwAppWnd):
     # это надо делать в AppWnd а не в  fwAppWnd, тк fwAppWnd не знает классов не из фреймворков типа ToolWnd итп
     #
     def initMainWindows(self):
-        self.control_wnd = ToolWnd({
+        self.tool_wnd = ToolWnd({
             'parent_wnd': self
         })
-        self.addChildWnd(self.control_wnd)
+        self.addChildWnd(self.tool_wnd)
 
 
         self.map_wnd = MapWnd({
             'parent_wnd': self,
-            'control_wnd': self.control_wnd,
+            'tool_wnd': self.tool_wnd,
         })
         self.addChildWnd(self.map_wnd)
 

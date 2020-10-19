@@ -1,4 +1,4 @@
-#import pygame as pg
+import pygame as pg
 from config import *
 from fw.functions import *
 from fw.FwError import FwError
@@ -23,6 +23,8 @@ class fwToolWnd(fwWindow):
         super().__init__(params)        # parent - fwWindow
 
         self.tmp_child_wnd = None   # временное окно для всплывашек открытого комбобокса итд
+
+        self.tmp_child_wnd_params = None
 
         ############################################
 
@@ -87,8 +89,8 @@ class fwToolWnd(fwWindow):
         elif msg == 'WM_PAUSE':
             self.pause()
 
-        elif msg == 'WM_UPDATE':
-            pass
+        else:
+            super().sendMessage(msg, param1, param2)
 
 
 
@@ -98,13 +100,13 @@ class fwToolWnd(fwWindow):
     #
     def createTmpChildWnd(self,params,params_new_wnd):
 
-        if (self.tmp_child_wnd is not None ):
+        if self.tmp_child_wnd is not None:
             # создание второо временного окна пока не закрыто первое запрещено
             return
 
         self.tmp_child_wnd_params = params
 
-        if (self.tmp_child_wnd_params['tmp_class_name']  == "GuiSelectList"):
+        if self.tmp_child_wnd_params['tmp_class_name']  == "GuiSelectList":
             params_new_wnd['parent_wnd'] = self
             self.tmp_child_wnd = GuiSelectList(params_new_wnd)
 
@@ -116,14 +118,14 @@ class fwToolWnd(fwWindow):
     def closeTmpChild(self,value):
         #value - возвращенное значение
 
-        if (self.tmp_child_wnd is None ):
+        if self.tmp_child_wnd is None:
             raise FwError
 
         self.tmp_child_wnd.desctructor()
         del self.tmp_child_wnd
         self.tmp_child_wnd = None
 
-        if (value is not None):
+        if value is not None:
             self.tmp_child_wnd_params['creator_wnd'].setValue(value)
 
 
@@ -134,7 +136,7 @@ class fwToolWnd(fwWindow):
         super().drawChildWnds()
 
         # рисуем временное окно если есть
-        if (self.tmp_child_wnd is not None):
+        if self.tmp_child_wnd is not None:
             self.tmp_child_wnd.draw()
 
 

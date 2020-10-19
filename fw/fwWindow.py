@@ -43,25 +43,24 @@ class fwWindow:
         #self.child_funcs_arr = {"newGame": self.newGame}
 
 
+    # как правило эту функцию следует переопределить
     def draw(self):
         self.drawThis()
-        self.drawChildWnds()
-
+        self.sendMessageToChilds('WM_DRAW')
 
 
     def drawThis(self):
         # как правило эту функцию следует переопределить
-
         # закрасит свой фон (если есть)
         self.drawBackground()
 
 
 
-    def drawChildWnds(self):
-        # вызовем draw очерних окон
-        if len(self.child_objects):
-            for wnd in self.child_objects:
-                wnd.draw()
+    # def drawChildWnds(self):
+    #     # вызовем draw очерних окон
+    #     if len(self.child_objects):
+    #         for wnd in self.child_objects:
+    #             wnd.draw()
 
 
 
@@ -126,7 +125,13 @@ class fwWindow:
     #   False если сообщение не обработано
     #
     def sendMessage(self, msg, param1=None, param2=None):
-        return False
+
+        if msg == 'WM_DRAW':
+            self.draw()
+
+        elif msg == 'WM_UPDATE':
+            self.update()
+
 
     #
     def sendMessageToChilds(self, msg, param1=None, param2=None):
@@ -136,7 +141,6 @@ class fwWindow:
 
     def update(self):
         pass
-        # self.sendMessageToChilds('WM_UPDATE')
 
 
 

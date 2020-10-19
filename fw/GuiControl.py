@@ -52,3 +52,8 @@ class GuiControl(fwWindow):
         # координаты приходят абсолютные, относительно окна приложения
         #
         self.mouse_hover_flag = self.isPointInWindow(event.pos)
+
+    def draw(self):
+        self.drawThis()
+        # drawChilds не вызывается потомучто у контролов нет чайлдов
+        # а если у кого и есть пусть переопределят draw

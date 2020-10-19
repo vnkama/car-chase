@@ -29,7 +29,7 @@ class MapWnd(fwMapWnd):
 
         super().__init__(params)        # parent - fwWindow
 
-        self.control_wnd = params['control_wnd']    #для вывода ссобщений
+        self.tool_wnd = params['tool_wnd']    #для вывода ссобщений
 
         self.background_srf = pg.Surface(MAP_SIZE_XY)
         self.Camera = Camera(MAP_WND_RECT.width,MAP_WND_RECT.height,MAP_SIZE_X,MAP_SIZE_Y)
@@ -362,7 +362,7 @@ class MapWnd(fwMapWnd):
 
         groups = (self.arr_sprites_update_camera, self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(self, 0, 300, groups, self.control_wnd)
+            Car(self, 0, 300, groups, self.tool_wnd)
         )
 
 
@@ -487,17 +487,15 @@ class MapWnd(fwMapWnd):
     #
     #
     #
-    def sendMessage(self, msg, param1=None,param2=None):
-        # if (msg == 'WM_NEW_GAME'):
-        #     self.newGame()
-        #
-        # elif (msg == 'WM_QUIT'):
-        #     pass
-        #
-        # elif (msg == 'WM_UPDATE'):
-        #     pass
-        #
-        # else:
-        #     # если не обработали здесь то отправляем наверх
-        super().sendMessage(msg, param1, param2)
+    # def sendMessage(self, msg, param1=None,param2=None):
+    #     # if (msg == 'WM_NEW_GAME'):
+    #     #     self.newGame()
+    #     #
+    #     # elif (msg == 'WM_QUIT'):
+    #     #     pass
+    #     #
+    #     #
+    #     # else:
+    #     #     # если не обработали здесь то отправляем наверх
+    #     super().sendMessage(msg, param1, param2)
 

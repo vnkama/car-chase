@@ -64,7 +64,7 @@ class fwAppWnd(fwWindow):
 
         self.main_timer = pg.time.Clock()
         self.is_mainloop_run = True
-        self.control_wnd = None
+        self.tool_wnd = None
         self.map_wnd = None
 
 
@@ -98,7 +98,7 @@ class fwAppWnd(fwWindow):
         self.initMainWindows()
 
         self.update_last_call_ms = 0
-        #self.update_interval_ms = 16
+        # self.update_interval_ms = 16
 
         self.draw_last_call_ms = 0
         self.draw_interval_ms = 16
@@ -192,10 +192,11 @@ class fwAppWnd(fwWindow):
                         self.handleEvents()
                         handle_events_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__HANDLE_EVENTS_INTERVAL_MS
 
-                    if draw_delay_ms <= 0:
 
+                    if draw_delay_ms <= 0:
                         self.draw()
                         draw_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__UPDATE_INTERVAL_MS
+
 
                     if update_delay_ms <= 0:
                         self.update()
@@ -296,17 +297,15 @@ class fwAppWnd(fwWindow):
     #
     #
     def update(self):
-        # fwWindow.update() пустой
-        # super().update()
+        # super().update()  # fwWindow.update() пустой
 
         cur_ms = pg.time.get_ticks()
         dt = cur_ms - self.update_last_call_ms
         self.update_last_call_ms = cur_ms
 
-        # dt = self.main_timer.get_time() # time used in the previous tick
 
         # вывод времени . прошедшем с предыдущего вызова dt
-        self.control_wnd.sendMessage("WM_SET_TICKS", dt)
+        self.tool_wnd.sendMessage("WM_SET_TICKS", dt)
         self.map_wnd.dt = dt
 
         self.sendMessageToChilds("WM_UPDATE")
@@ -314,8 +313,12 @@ class fwAppWnd(fwWindow):
 
 
 
-    # def draw(self):
-    #     super().draw()      #fwWindow
+    def draw(self):
+        # super().draw()      #fwWindow
+        self.sendMessageToChilds("WM_DRAW")
+
+
+
 
 
     # добавим обработчик перемещения мыши
