@@ -36,4 +36,13 @@ class AppWnd(fwAppWnd):
         self.addChildWnd(self.map_wnd)
 
 
+    def update(self):
+        # вывод времени . прошедшем с предыдущего вызова dt
+        super().update()
+
+        self.tool_wnd.sendMessage("WM_SET_TICKS", self.update_dt_ms)
+        self.map_wnd.dt = self.update_dt_ms
+
+
+
 

@@ -20,7 +20,7 @@ import random
 #
 class MapWnd(fwMapWnd):
 
-    def __init__(self,params):
+    def __init__(self, params):
 
 
         params['rect'] = MAP_WND_RECT
@@ -29,14 +29,14 @@ class MapWnd(fwMapWnd):
 
         super().__init__(params)        # parent - fwWindow
 
-        self.tool_wnd = params['tool_wnd']    #для вывода ссобщений
+        self.tool_wnd = params['tool_wnd']    # для вывода ссобщений
 
         self.background_srf = pg.Surface(MAP_SIZE_XY)
         self.Camera = Camera(MAP_WND_RECT.width,MAP_WND_RECT.height,MAP_SIZE_X,MAP_SIZE_Y)
         self.dt = 0
 
 
-        #группы спрайтов
+        # группы спрайтов
         self.arr_sprites_update_camera = pg.sprite.Group()
         self.arr_sprites_draw = pg.sprite.Group()           # для взывова draw, карта отдельно копируемся
         self.arr_sprites_update = pg.sprite.Group()         # то что двигаетсмя
@@ -61,7 +61,7 @@ class MapWnd(fwMapWnd):
 
 
 
-        #нарисуем деревья
+        # нарисуем деревья
 
         self.arr_trees = []
         groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_collide)
@@ -177,22 +177,22 @@ class MapWnd(fwMapWnd):
 
 
         road_len = len(arr_roadsections_axial_2idot)
-        #road_len = 7
+        # road_len = 7
 
 
-        #вектора-координаты 2d [x y 1] на повороты осевая линия дороги
-        #индексы 0..road_len
+        # вектора-координаты 2d [x y 1] на повороты осевая линия дороги
+        # индексы 0..road_len
 
         arr_roadsections_axial_turn_3mfdot = np.zeros((road_len,3),float)
         for i in range(road_len): #
             arr_roadsections_axial_turn_3mfdot[i] = nd2_getMatrix(arr_roadsections_axial_2idot[i])
 
 
-        #секция дороги в виде прямоугольника (НЕ полигона !). 4 угла
+        # секция дороги в виде прямоугольника (НЕ полигона !). 4 угла
         arr_P = np.zeros((road_len-1,4,3),float)
 
 
-        #нормальные вектора левого-правого краев дороги
+        # нормальные вектора левого-правого краев дороги
 
         arr_A_left = np.zeros((road_len-1),float)
         arr_B_left = np.zeros((road_len-1),float)
@@ -227,7 +227,7 @@ class MapWnd(fwMapWnd):
             matrix_scaling_begin = nd2_getScaleMatrix(k_width_begin)
             matrix_scaling_end = nd2_getScaleMatrix(k_width_end)
 
-            #масшиабируем вектор направления до нужной длины
+            # масшиабируем вектор направления до нужной длины
             roadsection_direction_begin = matrix_scaling_begin @ roadsection_axis_3mf
             roadsection_direction_end = matrix_scaling_end @ roadsection_axis_3mf
 
@@ -243,13 +243,13 @@ class MapWnd(fwMapWnd):
             arr_P[i][2] = arr_roadsections_axial_turn_3mfdot[i+1] + matrix_rotate_right @ roadsection_direction_end
             arr_P[i][3] = arr_roadsections_axial_turn_3mfdot[i] + matrix_rotate_right @ roadsection_direction_begin
 
-            #нормальные вектора левого-правого краев дороги
+            # нормальные вектора левого-правого краев дороги
             # края дороги могут быть непарралельны осевой
             N_left = matrix_rotate_left @ (arr_P[i][1] - arr_P[i][0])
             N_right = matrix_rotate_right @ (arr_P[i][2] - arr_P[i][3])
 
-            #считаем общее уравнение прямой для левого-правого краев дороги
-            #общее уравнение прямой для края дороги
+            # считаем общее уравнение прямой для левого-правого краев дороги
+            # общее уравнение прямой для края дороги
             # a*x1 + b*y1 + c1 = 0
             # a = Nx, берем из нормального вектора
             # b = Ny, берем из нормального вектора
@@ -265,8 +265,8 @@ class MapWnd(fwMapWnd):
 
 
 
-        #просчитаем все реальные углы
-        #в последней секции не просчитываем
+        # просчитаем все реальные углы
+        # в последней секции не просчитываем
         for i in range(road_len - 1):
 
             if i == 0:
@@ -306,10 +306,10 @@ class MapWnd(fwMapWnd):
         # рисуем полигоны на дороге
 
         for i in range(road_len - 1):
-            #for arr_roadsection in arr_roadsections_corners_3mf:
+            # for arr_roadsection in arr_roadsections_corners_3mf:
             arr_roadsection = arr_roadsections_corners_3mf[i]
-            #цикл для каждого 4х угольного полигона дороги
-            #arr_roadsection - содержит 4 угла полигона
+            # цикл для каждого 4х угольного полигона дороги
+            # arr_roadsection - содержит 4 угла полигона
 
             polygon_corners = []
 
@@ -325,7 +325,7 @@ class MapWnd(fwMapWnd):
             groups = (self.arr_sprites_update_camera, self.arr_sprites_draw,self.arr_sprites_curbs)
 
 
-            #ставим спрайт на левую сторону дороги
+            # ставим спрайт на левую сторону дороги
             self.arr_road_sprites.append(
                 Curb(
                     arr_roadsection[0],
@@ -335,7 +335,7 @@ class MapWnd(fwMapWnd):
                 )
             )
 
-            #ставим спрайт на правую сторону дороги
+            # ставим спрайт на правую сторону дороги
             self.arr_road_sprites.append(
                 Curb(
                     arr_roadsection[2],
@@ -367,8 +367,8 @@ class MapWnd(fwMapWnd):
 
 
     def update(self):
-        # self.updateChildWnds()    #у карты нет чайлдов
-        # print('MapWnd.update')
+        # self.updateChildWnds()    # у карты нет чайлдов
+
         self.arr_sprites_update.update()
         self.update_camera()
 
@@ -384,30 +384,27 @@ class MapWnd(fwMapWnd):
             sprite.update_camera(camera_position_rect)
 
 
+
     def drawThis(self):
 
-        # print('MapWnd.drawThis')
+        # копируем карту тайлов
+        #self.drawBackground()       # оригинальная родная заливка фона -
 
-
-        #копируем карту тайлов
-        #self.drawBackground()       #оригинальная родная заливка фона -
-
-        #координаты окна показываемые камерой относительно карты
+        # координаты окна показываемые камерой относительно карты
         camera_position_rect = self.Camera.getPositionRect()
 
-        #копируем фон(тайловая карта)
+        # копируем фон(тайловая карта)
         self.surface.blit(          # копируем в окно MapWnd
             self.background_srf,    # копируем из карты
             pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
             camera_position_rect)   # из карты берем то что показывает камера
-
 
         self.arr_cars[0].draw_sensors()
         self.arr_sprites_draw.draw(self.surface)
 
         # столкновение машины с краем дороги
         sprite_lst = pg.sprite.spritecollide(
-            self.arr_cars[0],           #машину сталикиваем
+            self.arr_cars[0],           # машину сталикиваем
             self.arr_sprites_curbs,      #с краями дороги
             False,
             pg.sprite.collide_mask
@@ -418,8 +415,8 @@ class MapWnd(fwMapWnd):
             #print("ROAD !!")
 
         sprite_lst = pg.sprite.spritecollide(
-            self.arr_cars[0],           #машину сталикиваем
-            self.arr_sprites_collide,    #
+            self.arr_cars[0],           # машину сталикиваем
+            self.arr_sprites_collide,
             False,
             pg.sprite.collide_mask
         )
@@ -433,44 +430,44 @@ class MapWnd(fwMapWnd):
         if event.button == 1:
             # нажата левая кнопка
 
-            if (self.isPointInWindow(event.pos)):
-                #кнопка нажата в зоне карты
+            if self.isPointInWindow(event.pos):
+                # кнопка нажата в зоне карты
 
 
-                #абсолютные координаты мыши -> в относительные в окне
+                # абсолютные координаты мыши -> в относительные в окне
                 # event.pos - абсолютные кордингаты клика относительно онка приложения
                 # click_mapwnd_rect - координаты относительна окна mapwnd
                 click_mapwnd_rect = pg.Rect(
-                    calcAbsToOffset(self.surface.get_abs_offset(),event.pos),
-                    (0,0)
+                    calcAbsToOffset(self.surface.get_abs_offset(), event.pos),
+                    (0, 0)
                 )
 
                 # координаты окна показываемые камерой относительно карты
                 camera_position_rect = self.Camera.getPositionRect()
 
-                #координаты клика относительно карты
+                # координаты клика относительно карты
                 click_map_rect =  camera_position_rect.move(click_mapwnd_rect.topleft)
 
-                #self.arr_cars[0].setTarget(click_map_rect)
+                # self.arr_cars[0].setTarget(click_map_rect)
 
 
 
-    def handle_KEYDOWN(self,event):
-        if (event.key == pg.K_LEFT):
+    def handle_KEYDOWN(self, event):
+        if event.key == pg.K_LEFT:
             self.arr_cars[0].setSpeering(-1)
 
-        elif (event.key == pg.K_RIGHT):
+        elif event.key == pg.K_RIGHT:
             self.arr_cars[0].setSpeering(1)
 
-        elif (event.key == pg.K_UP):
+        elif event.key == pg.K_UP:
             self.arr_cars[0].setAcceleration(1)
 
-        elif (event.key == pg.K_DOWN):
+        elif event.key == pg.K_DOWN:
             self.arr_cars[0].setBreaking(1)
 
 
 
-    def handle_KEYUP(self,event):
+    def handle_KEYUP(self, event):
         if event.key == pg.K_LEFT:
             self.arr_cars[0].setSpeering(0)
 

@@ -1,4 +1,4 @@
-import pygame as pg     #использован pg.Rect
+import pygame as pg     # использован pg.Rect
 
 # =================================================================================
 # количесвто особей в поколении
@@ -15,9 +15,16 @@ GAME_GENE_COUNT_MAX = 500
 FPS_RATE=60                             # частота кадров в сек 60
 
 #интервал пересчета UPDATE, внутриигровое время (механика)
-# MECH_UPDATE_INTERVAL_MS        = 16
-MECH_UPDATE_INTERVAL_MS_F    = 16.6666667
 
+
+# сколько FPS при обучении
+PAUSE_UPDATE_FPS            = 60
+# DRAW_FPS                    = 60
+# TRAINING_UPDATE_FPS         = 60
+
+
+PAUSE_DRAW_FPS              = 60
+PAUSE_DRAW_DT               = 1 / PAUSE_DRAW_FPS
 
 
 # интервал обработки HANDLE_EVENTS
@@ -40,7 +47,7 @@ else:
 
 
 
-#размер игровой карты (НЕ экрана)
+# размер игровой карты (НЕ экрана)
 MAP_SIZE_X = 2560
 MAP_SIZE_Y = 896
 MAP_SIZE_XY = (MAP_SIZE_X, MAP_SIZE_Y)

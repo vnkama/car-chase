@@ -115,19 +115,19 @@ class Car(pg.sprite.Sprite):
             grad2rad(90),
         ]
 
-        #значения сенсоров
+        # значения сенсоров
         self.arr_sensors_value = np.zeros(5,float)
 
         self.arr_sensors_car_pos = np.empty(shape=[Car.SENSOR_COUNT],dtype = object)       #координаты относительно машины (константа), при курсе 0
         self.arr_sensors_end_3mfdot = np.zeros(shape=(Car.SENSOR_COUNT,nd2_getMatrixSize()),dtype = float)       #координаты относительно карты, с учетом курса
         self.arr_sensors_wnd_pos = np.empty(shape=[Car.SENSOR_COUNT],dtype = list)         #координаты относительно окна
 
-        #расчитаем координаты сенсоров , относительно машины
+        # расчитаем координаты сенсоров , относительно машины
         # курс не учитываем
-        for ai,v in np.ndenumerate(self.arr_sensors_angles):
-            i=ai[0]
-            #формируем вектор от центра машины на сенсор.
-            self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(v) @ nd2_getMatrix([1,0])
+        for ai, v in np.ndenumerate(self.arr_sensors_angles):
+            i = ai[0]
+            # формируем вектор от центра машины на сенсор.
+            self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(v) @ nd2_getMatrix([1, 0])
 
         self.arr_sensors_value = np.full(shape=Car.SENSOR_COUNT,dtype=float,fill_value=Car.SENSOR_MAX_LEN)
 
@@ -155,7 +155,7 @@ class Car(pg.sprite.Sprite):
         # положение автомобиля в окне
         self.wnd_rect.center = (self.map_rectpos.left - camera_rect.left, self.map_rectpos.top - camera_rect.top)
 
-        # #пересчитаем положение сенсоров в окне
+        # пересчитаем положение сенсоров в окне
         for i in range(Car.SENSOR_COUNT):
             self.arr_sensors_wnd_pos[i] = (
                 int(self.arr_sensors_end_3mfdot[i][0]) - camera_rect.left,
@@ -180,74 +180,79 @@ class Car(pg.sprite.Sprite):
         ###################
 
 
-        #положение руля
+        # положение руля
         self.speering_wheel_alfa += self.speering_direction*self.SPEERING_DV * dts
 
-        #ограничим диапазон вращения руля
+        # ограничим диапазон вращения руля
         self.speering_wheel_alfa = max(-self.MAX_SPEERING,min(self.speering_wheel_alfa, self.MAX_SPEERING))
 
 
 
-        #ускорения
+        # ускорения
         #вектор ускорения совпадает с направлением машины
         engine_dv = (self.engine_acceleration_dv ) if self.is_engine_on else 0
 
 
 
         abs_velocity = abs(self.velocity)
+
+
         abs_friction_dv = abs_velocity if (abs_velocity < 0.2) else (abs_velocity * self.K_friction)
         friction_dv = math.copysign(abs_friction_dv,-1 if self.velocity >= 0 else 1) # знак наоборот
 
-        if (self.is_braking_on):
+        if self.is_braking_on:
             abs_braking_dv = abs_velocity if (abs_velocity < 0.9) else (abs_velocity * self.K_braking)
             braking_dv = math.copysign(abs_braking_dv,-1 if self.velocity >= 0 else 1)      # знак наоборот
         else:
             braking_dv = 0
 
-        #прирост скорости (скаляр)
+        # прирост скорости (скаляр)
         dv = (engine_dv + braking_dv + friction_dv) * dts
 
-        #новая скорость (скаляр)
+        # новая скорость (скаляр)
         self.velocity = max(-self.max_velocity,min(self.max_velocity, self.velocity+dv))
 
 
 
 
-        if (abs(self.speering_wheel_alfa) > 0.001):
-            #движение по дуге
 
-            #радиус поворота, скаляр
-            #берем положительное значение тк скаляр
+
+        if abs(self.speering_wheel_alfa) > 0.001:
+            # движение по дуге
+
+            # радиус поворота, скаляр
+            # берем положительное значение тк скаляр
             R_turn = self.CAR_LEN / math.tan(abs(self.speering_wheel_alfa))
 
-            #положение заднего колеса (оно идет по дуге поворота)
+            # положение заднего колеса (оно идет по дуге поворота)
             back_wheel_nd2 = nd2_getScaleMatrix(self.CAR_LEN/2) @ (nd2_getRotateMatrix180() @ self.course_nd2)
 
-            #вектор от заднего колеса на центр дуги , по которй едет машина
-            #вектор перпендикулярен курсу машины
-            if (self.speering_wheel_alfa > 0):
+            # вектор от заднего колеса на центр дуги , по которй едет машина
+            # вектор перпендикулярен курсу машины
+            if self.speering_wheel_alfa > 0:
                 R_turn_back_nd2 =  nd2_getScaleMatrix(R_turn) @ (nd2_getRotateMatrixRight90() @ self.course_nd2)
             else:
                 R_turn_back_nd2 =  nd2_getScaleMatrix(R_turn) @ (nd2_getRotateMatrixLeft90() @ self.course_nd2)
 
 
-            #центр дуги , по которй едет машина
+            # центр дуги , по которй едет машина
             centr_turn_nd2 = back_wheel_nd2 + R_turn_back_nd2
 
 
-            #угловой пробег (скаляр). (угол из центра вращения (centr_turn_nd2) на машину в начале и конце шага
+            # угловой пробег (скаляр). (угол из центра вращения (centr_turn_nd2) на машину в начале и конце шага
             d_alfa = math.copysign((self.velocity * dts) / R_turn,self.speering_wheel_alfa)
 
-            #матрица поворота
+            # матрица поворота
             rotateMatrix_nd2 = nd2_getRotateMatrix(d_alfa)
             self.map_pos_nd2 =  self.map_pos_nd2 + centr_turn_nd2 + rotateMatrix_nd2 @ nd2_getRotateMatrix180() @ centr_turn_nd2
 
-            #пересчитаем курс
+            # пересчитаем курс
             self.course_nd2 = nd2_normalize(rotateMatrix_nd2 @ self.course_nd2)
 
         else:
-             #движение по прямой
-             self.map_pos_nd2 = self.map_pos_nd2 + (self.velocity * dts) * self.course_nd2
+            # движение по прямой
+            self.map_pos_nd2 = self.map_pos_nd2 + (self.velocity * dts) * self.course_nd2
+            # print(self.map_pos_nd2)
 
         angle = nd2_getAngle(self.course_nd2)
         rumb_angle = PI / 16        # = 2 * PI / 32
@@ -255,13 +260,8 @@ class Car(pg.sprite.Sprite):
         self.setDirectionImage((int ((angle + rumb_angle / 2) / rumb_angle)) & 0x1F)
 
 
-        #новое положение
-        #
+        # новое положение
         self.map_rectpos.topleft = (int(self.map_pos_nd2[0]), int(self.map_pos_nd2[1]))
-
-
-
-
 
 
 
@@ -269,11 +269,10 @@ class Car(pg.sprite.Sprite):
     #
     #
     def update_sensors(self):
-        #print("update_sensors")
 
         rotate_nd2 = nd2_getRotateMatrix(nd2_getAngle(self.course_nd2))
-        for ai,sensor_car_pos in np.ndenumerate(self.arr_sensors_car_pos):
-            i=ai[0]
+        for ai, sensor_car_pos in np.ndenumerate(self.arr_sensors_car_pos):
+            i = ai[0]
 
             #повернем сенсор по курсу машины и разместим на карте
             self.arr_sensors_end_3mfdot[i] = rotate_nd2 @ sensor_car_pos + self.map_pos_nd2
@@ -286,8 +285,8 @@ class Car(pg.sprite.Sprite):
         # определим прмоугольник (его края парралелны карте) в который попадают все сенcоры (сенсор - это отрезок)
 
 
-        arr_x = self.arr_sensors_end_3mfdot[...,0]
-        arr_y = self.arr_sensors_end_3mfdot[...,1]
+        arr_x = self.arr_sensors_end_3mfdot[..., 0]
+        arr_y = self.arr_sensors_end_3mfdot[..., 1]
 
         x1 = np.amin(arr_x)
         x2 = np.amax(arr_x)
@@ -298,7 +297,7 @@ class Car(pg.sprite.Sprite):
         # rect закрывающий ВСЕ сенсоры-отрезки разом
         # УВЕЛИЧИМ НА 2 ПИКСЕЛЯ ВО ВСЕ СТОРОНЫ чтобы убрать краевые эффекты
         # было до увеличения arr_sensors_irect = pg.Rect(x1,y1,x2-x1+1,y2-y1+1)
-        arr_sensors_irect = pg.Rect(x1-2,y1-2,x2-x1+3,y2-y1+3)
+        arr_sensors_irect = pg.Rect(x1 - 2, y1 - 2, x2 - x1 + 3, y2 - y1 + 3)
 
 
 
@@ -323,25 +322,23 @@ class Car(pg.sprite.Sprite):
         # этим мы минимизируес число спрайтов c котороыми
 
 
-        #инициируем массив пустыми листами
-        arr_sensors_lst_curbs = np.empty(shape=[Car.SENSOR_COUNT],dtype=list)
+        # инициируем массив пустыми листами
+        arr_sensors_lst_curbs = np.empty(shape=[Car.SENSOR_COUNT], dtype=list)
         for i in range(arr_sensors_lst_curbs.size):
             arr_sensors_lst_curbs[i] = np.array([])
 
-
-
-        test = np.full(shape=[Car.SENSOR_COUNT],fill_value=0,dtype = int)
+        test = np.full(shape=[Car.SENSOR_COUNT], fill_value=0, dtype=int)
 
         # общее начало отрезков-сенсоров
         car_irectpos = pg.Rect(
             nd2_getPoint(self.map_pos_nd2),
-            (1,1)
+            (1, 1)
         )
 
         sensor_start_point_3mf = self.map_pos_nd2
 
         #длинна сенсра фактическая (текущее найденная длинна, после обхода всех перечений сенсора здесь будет самое короткое значение )
-        arr_sensor_len_f = np.full(shape=[Car.SENSOR_COUNT], dtype=float,fill_value=float(Car.SENSOR_MAX_LEN))
+        arr_sensor_len_f = np.full(shape=[Car.SENSOR_COUNT], dtype=float, fill_value=float(Car.SENSOR_MAX_LEN))
 
         #arr_sensor_end_point_f2 = np.full(shape=(Car.SENSOR_COUNT, 2), fill_value=0, dtype=float)
 
@@ -476,6 +473,7 @@ class Car(pg.sprite.Sprite):
     #     super().draw()
     #     self.draw_sensors()
     def draw_sensors(self):
+        # print('draw_sensors')
         for ai, sensor_wnd_pos in np.ndenumerate(self.arr_sensors_wnd_pos):
             i = ai[0]  # индекс
 

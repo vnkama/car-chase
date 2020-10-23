@@ -25,7 +25,7 @@ PI_d2 = PI/2
 
 
 g_main_game = None
-g_conrol_wnd = None
+# g_conrol_wnd = None
 
 
 ########################################
@@ -38,13 +38,13 @@ def setMainWnd(main_wnd):
     g_main_game = main_wnd
 
 ########################################
-def getControlWnd():
-    global g_conrol_wnd
-    return g_conrol_wnd
-
-def setControlWnd(conrol_wnd):
-    global g_conrol_wnd
-    g_conrol_wnd = conrol_wnd
+# def getControlWnd():
+#     global g_conrol_wnd
+#     return g_conrol_wnd
+#
+# def setControlWnd(conrol_wnd):
+#     global g_conrol_wnd
+#     g_conrol_wnd = conrol_wnd
 
 
 

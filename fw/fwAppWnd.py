@@ -11,14 +11,10 @@ from fw.fwWindow import fwWindow
 
 
 
-
 #
 #
 #
 class fwAppWnd(fwWindow):
-
-
-
 
     # pygame инициализируем как статический, т.к. CellWeed
     # грузит спрайты как статические, один набор спрайтов на все Weed
@@ -27,8 +23,8 @@ class fwAppWnd(fwWindow):
     pg.init()
     pg.display.set_caption(MAIN_WND_TITLE)
 
-    if (MAIN_WND_FULLSCREEN):
-        #вариант для FULLSCREEN
+    if MAIN_WND_FULLSCREEN:
+        # вариант для FULLSCREEN
         main_srf = pg.display.set_mode(
             #(1600, 900),
             (MAIN_WND_WIDTH, MAIN_WND_HEIGHT),
@@ -97,8 +93,44 @@ class fwAppWnd(fwWindow):
 
         self.initMainWindows()
 
+        # ctime - тайминг компьютера. используется для синхронизации FPS
+        # gtime - это внутриигровое время, по сюжету игра может длится 10 часов, а на компьютере прошло 5 минут
+        # dt - временной интервал
+        # постфиксы
+        # _ms     милисекунды,
+        # _sec    секунды
+        # _f      флоат, фремя с плавающей точкой
+
+        # номер шага обучения (1-based)
+        # когда трайнинг не идет переменная тоже стоит
+        # при инициации начального положения training_step = 0
+        # при расчете первого перемещения training_step = 1
+        self.training_update_step = 0
+
+        # время ticks последнего или текущего вызова update, считается с 0
+        # 0 - начало игры, 60 сек - внутриигровая минута.
+        # время хоккейное, при паузах стоит
+        # self.training_step = 60 соответствует self.training_update_last_call_gtime_ms = 1000
+        # пррименяется для расчета втч физики
+
+        self.training_update_last_call_gtime_ms_f = 0.0
+        self.training_update_next_call_gtime_ms_f = 0.0
+        self.training_update_dt_gtime_ms_f = 0.0
+
+
+
+        #
+        self.show_update_step = 0
+
+        # последний вызов draw независимо от режима (play - pause итд)
+        self.draw_last_call_ctime_fms = 0
+        self.draw_next_call_ctime_fms = 0
+
+
+
+
         self.update_last_call_ms = 0
-        # self.update_interval_ms = 16
+        self.update_dt_ms = 0
 
         self.draw_last_call_ms = 0
         self.draw_interval_ms = 16
@@ -158,17 +190,18 @@ class fwAppWnd(fwWindow):
                         or self.state == 'APP_STATE_TRAINING_PAUSE':
 
 
-                    delay_ms = draw_next_ms - pg.time.get_ticks()
+                    delay_ms = self.draw_next_call_ctime_fms - pg.time.get_ticks()
 
                     if delay_ms > 0:
                         pg.time.wait(math.ceil(delay_ms))
+
+                    self.draw_next_call_ctime_fms += PAUSE_DRAW_DT
 
                     self.handleEvents()
                     self.draw()
 
                     pg.display.update()
 
-                    draw_next_ms += MECH_UPDATE_INTERVAL_MS_F
 
 
                 elif self.state == 'APP_STATE_TRAINING_PLAY':
@@ -183,10 +216,11 @@ class fwAppWnd(fwWindow):
                     if delay_ms > 0:
                         pg.time.wait(delay_ms)
 
-                    cur_ms = pg.time.get_ticks()
-                    update_delay_ms = update_next_ms - cur_ms
-                    draw_delay_ms = draw_next_ms - cur_ms
-                    handle_events_delay_ms = draw_next_ms - cur_ms
+                    now_ms = pg.time.get_ticks()
+
+                    update_delay_ms = update_next_ms - now_ms
+                    draw_delay_ms = draw_next_ms - now_ms
+                    handle_events_delay_ms = draw_next_ms - now_ms
 
                     if handle_events_delay_ms <= 0:
                         self.handleEvents()
@@ -195,6 +229,7 @@ class fwAppWnd(fwWindow):
 
                     if draw_delay_ms <= 0:
                         self.draw()
+                        pg.display.update()
                         draw_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__UPDATE_INTERVAL_MS
 
 
@@ -208,9 +243,16 @@ class fwAppWnd(fwWindow):
                     self.handleEvents()
                     self.update_4_show()
                     self.draw()
+                    pg.display.update()
+
+
+
 
                 else:
                     pass
+
+
+
 
                 #self.main_timer.tick(FPS_RATE)
 
@@ -300,13 +342,8 @@ class fwAppWnd(fwWindow):
         # super().update()  # fwWindow.update() пустой
 
         cur_ms = pg.time.get_ticks()
-        dt = cur_ms - self.update_last_call_ms
+        self.update_dt_ms = cur_ms - self.update_last_call_ms
         self.update_last_call_ms = cur_ms
-
-
-        # вывод времени . прошедшем с предыдущего вызова dt
-        self.tool_wnd.sendMessage("WM_SET_TICKS", dt)
-        self.map_wnd.dt = dt
 
         self.sendMessageToChilds("WM_UPDATE")
 
