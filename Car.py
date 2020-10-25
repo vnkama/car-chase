@@ -118,9 +118,18 @@ class Car(pg.sprite.Sprite):
         # значения сенсоров
         self.arr_sensors_value = np.zeros(5,float)
 
-        self.arr_sensors_car_pos = np.empty(shape=[Car.SENSOR_COUNT],dtype = object)       #координаты относительно машины (константа), при курсе 0
-        self.arr_sensors_end_3mfdot = np.zeros(shape=(Car.SENSOR_COUNT,nd2_getMatrixSize()),dtype = float)       #координаты относительно карты, с учетом курса
-        self.arr_sensors_wnd_pos = np.empty(shape=[Car.SENSOR_COUNT],dtype = list)         #координаты относительно окна
+        # координаты относительно машины (константа), при курсе 0
+        self.arr_sensors_car_pos = np.empty(
+                shape=[Car.SENSOR_COUNT],
+                dtype=object)
+
+        # координаты относительно карты, с учетом курса
+        self.arr_sensors_end_3mfdot = np.zeros(shape=(Car.SENSOR_COUNT,
+                                                      nd2_getMatrixSize()),
+                                               dtype=float)
+
+        # координаты относительно окна
+        self.arr_sensors_wnd_pos = np.empty(shape=[Car.SENSOR_COUNT], dtype=list)
 
         # расчитаем координаты сенсоров , относительно машины
         # курс не учитываем

@@ -93,19 +93,14 @@ class fwAppWnd(fwWindow):
 
         self.initMainWindows()
 
-        # ctime - тайминг компьютера. используется для синхронизации FPS
-        # gtime - это внутриигровое время, по сюжету игра может длится 10 часов, а на компьютере прошло 5 минут
+        # rtime - реальное время. используется для например для синхронизации FPS или опрса клавиатуры
+        # gtime - это внутриигровое время, по сюжету игра может длится хоть 10 часов, а на компьютере прошло 5 минут
         # dt - временной интервал
         # постфиксы
         # _ms     милисекунды,
         # _sec    секунды
         # _f      флоат, фремя с плавающей точкой
 
-        # номер шага обучения (1-based)
-        # когда трайнинг не идет переменная тоже стоит
-        # при инициации начального положения training_step = 0
-        # при расчете первого перемещения training_step = 1
-        self.training_update_step = 0
 
         # время ticks последнего или текущего вызова update, считается с 0
         # 0 - начало игры, 60 сек - внутриигровая минута.
@@ -113,7 +108,13 @@ class fwAppWnd(fwWindow):
         # self.training_step = 60 соответствует self.training_update_last_call_gtime_ms = 1000
         # пррименяется для расчета втч физики
 
-        self.training_update_last_call_gtime_ms_f = 0.0
+
+        self.training_update_step = None
+        self.training_update_call_gtime_ms_f = None
+        self.training_update_call_rtime_ms = None
+
+
+
         self.training_update_next_call_gtime_ms_f = 0.0
         self.training_update_dt_gtime_ms_f = 0.0
 
@@ -207,6 +208,7 @@ class fwAppWnd(fwWindow):
                 elif self.state == 'APP_STATE_TRAINING_PLAY':
 
                     cur_ms = pg.time.get_ticks()
+
                     update_delay_ms = update_next_ms - cur_ms
                     draw_delay_ms = draw_next_ms - cur_ms
                     handle_events_delay_ms = handle_events_next_ms - cur_ms
@@ -234,8 +236,8 @@ class fwAppWnd(fwWindow):
 
 
                     if update_delay_ms <= 0:
-                        self.update()
-                        update_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__DRAW_INTERVAL_MS
+                        self.update_training()
+
 
 
                 elif self.state == 'APP_STATE_SHOW_PLAY':
@@ -279,7 +281,19 @@ class fwAppWnd(fwWindow):
     def newGame(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
         self.state = 'APP_STATE_TRAINING_NEW'
+
         # self.update_interval_ms = 16
+
+        # номер шага обучения (1-based)
+        # когда трайнинг не идет переменная тоже стоит
+        # при инициации начального положения training_step = 0
+        # при расчете первого перемещения training_step = 1
+
+        self.training_update_step = 0
+        self.training_update_call_gtime_ms_f = 0.0
+
+        self.training_update_call_rtime_ms = None
+
 
         self.sendMessageToChilds('WM_NEW_GAME')
 
@@ -348,6 +362,17 @@ class fwAppWnd(fwWindow):
         self.sendMessageToChilds("WM_UPDATE")
 
 
+    #
+    # перерасчет всех объектов при обучении сети
+    #
+    def update_training(self):
+        self.trainingupdate_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__DRAW_INTERVAL_MS
+
+
+
+    def update_show(self):
+        # подкачка очередного кадра всех объектов из файла в режиме show
+        pass
 
 
     def draw(self):

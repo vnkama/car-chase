@@ -10,7 +10,7 @@ from config import *
 #
 class fwWindow:
 
-    def __init__(self,params):
+    def __init__(self, params):
         self.parent_wnd = params['parent_wnd']
 
         self.enabled = True
@@ -20,14 +20,14 @@ class fwWindow:
             # есть родительское
             self.surface = self.parent_wnd.surface.subsurface(params['rect'])
 
-
         else:
             # нет родительсокго окна
-            # пример, это главное окно приложения
+            # например, это главное окно приложения
             # в таком случеа поверхность должна была быть передана при вызове
             self.surface = params['surface']
 
-        # -------
+
+
 
         self.background_color = params.get('background_color', None)
         self.background_disabled_color = params.get('background_color', self.background_color)
@@ -163,4 +163,20 @@ class fwWindow:
 
     def enable(self):
         self.enabled = True
+
+    def resize(self, new_rect):
+        # resize работает только если есть parent_wnd
+        if self.parent_wnd is not None:
+            old_offset = self.surface.get_offset()
+            old_rectsize = self.surface.get_rect()
+            self.old_rect = pg.Rect(old_offset, old_rectsize)
+
+            # удаляем старую оверхность
+            del self.surface
+
+            # создаем новую поверхность
+            self.surface = self.parent_wnd.surface.subsurface(new_rect)
+
+    def  resetOldSize(self):
+            self.resize(self.old_rect)
 

@@ -7,6 +7,7 @@ from fw.fwWindow import fwWindow
 from fw.GuiButton import GuiButton
 from fw.GuiSelectList import GuiSelectList
 from fw.GuiSemaphor import GuiSemaphor
+from fw.GuiSelect import GuiSelect
 
 
 #
@@ -25,7 +26,7 @@ class fwToolWnd(fwWindow):
         self.tmp_child_wnd = None   # временное окно для всплывашек открытого комбобокса итд
 
         self.tmp_child_wnd_params = None
-
+        self.focus_owner_wnd = None
         ############################################
 
         self.addChildWnd(GuiButton({
@@ -69,6 +70,13 @@ class fwToolWnd(fwWindow):
             # 'on_button_func': self.pause_onButton
         }))
 
+        self.selectUpdateSpeed = self.addChildWnd(GuiSelect({
+            'name': 'combo-test',
+            'text': ["x1", "x2", "x5", "x10", "max"],
+            'value': "x1",
+            'parent_wnd': self,
+            'rect': pg.Rect(10, 100, 80, 22),
+        }))
 
 
     def sendMessage(self, msg, param1=None, param2=None):
@@ -76,6 +84,9 @@ class fwToolWnd(fwWindow):
 
         if msg == 'WM_CREATE_TMP_CHILD':
             self.createTmpChildWnd(param1, param2)
+
+        elif msg == 'WM_REQUEST_FOCUS':
+            self.childWantFocus(param1)
 
         elif msg == 'WM_CLOSE_TMP_CHILD':
             self.closeTmpChild(param1)
@@ -92,6 +103,20 @@ class fwToolWnd(fwWindow):
         else:
             super().sendMessage(msg, param1, param2)
 
+
+    def requestFocus(self, focus_owner_wnd):
+        print("requestFocus")
+        # кто то из чайлдов заправшивает фокус
+        # сбросим всем остальным фокус
+
+        if self.focus_owner_wnd:
+            # уже есть держатель фокуса
+            # отберем у него фокус
+            self.focus_owner.clearFocus()
+            self.focus_owner = None
+
+
+        self.focus_owner_wnd = focus_owner_wnd
 
 
 

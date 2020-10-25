@@ -31,8 +31,11 @@ class GuiControl(fwWindow):
     def isFocus(self):
         return self.is_focus
 
-    def setFocus(self,focus):
+    def setFocus(self, focus):
         self.is_focus = focus
+
+    def clearFocus(self):
+        self.is_focus = False
 
     def getValue(self):
         return self.value

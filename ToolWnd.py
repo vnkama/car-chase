@@ -5,7 +5,7 @@ from fw.functions import *
 
 from fw.fwToolWnd import fwToolWnd
 # from fw.GuiButton import GuiButton
-from fw.GuiCombobox import GuiCombobox
+from fw.GuiSelect import GuiSelect
 from fw.GuiLabel import GuiLabel
 
 
@@ -28,12 +28,12 @@ class ToolWnd(fwToolWnd):
 
         ############################################
 
-        self.addChildWnd(GuiCombobox({
+        self.addChildWnd(GuiSelect({
             'name': 'combo-test',
             'text': ["one", "two", "three", "four"],
             'value': "two",
             'parent_wnd': self,
-            'rect': pg.Rect(10, 120, 120, 22),
+            'rect': pg.Rect(10, 140, 80, 22),
             # 'on_button_func': self.quit_onButton
         }))
 

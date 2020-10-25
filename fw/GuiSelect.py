@@ -9,7 +9,7 @@ from fw.GuiControl import GuiControl
 #
 #
 #
-class GuiCombobox(GuiControl):
+class GuiSelect(GuiControl):
 
     #load image of archer
     archer_srf = pg.image.load("./images/gui/combobox_archer.png").convert()
@@ -27,7 +27,7 @@ class GuiCombobox(GuiControl):
         self.value = params['value']
 
         #проверим кол--во слов в Combobox
-        if (len(self.arr_text) < 2 or len(self.arr_text) > 10):
+        if len(self.arr_text) < 2 or len(self.arr_text) > 10:
             raise FwError
 
         getAppWnd().registerHandler_MOUSEMOTION(self)
@@ -36,7 +36,7 @@ class GuiCombobox(GuiControl):
 
 
     def drawThis(self):
-        if (not self.mouse_hover_flag):
+        if not self.mouse_hover_flag:
             self.drawBackground()
         else:
             self.drawBackground(self.background_color_hover)
@@ -51,10 +51,10 @@ class GuiCombobox(GuiControl):
 
         #copy archer to control
         self.surface.blit(
-            GuiCombobox.archer_srf,
+            GuiSelect.archer_srf,
             archer_rect)
 
-        #output textvalue
+        # output textvalue
         text_srf = getAppWnd().getFont('arial_16').render(self.value, 1, HRGB(THEME_FONT_CLR))
         self.surface.blit(
             text_srf,
@@ -63,16 +63,17 @@ class GuiCombobox(GuiControl):
 
 
 
-    def handle_MOUSEBUTTONDOWN(self,event):
-        if (event.button == 1):
+    def handle_MOUSEBUTTONDOWN(self, event):
+        if event.button == 1:
             #LB have pressed
 
-            if (self.isPointInWindow(event.pos)):
+            if self.isPointInWindow(event.pos):
                 #print("LB in rect")
 
                 # LB have pressed in area of combo
 
                 if not self.isFocus():
+                    # не в фокусе, берем фокус будем открываться
                     #get focus
                     #self.setFocus(1)
                     self.open()
@@ -85,21 +86,35 @@ class GuiCombobox(GuiControl):
 
 
 
-            # else:
-            #     # LB have pressed out of area of combo
-            #     # reset focus
-            #     if (self.isFocus()):
-            #         self.setFocus(0)
+            else:
+                # LB have pressed out of area of combo
+                # reset focus
+                if self.isFocus():
+                    self.setFocus(0)
 
     def open(self):
+        #открываем селект
+        self.is_focus = 1
+
         self_rectsize = self.surface.get_rect()
-        self_offs = self.surface.get_offset()
-        child_rect = pg.Rect(
+
+        # местоположение вспомогательного окна (спсиок значений для выборов)
+        # окна физически не существует
+        # child_rect = pg.Rect(
+        #     self_offs[0],
+        #     self_offs[1] + self_rectsize.h + 1,
+        #     self_rectsize.w,
+        #     len(self.arr_text) * 22 + 2  # размер вспомогательного окна определяется числом слов
+        # )
+
+        # увеличим поверхность
+        new_rect = pg.Rect(
             self_offs[0],
-            self_offs[1] + self_rectsize.h + 1,
+            self_offs[1],
             self_rectsize.w,
-            len(self.arr_text) * 22 + 2  # размер вспомогательного окна определяется числом слов
+            self_rectsize.h + len(self.arr_text) * 22 + 2  # размер вспомогательного окна определяется числом слов
         )
+
 
         params1 = {
             'tmp_class_name': "GuiSelectList",
@@ -112,7 +127,8 @@ class GuiCombobox(GuiControl):
             'value': self.value,
         }
 
-        self.parent_wnd.sendMessage("WM_CREATE_TMP_CHILD", params1, params2)
+
+        self.parent_wnd.sendMessage("WM_REQUEST_FOCUS", params1, params2)
 
 
     #

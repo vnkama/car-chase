@@ -40,7 +40,7 @@ class GuiSelectList(GuiControl):
     def drawThis(self):
         #print("GuiSelectList drawThis")
 
-        if (not self.mouse_hover_flag):
+        if not self.mouse_hover_flag:
             self.drawBackground()
         else:
             self.drawBackground(self.background_color_hover)
@@ -69,10 +69,10 @@ class GuiSelectList(GuiControl):
         #self.mouse_hover_flag = self.isPointInWindow(event.pos)
 
     def handle_MOUSEBUTTONDOWN(self,event):
-        if (self.is_drawed):
+        if self.is_drawed:
             #работаем только в случае если спсиок был нарисован хоть 1 раз
 
-            if (self.isPointInWindow(event.pos) and event.button == 1):
+            if self.isPointInWindow(event.pos) and event.button == 1:
                 #LB нажата в зоне спиcка
 
                 wnd_d2 = self.surface.get_abs_offset()          #относительно окна приложения/экрана (mainWnd)
