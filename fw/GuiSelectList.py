@@ -13,9 +13,9 @@ class GuiSelectList(GuiControl):
 
     def __init__(self,params):
 
-        params['background_color'] = params.get('background_color',THEME_COMBOBOX_BACKGROUND)
-        params['background_color_hover'] = params.get('background_color_hover',THEME_COMBOBOX_BACKGROUND_HOVER)
-        params['border_color'] = params.get('border_color',THEME_COMBOBOX_BORDER_COLOR)
+        params['background_color'] = params.get('background_color',THEME_SELECT_BACKGROUND_CLR)
+        params['background_color_hover'] = params.get('background_color_hover',THEME_SELECT_BACKGROUND_HOVER_CLR)
+        params['border_color'] = params.get('border_color',THEME_SELECT_BORDER_CLR)
         params['border_width'] = params.get('border_width',1)
 
         super().__init__(params)
@@ -54,7 +54,7 @@ class GuiSelectList(GuiControl):
             text_srf = font_obj.render(cur_string, 1, HRGB(THEME_FONT_CLR))
             self.surface.blit(
                 text_srf,
-                (5,1 + i*THEME_COMBOBOX_STRING_HEIGHT)
+                (5,1 + i*THEME_SELECT_STRING_HEIGHT)
             )
 
         #нарисован
@@ -63,36 +63,38 @@ class GuiSelectList(GuiControl):
 
 
 
-    def handle_MOUSEMOTION(self,event):
-        super().handle_MOUSEMOTION(event)       # установим self.mouse_hover_flag
+    # def handle_MOUSEMOTION(self,event):
+    #     super().handle_MOUSEMOTION(event)       # установим self.mouse_hover_flag
 
         #self.mouse_hover_flag = self.isPointInWindow(event.pos)
 
-    def handle_MOUSEBUTTONDOWN(self,event):
+    def handle_MOUSEBUTTONDOWN(self, event):
         if self.is_drawed:
-            #работаем только в случае если спсиок был нарисован хоть 1 раз
+            # работаем только в случае если спсиок был нарисован хоть 1 раз
 
             if self.isPointInWindow(event.pos) and event.button == 1:
                 #LB нажата в зоне спиcка
 
                 wnd_d2 = self.surface.get_abs_offset()          #относительно окна приложения/экрана (mainWnd)
                 click_d2 = d2_minus(event.pos,wnd_d2)           #координата клика относительно данного
-                text_ind = (click_d2[1]-1) // THEME_COMBOBOX_STRING_HEIGHT    #0-based индекс текста, по которому кликунли
+                text_ind = (click_d2[1]-1) // THEME_SELECT_STRING_HEIGHT    #0-based индекс текста, по которому кликунли
                 self.closeSetValue(self.arr_text[text_ind])
 
 
             else:
-                #клик любой кнопкой вне созоны
+                # клик любой кнопкой вне созоны
                 self.closeWoSaving()
 
-    #
-    # закрыть без сохранения
-    #
-    def closeWoSaving(self):
-        self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD")
+        return True
+
+    # #
+    # # закрыть без сохранения
+    # #
+    # def closeWoSaving(self):
+    #     self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD")
 
     #
     # закрыть без сохранения
     #
-    def closeSetValue(self,value):
-        self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD",value)
+    # def closeSetValue(self,value):
+    #     self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD",value)

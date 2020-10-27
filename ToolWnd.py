@@ -33,7 +33,7 @@ class ToolWnd(fwToolWnd):
             'text': ["one", "two", "three", "four"],
             'value': "two",
             'parent_wnd': self,
-            'rect': pg.Rect(10, 140, 80, 22),
+            'rect': pg.Rect(30, 140, 80, 22),
             # 'on_button_func': self.quit_onButton
         }))
 

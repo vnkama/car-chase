@@ -7,7 +7,7 @@ import math
 #
 #
 #
-from src.config import THEME_RED_CLR, THEME_GREEN_CLR, THEME_GREY_CLR
+from src.config import THEME_RED_CLR, THEME_GREEN_CLR, THEME_DARK_GREY_CLR
 
 
 class GuiSemaphor(GuiControl):
@@ -48,4 +48,4 @@ class GuiSemaphor(GuiControl):
         elif color == 'green':
             self.lamp_color = THEME_GREEN_CLR
         elif color == 'grey':
-            self.lamp_color = THEME_GREY_CLR
+            self.lamp_color = THEME_DARK_GREY_CLR

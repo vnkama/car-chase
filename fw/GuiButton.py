@@ -13,7 +13,7 @@ class GuiButton(GuiControl):
 
         params['background_color'] = params.get('background_color', THEME_BUTTON_BACKGROUND)
         params['background_color_hover'] = params.get('background_color_hover', THEME_BUTTON_BACKGROUND_HOVER)
-        params['border_color'] = params.get('border_color', THEME_BUTTON_BORDER_COLOR)
+        params['border_color'] = params.get('border_color', THEME_BUTTON_BORDER_CLR)
         params['border_width'] = params.get('border_width', 1)
 
         super().__init__(params)
@@ -35,7 +35,7 @@ class GuiButton(GuiControl):
                     # кнопка нажата в зоне кнопки
                     self.on_button_func()
 
-
+        return True
 
     def drawThis(self):
 

@@ -426,7 +426,7 @@ class MapWnd(fwMapWnd):
             print("TOUCH !!")
 
 
-    def handle_MOUSEBUTTONDOWN(self,event):
+    def handle_MOUSEBUTTONDOWN(self, event):
         if event.button == 1:
             # нажата левая кнопка
 
@@ -450,7 +450,7 @@ class MapWnd(fwMapWnd):
 
                 # self.arr_cars[0].setTarget(click_map_rect)
 
-
+        return True
 
     def handle_KEYDOWN(self, event):
         if event.key == pg.K_LEFT:

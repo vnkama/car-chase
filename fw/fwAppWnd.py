@@ -334,8 +334,24 @@ class fwAppWnd(fwWindow):
 
             elif event.type == pg.MOUSEBUTTONDOWN:
                 # перебираем все зарегистрированные окна обработчики MOUSEBUTTONDOWN
-                for wnd in self.arr_handlers_MOUSEBUTTONDOWN:
-                    wnd.handle_MOUSEBUTTONDOWN(event)
+
+                # проверим есть ли контрол в фокусе
+                if self.tool_wnd.focus_owner_wnd is not None:
+                    # есть контрол в фокусе обрабатываем первым его его
+
+
+                    if self.tool_wnd.focus_owner_wnd.handle_MOUSEBUTTONDOWN(event):
+
+                        # контрол в фокусе обрабтали , обработаем все остальные
+                        for wnd in self.arr_handlers_MOUSEBUTTONDOWN:
+                            if wnd != self.tool_wnd.focus_owner_wnd:
+                                if not wnd.handle_MOUSEBUTTONDOWN(event):
+                                    break
+
+                else:
+                    for wnd in self.arr_handlers_MOUSEBUTTONDOWN:
+                        if not wnd.handle_MOUSEBUTTONDOWN(event):
+                            break
 
             elif event.type == pg.KEYDOWN:
                 # перебираем все зарегистрированные окна обработчики KEYDOWN
@@ -377,7 +393,7 @@ class fwAppWnd(fwWindow):
 
     def draw(self):
         # super().draw()      #fwWindow
-        self.sendMessageToChilds("WM_DRAW")
+        self.sendMessageToChilds('WM_DRAW')
 
 
 

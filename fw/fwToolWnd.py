@@ -72,8 +72,13 @@ class fwToolWnd(fwWindow):
 
         self.selectUpdateSpeed = self.addChildWnd(GuiSelect({
             'name': 'combo-test',
-            'text': ["x1", "x2", "x5", "x10", "max"],
-            'value': "x1",
+            'value': [
+                ("x1", 1),
+                ("x2", 2),
+                ("x5", 5),
+                ("x10", 10),
+                ("max", 1000),
+            ],
             'parent_wnd': self,
             'rect': pg.Rect(10, 100, 80, 22),
         }))
@@ -82,14 +87,14 @@ class fwToolWnd(fwWindow):
     def sendMessage(self, msg, param1=None, param2=None):
         # fwWindow.sendMessage() - не определен
 
-        if msg == 'WM_CREATE_TMP_CHILD':
-            self.createTmpChildWnd(param1, param2)
+        if msg == 'WM_REQUEST_FOCUS':
+            self.requestFocus(param1)
 
-        elif msg == 'WM_REQUEST_FOCUS':
-            self.childWantFocus(param1)
+        elif msg == 'WM_REQUEST_FREE_FOCUS':
+            self.onRequestFreeFocus(param1)
 
-        elif msg == 'WM_CLOSE_TMP_CHILD':
-            self.closeTmpChild(param1)
+        # elif msg == 'WM_CLOSE_TMP_CHILD':
+        #     self.closeTmpChild(param1)
 
         elif msg == 'WM_NEW_GAME':
             self.newGame()
@@ -104,65 +109,87 @@ class fwToolWnd(fwWindow):
             super().sendMessage(msg, param1, param2)
 
 
-    def requestFocus(self, focus_owner_wnd):
-        print("requestFocus")
+    def requestFocus(self, focus_new_owner_wnd):
         # кто то из чайлдов заправшивает фокус
         # сбросим всем остальным фокус
 
         if self.focus_owner_wnd:
             # уже есть держатель фокуса
             # отберем у него фокус
-            self.focus_owner.clearFocus()
-            self.focus_owner = None
+            self.focus_owner_wnd.clearFocus()
+            self.focus_owner_wnd = None
 
 
-        self.focus_owner_wnd = focus_owner_wnd
+        self.focus_owner_wnd = focus_new_owner_wnd
+        self.focus_owner_wnd.setFocus()
 
 
+    def onRequestFreeFocus(self, focus_owner_wnd):
+        # пришел запрос на закрытие окна
+        if self.focus_owner_wnd is not None and self.focus_owner_wnd == focus_owner_wnd:
+            self.focus_owner_wnd.clearFocus()
+            self.focus_owner_wnd = None
+
+
+    def draw(self):
+        self.drawThis()
+
+        if self.focus_owner_wnd is None:
+            # нет контролов в фокусе,
+            self.sendMessageToChilds('WM_DRAW')
+
+        else:
+            # есть контрол в фокусе,
+            for child_wnd in self.child_objects:
+                if self.focus_owner_wnd != child_wnd:
+                    child_wnd.sendMessage('WM_DRAW')
+
+            # контрол под фокусом рисуем последним, чтобы он был верхним
+            self.focus_owner_wnd.sendMessage('WM_DRAW')
 
     #
     #
     #
-    def createTmpChildWnd(self,params,params_new_wnd):
-
-        if self.tmp_child_wnd is not None:
-            # создание второо временного окна пока не закрыто первое запрещено
-            return
-
-        self.tmp_child_wnd_params = params
-
-        if self.tmp_child_wnd_params['tmp_class_name']  == "GuiSelectList":
-            params_new_wnd['parent_wnd'] = self
-            self.tmp_child_wnd = GuiSelectList(params_new_wnd)
+    # def createTmpChildWnd(self,params,params_new_wnd):
+    #
+    #     if self.tmp_child_wnd is not None:
+    #         # создание второо временного окна пока не закрыто первое запрещено
+    #         return
+    #
+    #     # self.tmp_child_wnd_params = params
+    #
+    #     if self.tmp_child_wnd_params['tmp_class_name']  == "GuiSelectList":
+    #         params_new_wnd['parent_wnd'] = self
+    #         self.tmp_child_wnd = GuiSelectList(params_new_wnd)
 
 
 
     #
     # закрыть дочернее окно
     #
-    def closeTmpChild(self,value):
-        #value - возвращенное значение
-
-        if self.tmp_child_wnd is None:
-            raise FwError
-
-        self.tmp_child_wnd.desctructor()
-        del self.tmp_child_wnd
-        self.tmp_child_wnd = None
-
-        if value is not None:
-            self.tmp_child_wnd_params['creator_wnd'].setValue(value)
+    # def closeTmpChild(self,value):
+    #     #value - возвращенное значение
+    #
+    #     if self.tmp_child_wnd is None:
+    #         raise FwError
+    #
+    #     self.tmp_child_wnd.desctructor()
+    #     del self.tmp_child_wnd
+    #     self.tmp_child_wnd = None
+    #
+    #     if value is not None:
+    #         self.tmp_child_wnd_params['creator_wnd'].setValue(value)
 
 
     #
     #
     #
-    def drawChildWnds(self):
-        super().drawChildWnds()
-
-        # рисуем временное окно если есть
-        if self.tmp_child_wnd is not None:
-            self.tmp_child_wnd.draw()
+    # def drawChildWnds(self):
+    #     super().drawChildWnds()
+    #
+    #     # рисуем временное окно если есть
+    #     # if self.tmp_child_wnd is not None:
+    #     #     self.tmp_child_wnd.draw()
 
 
     def quit_onButton(self):

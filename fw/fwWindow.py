@@ -16,6 +16,12 @@ class fwWindow:
         self.enabled = True
         self.child_objects = []
 
+        self.old_rect = None
+
+        self.main_rect = params['rect']
+
+
+
         if self.parent_wnd is not None:
             # есть родительское
             self.surface = self.parent_wnd.surface.subsurface(params['rect'])
@@ -79,7 +85,7 @@ class fwWindow:
         # рисуем свою рамку, если есть
         if self.border_width is not None and self.border_color is not None:
 
-            color = self.border_color if self.enabled else THEME_BUTTON_BORDER_DISABLED_COLOR
+            color = self.border_color if self.enabled else THEME_BUTTON_BORDER_DISABLED_CLR
 
             if self.border_width > 0:
                 surface_rect = self.surface.get_rect()
@@ -94,12 +100,25 @@ class fwWindow:
 
     #
     # проверяем попадает ли координата внутрь данного окна
+    # point - координата относительно окна приложения -> (x,y)
     #
-    def isPointInWindow(self,point):
+    def isPointInWindow(self, point):
         return pg.Rect(
             self.surface.get_abs_offset(),
             self.surface.get_size()
         ).collidepoint(point)
+
+    #
+    #
+    # point - координата относительно окна приложения
+    # возвращает коорднаты точки point относительно даннго окна -> (x,y)
+    def getOffsetInWindow(self, point):
+        offs = self.surface.get_abs_offset() #координаты данного окна относительно приложения
+        return (
+            point[0] - offs[0],
+            point[1] - offs[1],
+        )
+
 
 
 
@@ -150,10 +169,11 @@ class fwWindow:
 
 
 
+
     # абстарнктные обработчики событий клавиатуры и мыши
     # реальные нужно определять в классах наследниках, там где необходимы
     def handle_MOUSEMOTION(self, event):        pass
-    def handle_MOUSEBUTTONDOWN(self, event):    pass
+    def handle_MOUSEBUTTONDOWN(self, event):    return True       # return True - значит можно продолжать обработку дальше
     def handle_KEYDOWN(self, event):            pass
     def handle_KEYUP(self, event):              pass
 
@@ -169,7 +189,7 @@ class fwWindow:
         if self.parent_wnd is not None:
             old_offset = self.surface.get_offset()
             old_rectsize = self.surface.get_rect()
-            self.old_rect = pg.Rect(old_offset, old_rectsize)
+            self.old_rect = pg.Rect(old_offset, old_rectsize.size)
 
             # удаляем старую оверхность
             del self.surface
@@ -177,6 +197,6 @@ class fwWindow:
             # создаем новую поверхность
             self.surface = self.parent_wnd.surface.subsurface(new_rect)
 
-    def  resetOldSize(self):
+    def resetOldSize(self):
             self.resize(self.old_rect)
 
