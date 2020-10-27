@@ -25,17 +25,20 @@ class ToolWnd(fwToolWnd):
 
 
 
+        ############################################
+
+
 
         ############################################
 
-        self.addChildWnd(GuiSelect({
-            'name': 'combo-test',
-            'text': ["one", "two", "three", "four"],
-            'value': "two",
-            'parent_wnd': self,
-            'rect': pg.Rect(30, 140, 80, 22),
-            # 'on_button_func': self.quit_onButton
-        }))
+        # self.addChildWnd(GuiSelect({
+        #     'name': 'combo-test',
+        #     'text': ["one", "two", "three", "four"],
+        #     'value': "two",
+        #     'parent_wnd': self,
+        #     'rect': pg.Rect(60, 180, 80, 22),
+        #     # 'on_button_func': self.quit_onButton
+        # }))
 
         ############################################
 
