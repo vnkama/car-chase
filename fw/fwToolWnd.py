@@ -5,7 +5,6 @@ from fw.FwError import FwError
 
 from fw.fwWindow import fwWindow
 from fw.GuiButton import GuiButton
-# from fw.GuiSelectList import GuiSelectList
 from fw.GuiSemaphor import GuiSemaphor
 from fw.GuiSelect import GuiSelect
 from fw.GuiLabel import GuiLabel
@@ -70,15 +69,17 @@ class fwToolWnd(fwWindow):
             # 'on_button_func': self.pause_onButton
         }))
 
+        #-------------------------------------
+
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(10, 110, 60, 22),
+            'rect': pg.Rect(10, 120, 64, 22),
             'text': 'Training:',
         }))
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(10, 140, 60, 22),
+            'rect': pg.Rect(10, 150, 60, 22),
             'text': 'Update:',
         }))
 
@@ -92,12 +93,12 @@ class fwToolWnd(fwWindow):
                 ("max", 1000),
             ],
             'parent_wnd': self,
-            'rect': pg.Rect(65, 140, 80, 22),
+            'rect': pg.Rect(65, 150, 80, 22),
         }))
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(160, 140, 60, 22),
+            'rect': pg.Rect(160, 150, 60, 22),
             'text': 'Draw:',
         }))
 
@@ -110,9 +111,15 @@ class fwToolWnd(fwWindow):
                 ("1 fps", 1),
             ],
             'parent_wnd': self,
-            'rect': pg.Rect(200, 140, 80, 22),
+            'rect': pg.Rect(200, 150, 80, 22),
         }))
 
+        #-------------------------------------
+        self.addChildWnd(GuiLabel({
+            'parent_wnd': self,
+            'rect': pg.Rect(10, 200, 60, 22),
+            'text': 'Show:',
+        }))
 
 
     def sendMessage(self, msg, param1=None, param2=None):
@@ -240,6 +247,7 @@ class fwToolWnd(fwWindow):
     def newGame(self):
         self.btnNew.disable()
         self.btnPause.disable()
+
 
     def play(self):
         self.btnNew.disable()

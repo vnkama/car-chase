@@ -44,7 +44,7 @@ class ToolWnd(fwToolWnd):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(0, 200, 60, 32),
+            'rect': pg.Rect(0, 300, 60, 32),
             'text': 'Param 1:',
         }))
 
@@ -52,7 +52,7 @@ class ToolWnd(fwToolWnd):
 
         self.lbl_speed = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(61, 200, 200, 32),
+            'rect': pg.Rect(61, 300, 200, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_speed)
@@ -61,14 +61,14 @@ class ToolWnd(fwToolWnd):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(0, 232, 100, 32),
+            'rect': pg.Rect(0, 332, 100, 32),
             'text': 'ticks:',
         }))
 
 
         self.lbl_ticks = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(80, 232, 100, 32),
+            'rect': pg.Rect(80, 332, 100, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_ticks)

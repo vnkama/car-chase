@@ -1,7 +1,7 @@
-#import pygame as pg
+# import pygame as pg
 from config import *
 from fw.functions import *
-#from fw.FwError import FwError
+# from fw.FwError import FwError
 
 from fw.GuiControl import GuiControl
 from Vector import *
@@ -38,7 +38,6 @@ class GuiSelectList(GuiControl):
 
 
     def drawThis(self):
-        #print("GuiSelectList drawThis")
 
         if not self.mouse_hover_flag:
             self.drawBackground()
@@ -49,24 +48,20 @@ class GuiSelectList(GuiControl):
 
         font_obj = getAppWnd().getFont('arial_16')
 
-        #выведем строки в выпадающем спсике
-        for i,cur_string in enumerate(self.arr_text):
+        # выведем строки в выпадающем спсике
+        for i, cur_string in enumerate(self.arr_text):
             text_srf = font_obj.render(cur_string, 1, HRGB(THEME_FONT_CLR))
             self.surface.blit(
                 text_srf,
-                (5,1 + i*THEME_SELECT_STRING_HEIGHT)
+                (5, 1 + i * THEME_SELECT_STRING_HEIGHT)
             )
 
-        #нарисован
+        # нарисован
         self.is_drawed = 1
 
 
 
 
-    # def handle_MOUSEMOTION(self,event):
-    #     super().handle_MOUSEMOTION(event)       # установим self.mouse_hover_flag
-
-        #self.mouse_hover_flag = self.isPointInWindow(event.pos)
 
     def handle_MOUSEBUTTONDOWN(self, event):
         if self.is_drawed:
@@ -87,14 +82,3 @@ class GuiSelectList(GuiControl):
 
         return True
 
-    # #
-    # # закрыть без сохранения
-    # #
-    # def closeWoSaving(self):
-    #     self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD")
-
-    #
-    # закрыть без сохранения
-    #
-    # def closeSetValue(self,value):
-    #     self.parent_wnd.sendMessage("WM_CLOSE_TMP_CHILD",value)

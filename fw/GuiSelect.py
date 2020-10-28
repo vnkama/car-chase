@@ -42,11 +42,16 @@ class GuiSelect(GuiControl):
         self.closed_rectsize = self.getSurface().get_rect()    # ex rect(0, 0, 56, 32)
 
 
-    def setItem(self, item):
-        # можно дописать функцию так чтобы передавать стринг,
-        # и она будет искать подходящее занчение в списке
-        if type(item) is int:
-            self.selected_item_i = item
+    def setSelectedItemByIndex(self, item):
+        self.selected_item_i = item
+
+    def setSelectedItemByText(self, txt):
+        # устанваливает выбранное знаечние по тексту
+        for i, item in enumerate(self.value_arr):
+            if txt == item[0]:
+                self.selected_item_i = i
+
+
 
     def getValue(self):
         return self.value_arr[self.selected_item_i][1]
@@ -131,7 +136,7 @@ class GuiSelect(GuiControl):
             # клик был в нижней части селекта - выпадающем списке
             # устанвливаем новое значение селекта
             new_item_i = math.floor(Y / THEME_SELECT_STRING_HEIGHT)
-            self.setItem(new_item_i)
+            self.setSelectedItemByIndex(new_item_i)
             self.parent_wnd.sendMessage('WM_REQUEST_FREE_FOCUS', self)
 
 

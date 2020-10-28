@@ -300,7 +300,7 @@ class fwAppWnd(fwWindow):
 
     def play(self):
         if (
-                self.state == 'APP_STATE_TRAINING_NEW' or \
+                self.state == 'APP_STATE_TRAINING_NEW' or
                 self.state == 'APP_STATE_TRAINING_PAUSE'
         ):
 
