@@ -4,9 +4,9 @@ from fw.functions import *
 # from fw.FwError import FwError
 
 from fw.fwToolWnd import fwToolWnd
-# from fw.GuiButton import GuiButton
-from fw.GuiSelect import GuiSelect
 from fw.GuiLabel import GuiLabel
+# from fw.GuiButton import GuiButton
+# from fw.GuiSelect import GuiSelect
 
 
 #

@@ -102,7 +102,7 @@ class fwToolWnd(fwWindow):
             'text': 'Draw:',
         }))
 
-        self.selectUpdateSpeed = self.addChildWnd(GuiSelect({
+        self.selectDrawSpeed = self.addChildWnd(GuiSelect({
             'name': 'combo-test',
             'value': [
                 ("60 fps", 60),
@@ -114,12 +114,14 @@ class fwToolWnd(fwWindow):
             'rect': pg.Rect(200, 150, 80, 22),
         }))
 
-        #-------------------------------------
+        # -------------------------------------
+
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
             'rect': pg.Rect(10, 200, 60, 22),
             'text': 'Show:',
         }))
+
 
 
     def sendMessage(self, msg, param1=None, param2=None):
@@ -131,8 +133,8 @@ class fwToolWnd(fwWindow):
         elif msg == 'WM_REQUEST_FREE_FOCUS':
             self.onRequestFreeFocus(param1)
 
-        # elif msg == 'WM_CLOSE_TMP_CHILD':
-        #     self.closeTmpChild(param1)
+        elif msg == 'WM_GET_TRAINING_PROPS':
+            self.getTrainingProps(param1)
 
         elif msg == 'WM_NEW_GAME':
             self.newGame()
@@ -145,6 +147,14 @@ class fwToolWnd(fwWindow):
 
         else:
             super().sendMessage(msg, param1, param2)
+
+
+
+    def getTrainingProps(self, param1):
+        param1['res'] = {
+            'update_fps': self.selectUpdateSpeed.getValue(),
+            'draw_fps': self.selectDrawSpeed.getValue(),
+        }
 
 
     def requestFocus(self, focus_new_owner_wnd):

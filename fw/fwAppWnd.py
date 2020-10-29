@@ -247,9 +247,6 @@ class fwAppWnd(fwWindow):
                     self.draw()
                     pg.display.update()
 
-
-
-
                 else:
                     pass
 
@@ -281,6 +278,12 @@ class fwAppWnd(fwWindow):
     def newGame(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
         self.state = 'APP_STATE_TRAINING_NEW'
+
+        # запросим настройки по скорости обновления
+        res = {}
+        self.tool_wnd.sendMessage('WM_GET_TRAINING_PROPS', res)
+        update_fps = res['res']['update_fps'] * TRAINING_UPDATE_FPS
+        draw_fps = res['res']['draw_fps']
 
         # self.update_interval_ms = 16
 
