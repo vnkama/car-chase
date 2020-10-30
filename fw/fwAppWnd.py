@@ -116,7 +116,7 @@ class fwAppWnd(fwWindow):
 
 
         self.training_update_next_call_gtime_ms_f = 0.0
-        self.training_update_dt_gtime_ms_f = 0.0
+        self.training_update_dt_gtime_ms_f = None
 
 
 
@@ -279,11 +279,16 @@ class fwAppWnd(fwWindow):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
         self.state = 'APP_STATE_TRAINING_NEW'
 
-        # запросим настройки по скорости обновления
+        # запросим настройки по скорости обновления из tool_wnd
         res = {}
         self.tool_wnd.sendMessage('WM_GET_TRAINING_PROPS', res)
-        update_fps = res['res']['update_fps'] * TRAINING_UPDATE_FPS
-        draw_fps = res['res']['draw_fps']
+
+        # res['res']['update_fps'] - 1 : 1x обычная скороть расчет в реальном времени, 2 : 2x двойная
+        # res['res']['update_fps'] * TRAINING_UPDATE_FPS    :   1x  :  60 расчетов в секунду
+        # период перерасчета в релаьном времени
+        self.training_update_dt_rtime_ms_f = 1 / (res['res']['update_fps'] * TRAINING_UPDATE_FPS)
+
+        self.training_draw_dt_rtime_ms_f = 1 / res['res']['draw_fps']
 
         # self.update_interval_ms = 16
 
