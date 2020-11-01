@@ -27,7 +27,7 @@ class MapWnd(fwMapWnd):
         params['background_color'] = MAP_WND_BACKGROUND
         params['name'] = 'MapWnd'
 
-        super().__init__(params)        # parent - fwWindow
+        super().__init__(params)        # parent - fwMapWnd
 
         self.tool_wnd = params['tool_wnd']    # для вывода ссобщений
 
@@ -354,7 +354,9 @@ class MapWnd(fwMapWnd):
 
 
     def newGame(self):
-        # начало новой игры (нажата кнопка new)
+        # начало новой игры (нажата кнопка new или программа только что запущена)
+
+        super().newGame()
 
         if len(self.arr_cars):
             self.arr_cars[0].kill()

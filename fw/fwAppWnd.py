@@ -42,6 +42,12 @@ class fwAppWnd(fwWindow):
     #
     #
     def __init__(self):
+        # последний вызов draw независимо от режима (play - pause - training - show итд)
+        # независымый учет для разных режимов не имеет смысла, тк.к физически одновременно может рисоваться на экране только один
+        self.draw_last_call_rtime_ms_f = None
+        # self.draw_next_call_rtime_ms_f = None
+        self.draw_dt_rtime_ms_f = None
+
 
         # укахатель на главное окно приложения
         setMainWnd(self)
@@ -102,39 +108,8 @@ class fwAppWnd(fwWindow):
         # _f      флоат, фремя с плавающей точкой
 
 
-        # время ticks последнего или текущего вызова update, считается с 0
-        # 0 - начало игры, 60 сек - внутриигровая минута.
-        # время хоккейное, при паузах стоит
-        # self.training_step = 60 соответствует self.training_update_last_call_gtime_ms = 1000
-        # пррименяется для расчета втч физики
+        self.initTiming()
 
-
-        self.training_update_step = None
-        self.training_update_call_gtime_ms_f = None
-        self.training_update_call_rtime_ms = None
-
-
-
-        self.training_update_next_call_gtime_ms_f = 0.0
-        self.training_update_dt_gtime_ms_f = None
-
-
-
-        #
-        self.show_update_step = 0
-
-        # последний вызов draw независимо от режима (play - pause итд)
-        self.draw_last_call_ctime_fms = 0
-        self.draw_next_call_ctime_fms = 0
-
-
-
-
-        self.update_last_call_ms = 0
-        self.update_dt_ms = 0
-
-        self.draw_last_call_ms = 0
-        self.draw_interval_ms = 16
 
         self.state = None
         self.newGame()
@@ -150,6 +125,33 @@ class fwAppWnd(fwWindow):
     #
     def __del__(self):
         pg.quit()
+
+
+    def initTiming(self):
+
+        self.training_update_last_call_rtime_ms = None      # время последнего вызова training_update
+        self.training_update_dt_rtime_ms_f = None           # интервал времени между текущим и предыдущим вызовами функции
+                                                            # задаетсмя настроками программы
+
+
+
+
+
+
+        #############################
+        # УДАЛИТЬ
+
+        self.update_last_call_ms = 0
+        self.update_dt_ms = 0
+
+        # self.training_draw_call_rtime_ms = None
+        # self.training_draw_dt_rtime_ms_f = None
+
+
+        # self.draw_last_call_ms = 0
+        # self.draw_interval_ms = 16
+        #############################
+
 
 
     def sendMessage(self, msg, param1=None, param2=None):
@@ -191,12 +193,14 @@ class fwAppWnd(fwWindow):
                         or self.state == 'APP_STATE_TRAINING_PAUSE':
 
 
-                    delay_ms = self.draw_next_call_ctime_fms - pg.time.get_ticks()
+                    delay_ms = self.draw_last_call_rtime_ms_f - pg.time.get_ticks() + self.draw_dt_rtime_ms_f
 
                     if delay_ms > 0:
                         pg.time.wait(math.ceil(delay_ms))
 
-                    self.draw_next_call_ctime_fms += PAUSE_DRAW_DT
+                    self.draw_last_call_rtime_ms_f = pg.time.get_ticks()    # += PAUSE_DRAW_DT
+                    print(self.draw_last_call_rtime_ms_f)
+
 
                     self.handleEvents()
                     self.draw()
@@ -253,7 +257,7 @@ class fwAppWnd(fwWindow):
 
 
 
-                #self.main_timer.tick(FPS_RATE)
+                #self.main_timer.tick(DRAW_FPS)
 
                 # self.handleEvents()
                 # self.update()
@@ -277,30 +281,37 @@ class fwAppWnd(fwWindow):
 
     def newGame(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
+
         self.state = 'APP_STATE_TRAINING_NEW'
 
         # запросим настройки по скорости обновления из tool_wnd
         res = {}
         self.tool_wnd.sendMessage('WM_GET_TRAINING_PROPS', res)
 
+        self.draw_last_call_rtime_ms_f = 0
+        # self.draw_next_call_rtime_ms_f = 0
+        self.draw_dt_rtime_ms_f = 1000 / PAUSE_DRAW_FPS
+
+
+
         # res['res']['update_fps'] - 1 : 1x обычная скороть расчет в реальном времени, 2 : 2x двойная
         # res['res']['update_fps'] * TRAINING_UPDATE_FPS    :   1x  :  60 расчетов в секунду
-        # период перерасчета в релаьном времени
+        # период перерасчета в реалаьном времени
         self.training_update_dt_rtime_ms_f = 1 / (res['res']['update_fps'] * TRAINING_UPDATE_FPS)
-
         self.training_draw_dt_rtime_ms_f = 1 / res['res']['draw_fps']
+
+        self.training_update_last_call_rtime_ms = None
+
 
         # self.update_interval_ms = 16
 
-        # номер шага обучения (1-based)
-        # когда трайнинг не идет переменная тоже стоит
-        # при инициации начального положения training_step = 0
-        # при расчете первого перемещения training_step = 1
-
         self.training_update_step = 0
-        self.training_update_call_gtime_ms_f = 0.0
 
-        self.training_update_call_rtime_ms = None
+        self.training_update_gtime_ms_f = 0.0
+
+
+
+
 
 
         self.sendMessageToChilds('WM_NEW_GAME')

@@ -12,20 +12,25 @@ GAME_GENE_COUNT_MAX = 500
 # =================================================================================
 
 
-FPS_RATE = 60  # частота кадров в сек 60
-UPDATE_HZ = 60 #
+DRAW_FPS = 60  # частота кадров в сек 60
+PAUSE_DRAW_FPS = 60
+
+
+
+#UPDATE_HZ = 60 #
 
 #интервал пересчета UPDATE, внутриигровое время (механика)
 
 
 # сколько FPS при обучении
 PAUSE_UPDATE_FPS            = 60
+
 # DRAW_FPS                    = 60
+
 TRAINING_UPDATE_FPS         = 60
+TRAINING_UPDATE_DT_GTAME_MS_F     = 1000 / TRAINING_UPDATE_FPS
 
 
-PAUSE_DRAW_FPS              = 60
-PAUSE_DRAW_DT               = 1 / PAUSE_DRAW_FPS
 
 
 # интервал обработки HANDLE_EVENTS

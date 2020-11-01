@@ -27,10 +27,6 @@ class ToolWnd(fwToolWnd):
 
         ############################################
 
-
-
-        ############################################
-
         # self.addChildWnd(GuiSelect({
         #     'name': 'combo-test',
         #     'text': ["one", "two", "three", "four"],

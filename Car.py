@@ -32,7 +32,7 @@ class Car(pg.sprite.Sprite):
     # скорость вращения: милли сектор в тик
     # на эту переменную увеличивается счечтк вращения каждый тик FPS
     # как только наберется 1000 , то спрайт поворачивается на 1/16
-    rotate_msector_v = rotate_speed__mturn_sec * 32 // FPS_RATE
+    rotate_msector_v = rotate_speed__mturn_sec * 32 // DRAW_FPS
 
     for i in range(0,32):
         file_name = "./images/car-green/car_green_3_{:02d}.png".format(i)
