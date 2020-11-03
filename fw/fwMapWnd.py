@@ -44,6 +44,13 @@ class fwMapWnd(fwWindow):
         elif msg == 'WM_QUIT':
             pass
 
+        elif msg == 'WM_UPDATE_TRAINING':
+            self.training_update();
+
+        elif msg == 'WM_UPDATE_SHOW':
+            pass
+
         else:
             # если не обработали здесь то вызываем fwWindow.sendMessage
             super().sendMessage(msg, param1, param2)
+

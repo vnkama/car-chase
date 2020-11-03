@@ -13,7 +13,9 @@ GAME_GENE_COUNT_MAX = 500
 
 
 DRAW_FPS = 60  # частота кадров в сек 60
-PAUSE_DRAW_FPS = 60
+TRAINING_PAUSE_DRAW_FPS = 60
+
+
 
 
 

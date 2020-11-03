@@ -102,7 +102,7 @@ class ToolWnd(fwWindow):
             'text': 'Draw:',
         }))
 
-        self.selectDrawSpeed = self.addChildWnd(GuiSelect({
+        self.selectTrainingDrawSpeed = self.addChildWnd(GuiSelect({
             'name': 'combo-test',
             'value': [
                 ("60 fps", 60),
@@ -194,7 +194,7 @@ class ToolWnd(fwWindow):
     def getTrainingProps(self, param1):
         param1['res'] = {
             'update_fps': self.selectUpdateSpeed.getValue(),
-            'draw_fps': self.selectDrawSpeed.getValue(),
+            'draw_fps': self.selectTrainingDrawSpeed.getValue(),
         }
 
 

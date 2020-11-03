@@ -30,12 +30,22 @@ class AppWnd(fwWindow):
     #
     #
     def __init__(self):
-        # последний вызов функции draw независимо от режима (play - pause - training - show итд)
+        # время последнего вызова функции draw. Переменная одна для всех режимов(play - pause - training - show итд) не
         # независымый учет для разных режимов не имеет смысла, тк.к физически одновременно может рисоваться на экране только один
         self.draw_last_call_rtime_ms_f = None
 
         # self.draw_next_call_rtime_ms_f = None
         self.draw_dt_rtime_ms_f = None
+
+
+        # время последнего вызова training_update
+        self.update_last_call_rtime_ms = None
+
+        # интервал времени между текущим и предыдущим вызовами функции
+        # задаетсмя настроками программы
+        self.update_dt_rtime_ms_f = None
+
+
 
 
         # указатель на главное окно приложения
@@ -133,16 +143,6 @@ class AppWnd(fwWindow):
 
 
     def initTiming(self):
-
-        self.training_update_last_call_rtime_ms = None      # время последнего вызова training_update
-        self.training_update_dt_rtime_ms_f = None           # интервал времени между текущим и предыдущим вызовами функции
-                                                            # задаетсмя настроками программы
-
-
-
-
-
-
         #############################
         # УДАЛИТЬ
 
@@ -203,7 +203,7 @@ class AppWnd(fwWindow):
                     if delay_ms > 0:
                         pg.time.wait(math.ceil(delay_ms))
 
-                    self.draw_last_call_rtime_ms_f = pg.time.get_ticks()    # += PAUSE_DRAW_DT
+                    #self.draw_last_call_rtime_ms_f = pg.time.get_ticks()    # += PAUSE_DRAW_DT
 
 
                     self.handleEvents()
@@ -282,35 +282,19 @@ class AppWnd(fwWindow):
         print(CONSOLE_CLR_RED + "AppWnd.quitApp" + CONSOLE_CLR_RESET)
 
 
-
     def newGame(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
 
         self.state = 'APP_STATE_TRAINING_NEW'
 
-        # запросим настройки по скорости обновления из tool_wnd
-        res = {}
-        self.tool_wnd.sendMessage('WM_GET_TRAINING_PROPS', res)
 
         self.draw_last_call_rtime_ms_f = 0
         # self.draw_next_call_rtime_ms_f = 0
-        self.draw_dt_rtime_ms_f = 1000 / PAUSE_DRAW_FPS
 
-
-
-        # res['res']['update_fps'] - 1 : 1x обычная скороть расчет в реальном времени, 2 : 2x двойная
-        # res['res']['update_fps'] * TRAINING_UPDATE_FPS    :   1x  :  60 расчетов в секунду
-        # период перерасчета в реалаьном времени
-        self.training_update_dt_rtime_ms_f = 1 / (res['res']['update_fps'] * TRAINING_UPDATE_FPS)
-        self.training_draw_dt_rtime_ms_f = 1 / res['res']['draw_fps']
-
-        self.training_update_last_call_rtime_ms = None
-
+        self.draw_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_DRAW_FPS
 
         # self.update_interval_ms = 16
-
         self.training_update_step = 0
-
         self.training_update_gtime_ms_f = 0.0
 
 
@@ -323,14 +307,29 @@ class AppWnd(fwWindow):
 
     def play(self):
         if (
-                self.state == 'APP_STATE_TRAINING_NEW' or
-                self.state == 'APP_STATE_TRAINING_PAUSE'
+            self.state == 'APP_STATE_TRAINING_NEW' or
+            self.state == 'APP_STATE_TRAINING_PAUSE'
         ):
 
             self.state = 'APP_STATE_TRAINING_PLAY'
-            self.sendMessageToChilds('WM_PLAY')
             print("AppWnd.play")
 
+            self.draw_dt_rtime_ms_f = 1000 / self.tool_wnd.selectTrainingDrawSpeed.getValue()
+
+
+            # res['res']['update_fps'] - 1 : 1x обычная скороть расчет в реальном времени, 2 : 2x двойная
+            # res['res']['update_fps'] * TRAINING_UPDATE_FPS    :   1x  :  60 расчетов в секунду
+            # период перерасчета в реалаьном времени
+            # запросим настройки по скорости обновления из tool_wnd
+            res = {}
+            self.update_last_call_rtime_ms = 0
+            self.tool_wnd.sendMessage('WM_GET_TRAINING_PROPS', res)
+            self.update_dt_rtime_ms_f = 1000 / (res['res']['update_fps'] * TRAINING_UPDATE_FPS)
+
+            self.sendMessageToChilds('WM_PLAY')
+
+        elif self.state == 'APP_STATE_SHOW_PAUSE':
+            pass
 
 
     def pause(self):
@@ -387,39 +386,48 @@ class AppWnd(fwWindow):
                     wnd.handle_KEYUP(event)
 
 
-
     #
     #
     #
-    def update(self):
-        # super().update()  # fwWindow.update() пустой
-
-        cur_ms = pg.time.get_ticks()
-        self.update_dt_ms = cur_ms - self.update_last_call_ms
-        self.update_last_call_ms = cur_ms
-
-        self.sendMessageToChilds("WM_UPDATE")
-
-        # вывод времени . прошедшем с предыдущего вызова dt
-        self.tool_wnd.sendMessage("WM_SET_TICKS", self.update_dt_ms)
-        self.map_wnd.dt = self.update_dt_ms
+    # def update(self):
+    #     # super().update()  # fwWindow.update() пустой
+    #
+    #     cur_ms = pg.time.get_ticks()
+    #     self.update_dt_ms = cur_ms - self.update_last_call_ms
+    #     self.update_last_call_ms = cur_ms
+    #
+    #     self.sendMessageToChilds("WM_UPDATE")
+    #
+    #     # вывод времени . прошедшем с предыдущего вызова dt
+    #     self.tool_wnd.sendMessage("WM_SET_TICKS", self.update_dt_ms)
+    #     self.map_wnd.dt = self.update_dt_ms
 
 
     #
     # перерасчет всех объектов при обучении сети
     #
     def update_training(self):
-        self.trainingupdate_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__DRAW_INTERVAL_MS
+        self.update_last_call_rtime_ms = pg.time.get_ticks()
 
+        print(f'appWnd.update_training {self.update_last_call_rtime_ms}')
+
+        # self.trainingupdate_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__DRAW_INTERVAL_MS
+
+        self.sendMessageToChilds("WM_UPDATE_TRAINING")
 
 
     def update_show(self):
         # подкачка очередного кадра всех объектов из файла в режиме show
-        pass
+        self.update_last_call_rtime_ms = pg.time.get_ticks()
+        print(f'appWnd.update_show {self.update_last_call_rtime_ms}')
+
+        self.sendMessageToChilds("WM_UPDATE_SHOW")
 
 
     def draw(self):
         # super().draw()      #fwWindow
+        self.draw_last_call_rtime_ms_f = pg.time.get_ticks()
+
         self.sendMessageToChilds('WM_DRAW')
 
 
