@@ -2,8 +2,8 @@ import pygame as pg
 
 # порядок загрзки pygame
 # 1. импортируем InitPygame, где вызывается pg.init(),
-# 2. подключаем разные модули использующие pygame
-# 3. при подключении модулей обрабатываются статические переменные, втч использующие pygame для загрузки изображений
+# 2. подключаем разные модули, использующие pygame
+# 3. при подключении модулей во многих из них обрабатываются статические переменные, втч использующие pygame для загрузки изображений
 # 4. только после этого обрабатываются __init__
 from InitPygame import *
 
@@ -16,6 +16,7 @@ import math
 import traceback
 from fw.fwWindow import fwWindow
 
+from Series import Series
 from ToolWnd import ToolWnd
 from MapWnd import MapWnd
 
@@ -30,6 +31,8 @@ class AppWnd(fwWindow):
     #
     #
     def __init__(self):
+
+
         # время последнего вызова функции draw. Переменная одна для всех режимов(play - pause - training - show итд) не
         # независымый учет для разных режимов не имеет смысла, тк.к физически одновременно может рисоваться на экране только один
         self.draw_last_call_rtime_ms_f = None
@@ -63,7 +66,8 @@ class AppWnd(fwWindow):
                                                  # subsurface вызывать не откуда, то передаем главную повехность для него как surface
         })
 
-        self.main_timer = pg.time.Clock()
+        # self.main_timer = pg.time.Clock()
+
         self.is_mainloop_run = True
         self.tool_wnd = None
         self.map_wnd = None
@@ -113,10 +117,6 @@ class AppWnd(fwWindow):
         self.state = None
         self.newGame()
 
-    # # определить в классе наследнике
-    # def initMainWindows(self):
-    #     pass
-
     #
     # инициализируем основные окна,
     # это надо делать в AppWnd а не в  fwAppWnd, тк fwAppWnd не знает классов не из фреймворков типа ToolWnd итп
@@ -126,7 +126,6 @@ class AppWnd(fwWindow):
             'parent_wnd': self
         })
         self.addChildWnd(self.tool_wnd)
-
 
         self.map_wnd = MapWnd({
             'parent_wnd': self,
