@@ -13,8 +13,6 @@ import random
 
 
 
-
-
 #
 # окно с картой
 #
@@ -27,7 +25,7 @@ class MapWnd(fwMapWnd):
         params['background_color'] = MAP_WND_BACKGROUND
         params['name'] = 'MapWnd'
 
-        super().__init__(params)        # parent - fwWindow
+        super().__init__(params)        # parent - fwMapWnd
 
         self.tool_wnd = params['tool_wnd']    # для вывода ссобщений
 
@@ -354,7 +352,9 @@ class MapWnd(fwMapWnd):
 
 
     def newGame(self):
-        # начало новой игры (нажата кнопка new)
+        # начало новой игры (нажата кнопка new или программа только что запущена)
+
+        super().newGame()
 
         if len(self.arr_cars):
             self.arr_cars[0].kill()
@@ -366,7 +366,7 @@ class MapWnd(fwMapWnd):
         )
 
 
-    def update(self):
+    def training_update(self):
         # self.updateChildWnds()    # у карты нет чайлдов
 
         self.arr_sprites_update.update()
@@ -443,10 +443,10 @@ class MapWnd(fwMapWnd):
                 )
 
                 # координаты окна показываемые камерой относительно карты
-                camera_position_rect = self.Camera.getPositionRect()
+                # camera_position_rect = self.Camera.getPositionRect()
 
                 # координаты клика относительно карты
-                click_map_rect =  camera_position_rect.move(click_mapwnd_rect.topleft)
+                # click_map_rect =  camera_position_rect.move(click_mapwnd_rect.topleft)
 
                 # self.arr_cars[0].setTarget(click_map_rect)
 

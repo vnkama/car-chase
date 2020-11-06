@@ -32,7 +32,7 @@ class Car(pg.sprite.Sprite):
     # скорость вращения: милли сектор в тик
     # на эту переменную увеличивается счечтк вращения каждый тик FPS
     # как только наберется 1000 , то спрайт поворачивается на 1/16
-    rotate_msector_v = rotate_speed__mturn_sec * 32 // FPS_RATE
+    rotate_msector_v = rotate_speed__mturn_sec * 32 // DRAW_FPS
 
     for i in range(0,32):
         file_name = "./images/car-green/car_green_3_{:02d}.png".format(i)
@@ -43,12 +43,12 @@ class Car(pg.sprite.Sprite):
     def __init__(self,map,x,y,groups,message):
         super().__init__(groups)
 
-        #указатель "наверх" на карту
+        # указатель "наверх" на карту
         self.map = map
 
         # self.map_rectpos координаты центра спрайта привязанные к карте, они неизменны (для неподвижных спрайтов)
         # self.map_rectpos здесь только объявлен, будет переопределен в setPos
-        #self.map_rectpos = None
+        # self.map_rectpos = None
         self.map_rectpos = pg.Rect(0,0,0,0)
         self.map_pos_nd2 = nd2_getMatrix((x,y),1)
 
@@ -283,7 +283,7 @@ class Car(pg.sprite.Sprite):
         for ai, sensor_car_pos in np.ndenumerate(self.arr_sensors_car_pos):
             i = ai[0]
 
-            #повернем сенсор по курсу машины и разместим на карте
+            # повернем сенсор по курсу машины и разместим на карте
             self.arr_sensors_end_3mfdot[i] = rotate_nd2 @ sensor_car_pos + self.map_pos_nd2
 
 
@@ -320,7 +320,7 @@ class Car(pg.sprite.Sprite):
         lst_curbs_4_all_sensors = []
 
         for sprite_curb in self.map.arr_sprites_curbs:
-            if (arr_sensors_irect.colliderect(sprite_curb.map_rect)):
+            if arr_sensors_irect.colliderect(sprite_curb.map_rect):
                 lst_curbs_4_all_sensors.append(sprite_curb)
 
 
@@ -385,7 +385,7 @@ class Car(pg.sprite.Sprite):
 
 
 
-                if (not sensor_irect.colliderect(curb_wrapper_irect)):
+                if not sensor_irect.colliderect(curb_wrapper_irect):
                     continue
 
                 # пересекаются sensor_irect с curbs rect
@@ -461,7 +461,7 @@ class Car(pg.sprite.Sprite):
                 intersect_len = d2_caclDistance2Points(intersect_point_2f,sensor_start_point_3mf)
 
                 # если найденная точка пересечения ближе
-                if (intersect_len < arr_sensor_len_f[sensor_i]):
+                if intersect_len < arr_sensor_len_f[sensor_i]:
                     arr_sensor_len_f[sensor_i] = intersect_len
                     self.arr_sensors_end_3mfdot[sensor_i] = intersect_point_2f
 
@@ -474,25 +474,20 @@ class Car(pg.sprite.Sprite):
         sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
         self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
 
-    #
-    #
-    #
-    # def draw(self,surface):
-    #     print("draw")
-    #     super().draw()
-    #     self.draw_sensors()
+
     def draw_sensors(self):
         # print('draw_sensors')
         for ai, sensor_wnd_pos in np.ndenumerate(self.arr_sensors_wnd_pos):
             i = ai[0]  # индекс
 
-            pg.draw.line(
-                self.map.surface,
-                (255, 0, 128, 128),
-                self.wnd_rect.center,
-                sensor_wnd_pos,
-                1,
-            )
+            if sensor_wnd_pos is not None:
+                pg.draw.line(
+                    self.map.surface,
+                    (255, 0, 128, 128),
+                    self.wnd_rect.center,
+                    sensor_wnd_pos,
+                    1,
+                )
 
 
 
