@@ -43,12 +43,12 @@ class Car(pg.sprite.Sprite):
     def __init__(self,map,x,y,groups,message):
         super().__init__(groups)
 
-        #указатель "наверх" на карту
+        # указатель "наверх" на карту
         self.map = map
 
         # self.map_rectpos координаты центра спрайта привязанные к карте, они неизменны (для неподвижных спрайтов)
         # self.map_rectpos здесь только объявлен, будет переопределен в setPos
-        #self.map_rectpos = None
+        # self.map_rectpos = None
         self.map_rectpos = pg.Rect(0,0,0,0)
         self.map_pos_nd2 = nd2_getMatrix((x,y),1)
 
