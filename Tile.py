@@ -4,25 +4,25 @@ from fw.functions import *
 #
 #
 #
-class Tile():
-
+class Tile:
     SPRITE_SIZE_X = SPRITE_SIZE_Y = 128
-    SPRITE_SIZE_XY = (SPRITE_SIZE_X,SPRITE_SIZE_Y)
+    SPRITE_SIZE_XY = (SPRITE_SIZE_X, SPRITE_SIZE_Y)
 
     arr_tiles_img = []
 
     srf = pg.image.load("./images/land_grass04.png").convert()
-    arr_tiles_img.insert(1,srf)
+    arr_tiles_img.insert(1, srf)
 
     srf = pg.image.load("./images/land_grass11.png").convert()
-    arr_tiles_img.insert(2,srf)
+    arr_tiles_img.insert(2, srf)
+
 
     # def __init__(self,params):
     #     self.floor_type = params['floor_type']
 
     @staticmethod
-    def copyImg(dest_srf,dest_rect,sprite_num):
-        dest_srf.blit(Tile.arr_tiles_img[sprite_num],dest_rect)
+    def copyImg(dest_srf, dest_rect, sprite_num):
+        dest_srf.blit(Tile.arr_tiles_img[sprite_num], dest_rect)
 
 
 class Tree(pg.sprite.Sprite):
@@ -46,7 +46,7 @@ class Tree(pg.sprite.Sprite):
 
         self.rect = self.map_rect.copy()
 
-    def update_camera(self, camera_rect):
+    def updateCamera(self, camera_rect):
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
 
@@ -77,7 +77,7 @@ class Oil(pg.sprite.Sprite):
 
         self.rect = self.map_rect.copy()
 
-    def update_camera(self,camera_rect):
+    def updateCamera(self,camera_rect):
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
 
@@ -107,7 +107,7 @@ class Rock(pg.sprite.Sprite):
         self.rect = self.map_rect.copy()
 
 
-    def update_camera(self, camera_rect):
+    def updateCamera(self, camera_rect):
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
 
@@ -127,7 +127,7 @@ class Rock(pg.sprite.Sprite):
 #
 class Curb(pg.sprite.Sprite):
 
-    def __init__(self,p0_xy,p1_xy,arr_lineEqualABC,groups):
+    def __init__(self, p0_xy, p1_xy, arr_lineEqualABC, groups):
         super().__init__(groups)
 
         self.arr_lineEqualABC = arr_lineEqualABC
@@ -174,7 +174,7 @@ class Curb(pg.sprite.Sprite):
             pg.draw.line(self.image, color, (0,self.rect.size[1] - 1), (self.rect.size[0] - 1,0), 1)
 
 
-    def update_camera(self,camera_rect):
+    def updateCamera(self,camera_rect):
         self.rect.left = self.map_rect.left - camera_rect.left
         self.rect.top = self.map_rect.top - camera_rect.top
 

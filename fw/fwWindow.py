@@ -1,36 +1,70 @@
 import pygame as pg
 from config import *
 # from fw.functions import *
-# from fw.FwError import FwError
+from fw.FwError import FwError
 
 
-#
-# базовый класс окна.
-# класс абстрактный, напрямую  объект от него не создаетсмя
-#
+
 class fwWindow:
+    #
+    # базовый класс окна.
+    # класс абстрактный, напрямую  объект от него не создаетсмя
+    #
 
     def __init__(self, params):
+        # parent_wnd используется parent_send_message
         self.parent_wnd = params['parent_wnd']
+
+        # сохранеям указатель на родительский  surface, если своего surface нет
+        # нужен чтобы давать его чайлдам данного объекта
+        self.parent_surface = None
+
+        self.surface = None
 
         self.enabled = True
         self.child_objects = []
 
+        self.main_rect = None
         self.old_rect = None
 
-        self.main_rect = params['rect']
 
 
 
-        if self.parent_wnd is not None:
-            # есть родительское
-            self.surface = self.parent_wnd.surface.subsurface(params['rect'])
+        if params['type'] == 'main':
+            # это главное окно приложения
+            # родительсокго окна - нет
+            # surface у него - главная поверхность pygame, она должна была быть передана при вызове через params['surface']
+
+            #  params['surface']
+            self.parent_wnd = None
+            self.surface = params['surface']
+            self.main_rect = params['rect']
+
+
+
+        elif params['type'] == 'normal':
+            # обычное окно
+            self.parent_wnd = params['parent_wnd']
+
+            if self.parent_wnd.surface is not None:
+                # у родительскокго окна есть surface, создадм свою subsurface от него
+                self.surface = self.parent_wnd.surface.subsurface(params['rect'])
+            else:
+                # у родительскокго окна нет surface, но он должен хранить parent_surface создадм свою subsurface от него
+                self.surface = self.parent_wnd.parent_surface.subsurface(params['rect'])
+
+            self.main_rect = params['rect']
+
+
+        elif params['type'] == 'no_surface':
+            # мы создаем не окно а объект у которого нет surface,
+            # но может update, sendMessage
+            self.parent_wnd = params['parent_wnd']
+            self.surface = None
+            self.parent_surface = params['parent_surface']
 
         else:
-            # нет родительсокго окна
-            # например, это главное окно приложения
-            # в таком случеа поверхность должна была быть передана при вызове
-            self.surface = params['surface']
+            raise FwError()
 
 
 
@@ -39,14 +73,13 @@ class fwWindow:
         self.background_disabled_color = params.get('background_color', self.background_color)
 
 
-        self.border_color = params.get('border_color',None)
-        self.border_width = params.get('border_width',None)
+        self.border_color = params.get('border_color', None)
+        self.border_width = params.get('border_width', None)
 
 
         self.text = params.get('text',None)
         self.name = params.get('name',None)
 
-        #self.child_funcs_arr = {"newGame": self.newGame}
 
 
     # как правило эту функцию следует переопределить
@@ -136,8 +169,6 @@ class fwWindow:
         return new_child
 
 
-
-
     #
     # функция пустая, переопределять
     #   return True если сообщение обработано
@@ -158,6 +189,13 @@ class fwWindow:
             child_wnd.sendMessage(msg, param1, param2)
 
 
+    def drawAllChilds(self):
+        for child_wnd in self.child_objects:
+            child_wnd.draw()
+
+
+
+
     def update(self):
         pass
 
@@ -173,9 +211,9 @@ class fwWindow:
     # абстарнктные обработчики событий клавиатуры и мыши
     # реальные нужно определять в классах наследниках, там где необходимы
     def handle_MOUSEMOTION(self, event):        pass
-    def handle_MOUSEBUTTONDOWN(self, event):    return True       # return True - значит можно продолжать обработку дальше
-    def handle_KEYDOWN(self, event):            pass
-    def handle_KEYUP(self, event):              pass
+    def handle_MouseButtonDown(self, event):    return True       # return True - значит можно продолжать обработку дальше
+    def handle_KeyDown(self, event):            pass
+    def handle_KeyUp(self, event):              pass
 
 
     def disable(self):

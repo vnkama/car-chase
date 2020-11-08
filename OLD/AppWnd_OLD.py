@@ -23,25 +23,25 @@
     # # это надо делать в AppWnd а не в  fwAppWnd, тк fwAppWnd не знает классов не из фреймворков типа ToolWnd итп
     # #
     # def initMainWindows(self):
-    #     self.tool_wnd = ToolWnd({
+    #     self.Tool_wnd = ToolWnd({
     #         'parent_wnd': self
     #     })
-    #     self.addChildWnd(self.tool_wnd)
+    #     self.addChildWnd(self.Tool_wnd)
     #
     #
-    #     self.map_wnd = MapWnd({
+    #     self.Map_wnd = MapWnd({
     #         'parent_wnd': self,
-    #         'tool_wnd': self.tool_wnd,
+    #         'Tool_wnd': self.Tool_wnd,
     #     })
-    #     self.addChildWnd(self.map_wnd)
+    #     self.addChildWnd(self.Map_wnd)
 
 
     # def update(self):
     #     # вывод времени . прошедшем с предыдущего вызова dt
     #     super().update()
     #
-    #     self.tool_wnd.sendMessage("WM_SET_TICKS", self.update_dt_ms)
-    #     self.map_wnd.dt = self.update_dt_ms
+    #     self.Tool_wnd.sendMessage("WM_SET_TICKS", self.update_dt_ms)
+    #     self.Map_wnd.dt = self.update_dt_ms
 
 
 

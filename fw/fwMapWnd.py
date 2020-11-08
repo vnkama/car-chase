@@ -23,29 +23,20 @@ class fwMapWnd(fwWindow):
         self.training_update_dt_gtime_ms_f = None
 
 
-    def newGame(self):
-        self.training_update_step = 0
-        # self.training_step = 60 соответствует self.training_update_gtime_ms_f = 1000.0
-        # применяется для расчета втч физики
-
-        # время ticks последнего или текущего вызова update, считается с 0
-        # 0 - начало игры, 60 сек - внутриигровая минута.
-        # время хоккейное, при паузах стоит,
-        self.training_update_gtime_ms_f = 0
-        self.training_update_dt_gtime_ms_f = TRAINING_UPDATE_DT_GTAME_MS_F
+    # def newGame(self):
 
 
     def sendMessage(self, msg, param1=None, param2=None):
         # fwWindow.sendMessage - не олпределен
 
-        if msg == 'WM_NEW_GAME':
+        if msg == 'WM_NEW_SERIES':
             self.newGame()
 
         elif msg == 'WM_QUIT':
             pass
 
         elif msg == 'WM_UPDATE_TRAINING':
-            self.training_update();
+            self.updateTraining();
 
         elif msg == 'WM_UPDATE_SHOW':
             pass

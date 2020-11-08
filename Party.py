@@ -7,10 +7,8 @@ from MapWnd import MapWnd
 class Party:
 
     def __init__(self):
-        self.map_wnd = MapWnd()
+        self.Map_wnd = MapWnd()
 
 
-    def newTrainig(self):
-        self.
 
 

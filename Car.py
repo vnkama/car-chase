@@ -17,7 +17,7 @@ class Car(pg.sprite.Sprite):
 
     SPRITE_SIZE_X = 80
     SPRITE_SIZE_Y = 80
-    SPRITE_SIZE_XY = (SPRITE_SIZE_X,SPRITE_SIZE_Y)
+    SPRITE_SIZE_XY = (SPRITE_SIZE_X, SPRITE_SIZE_Y)
 
     SENSOR_COUNT = 5
     SENSOR_MAX_LEN = 500       # максимальная длинна сенсора
@@ -40,7 +40,14 @@ class Car(pg.sprite.Sprite):
         arr_img_srf.insert(i,srf)
 
 
-    def __init__(self,map,x,y,groups,message):
+    def __init__(self, map, x, y, groups, message):
+
+        self.arr_sensors_angles = None
+        self.arr_sensors_car_pos = None
+        self.arr_sensors_end_3mfdot = None
+        self.arr_sensors_wnd_pos = None
+        self.arr_sensors_value = None
+
         super().__init__(groups)
 
         # указатель "наверх" на карту
@@ -49,8 +56,8 @@ class Car(pg.sprite.Sprite):
         # self.map_rectpos координаты центра спрайта привязанные к карте, они неизменны (для неподвижных спрайтов)
         # self.map_rectpos здесь только объявлен, будет переопределен в setPos
         # self.map_rectpos = None
-        self.map_rectpos = pg.Rect(0,0,0,0)
-        self.map_pos_nd2 = nd2_getMatrix((x,y),1)
+        self.map_rectpos = pg.Rect(0, 0, 0, 0)
+        self.map_pos_nd2 = nd2_getMatrix((x, y), 1)
 
 
 
@@ -60,9 +67,9 @@ class Car(pg.sprite.Sprite):
         # используется в pygame.draw !!!
         # self.wnd_rect здесь только объявлен, будет переопределен в setPos
         # self.rect и self.wnd_rect это просто синониы
-        self.rect = self.wnd_rect = pg.Rect(0,0,Car.SPRITE_SIZE_X,Car.SPRITE_SIZE_Y)
+        self.rect = self.wnd_rect = pg.Rect(0, 0, Car.SPRITE_SIZE_X, Car.SPRITE_SIZE_Y)
 
-        self.setPos(pg.Rect(x,y,0,0))
+        self.setPos(pg.Rect(x, y, 0, 0))
 
         self.image = Car.arr_img_srf[0]
         self.brezenhem = Brezenhem()
@@ -74,26 +81,24 @@ class Car(pg.sprite.Sprite):
 
         self.message = message
 
-        self.velocity = 15.0                #сколоксть начальная
+        self.velocity = 15.0                # сколоксть начальная
 
 
 
-        self.max_velocity = 100.0          #максимальная скорость пиксель в секунду
+        self.max_velocity = 100.0          # максимальная скорость пиксель в секунду
 
-        self.CAR_LEN = 70                   #длинна машины , точнее расстояние между осями
+        self.CAR_LEN = 70                   # длинна машины, точнее расстояние между осями
 
         self.is_engine_on = 0
-        self.engine_acceleration_dv = 10.0   #разгон под двигателем
+        self.engine_acceleration_dv = 10.0   # разгон под двигателем
 
         self.is_braking_on = 0
         self.K_braking = 0.4
 
 
-        self.K_friction = 0          #коефициент торможения (об воздузх :)       #
+        self.K_friction = 0          # коефициент торможения (об воздузх :)       #
 
-
-
-        self.course_nd2 = nd2_getMatrix((0.8,0.2))  #матрица курса
+        self.course_nd2 = nd2_getMatrix((0.8, 0.2))  # матрица курса
         self.speering_wheel_alfa = 0.0          #положение руля     0-прямой
 
         self.speering_direction = 0     # -1 0 1 куда крутим руль
@@ -106,7 +111,7 @@ class Car(pg.sprite.Sprite):
 
     def init_sensors(self):
 
-        #углы положения сенсоров
+        # углы положения сенсоров
         self.arr_sensors_angles = [
             grad2rad(-90),
             grad2rad(-45),
@@ -119,14 +124,13 @@ class Car(pg.sprite.Sprite):
         self.arr_sensors_value = np.zeros(5,float)
 
         # координаты относительно машины (константа), при курсе 0
-        self.arr_sensors_car_pos = np.empty(
-                shape=[Car.SENSOR_COUNT],
-                dtype=object)
+        self.arr_sensors_car_pos = np.empty(shape=[Car.SENSOR_COUNT], dtype=object, )
 
         # координаты относительно карты, с учетом курса
-        self.arr_sensors_end_3mfdot = np.zeros(shape=(Car.SENSOR_COUNT,
-                                                      nd2_getMatrixSize()),
-                                               dtype=float)
+        self.arr_sensors_end_3mfdot = np.zeros(
+                shape=(Car.SENSOR_COUNT, nd2_getMatrixSize()),
+                dtype=float
+        )
 
         # координаты относительно окна
         self.arr_sensors_wnd_pos = np.empty(shape=[Car.SENSOR_COUNT], dtype=list)
@@ -138,20 +142,20 @@ class Car(pg.sprite.Sprite):
             # формируем вектор от центра машины на сенсор.
             self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(v) @ nd2_getMatrix([1, 0])
 
-        self.arr_sensors_value = np.full(shape=Car.SENSOR_COUNT,dtype=float,fill_value=Car.SENSOR_MAX_LEN)
+        self.arr_sensors_value = np.full(shape=Car.SENSOR_COUNT, dtype=float, fill_value=Car.SENSOR_MAX_LEN)
 
 
-    def setAcceleration(self,on):
+    def setAcceleration(self, on):
         self.is_engine_on = on
 
 
 
-    def setBreaking(self,on):
+    def setBreaking(self, on):
         self.is_braking_on = on
 
 
 
-    def setSpeering(self,dir):
+    def setSpeering(self, dir):
         # -1    налево
         # 1     направо
         self.speering_direction = dir
@@ -159,7 +163,7 @@ class Car(pg.sprite.Sprite):
 
 
 
-    def update_camera(self,camera_rect):
+    def updateCamera(self,camera_rect):
 
         # положение автомобиля в окне
         self.wnd_rect.center = (self.map_rectpos.left - camera_rect.left, self.map_rectpos.top - camera_rect.top)

@@ -2,6 +2,8 @@ import pygame as pg
 from config import *
 
 pg.init()
+pg.font.init()
+
 pg.display.set_caption(MAIN_WND_TITLE)
 if MAIN_WND_FULLSCREEN:
     # вариант для FULLSCREEN

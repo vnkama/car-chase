@@ -169,8 +169,8 @@ class ToolWnd(fwWindow):
         elif msg == 'WM_GET_TRAINING_PROPS':
             self.getTrainingProps(param1)
 
-        elif msg == 'WM_NEW_GAME':
-            self.newGame()
+        # elif msg == 'WM_NEW_SERIES':
+        #     self.newSeries()
 
         elif msg == 'WM_PLAY':
             self.play()
@@ -242,7 +242,7 @@ class ToolWnd(fwWindow):
         getAppWnd().sendMessage('WM_QUIT_APP')
 
     def new_onButton(self):
-        getAppWnd().sendMessage('WM_NEW_GAME')
+        getAppWnd().sendMessage('WM_NEW_SERIES')
 
 
     def play_onButton(self):
@@ -252,7 +252,7 @@ class ToolWnd(fwWindow):
         getAppWnd().sendMessage('WM_PAUSE')
 
 
-    def newGame(self):
+    def newSeries(self):
         self.btnNew.disable()
         self.btnPause.disable()
 

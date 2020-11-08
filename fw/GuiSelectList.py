@@ -63,7 +63,7 @@ class GuiSelectList(GuiControl):
 
 
 
-    def handle_MOUSEBUTTONDOWN(self, event):
+    def handle_MouseButtonDown(self, event):
         if self.is_drawed:
             # работаем только в случае если спсиок был нарисован хоть 1 раз
 

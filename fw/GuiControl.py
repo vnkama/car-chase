@@ -14,6 +14,7 @@ class GuiControl(fwWindow):
     def __init__(self,params):
 
         params['font'] = params.get('font', THEME_FONT)
+        params['type'] = 'normal'
 
         super().__init__(params)
 
@@ -70,7 +71,7 @@ class GuiControl(fwWindow):
     def handleClickInFocus(self, event):
         pass
 
-    def handle_MOUSEBUTTONDOWN(self, event):
+    def handle_MouseButtonDown(self, event):
         if event.button == 1:
             # mouse LB have pressed
 

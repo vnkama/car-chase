@@ -25,7 +25,7 @@ class GuiButton(GuiControl):
 
 
 
-    def handle_MOUSEBUTTONDOWN(self, event):
+    def handle_MouseButtonDown(self, event):
         if self.enabled:
 
             if event.button == 1:

@@ -2,22 +2,43 @@ from config import *
 from fw.functions import *
 # from fw.FwError import FwError
 
-from Party import Party
+from fw.fwWindow import fwWindow
+from MapWnd import MapWnd
 
 
-class Series:
+class Series(fwWindow):
 
-    def __init__(self):
+    def __init__(self, params):
+        super().__init__(params)        # parent - fwMapWnd
+
         self.generation_num = None
         self.party_num = None
-        self.party = Party()
 
 
-    def newTrainig(self):
+
+        self.Tool_wnd = params['Tool_wnd']
+
+        self.Map_wnd = MapWnd({
+            'type': 'normal',
+            'parent_wnd': self,
+            'parent_surface': self.parent_surface,
+            'Tool_wnd': self.Tool_wnd,
+        })
+        # self.addChildWnd(self.Map_wnd)
+
+    def newSeries(self):
         self.generation_num = 1
         self.party_num = 1
 
-        self.party.newTrainig()
+        arrangement_arr = {
+            'Car': {
+                'x': 300,
+                'y': 100,
+            },
+        }
+
+        self.Map_wnd.reset(arrangement_arr)
+
 
 
     def playShow(self):
@@ -53,3 +74,12 @@ class Series:
         # elif msg == 'WM_UPDATE':
         #     self.update()
 
+
+    def draw(self):
+        self.Map_wnd.draw()
+
+    def updateTraining(self):
+        self.Map_wnd.updateTraining()
+
+    def updateShow(self):
+        self.Map_wnd.updateShow()

@@ -25,9 +25,19 @@ class MapWnd(fwMapWnd):
         params['background_color'] = MAP_WND_BACKGROUND
         params['name'] = 'MapWnd'
 
+        self.training_update_step = None
+
+        # время ticks последнего или текущего вызова update, считается с 0
+        # 0 - начало игры, 60 сек - внутриигровая минута.
+        # время хоккейное, при паузах стоит,
+        self.training_update_gtime_ms_f = None
+
+        # шаг внутриигрового времени соотвтетствубщий 1му шагу   training_update_step
+        self.training_update_dt_gtime_ms_f = None
+
         super().__init__(params)        # parent - fwMapWnd
 
-        self.tool_wnd = params['tool_wnd']    # для вывода ссобщений
+        self.Tool_wnd = params['Tool_wnd']    # для вывода ссобщений
 
         self.background_srf = pg.Surface(MAP_SIZE_XY)
         self.Camera = Camera(MAP_WND_RECT.width,MAP_WND_RECT.height,MAP_SIZE_X,MAP_SIZE_Y)
@@ -94,13 +104,11 @@ class MapWnd(fwMapWnd):
         )
 
 
-
-
         # формирует дорогу
         self.init_road()
 
         self.arr_cars = []
-        self.newGame()
+        # self.newGame()
 
         getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
         getAppWnd().registerHandler_KEYDOWN(self)
@@ -109,7 +117,6 @@ class MapWnd(fwMapWnd):
 
 
     def init_road(self):
-
 
         arr_roadsections_axial_2idot =  np.array(
             [
@@ -343,18 +350,17 @@ class MapWnd(fwMapWnd):
                 )
             )
 
-    #
-    #
-    #
-    # def sendMessage(self, msg, param1=None, param2=None):
-    #     if (msg == 'WM_NEW_GAME'):
-    #         self.newGame
 
+    def reset(self, arrangement_arr):
 
-    def newGame(self):
         # начало новой игры (нажата кнопка new или программа только что запущена)
 
-        super().newGame()
+        self.training_update_step = 0
+        # self.training_update_step = 60 соответствует self.training_update_gtime_ms_f = 1000.0
+        # применяется для расчета втч физики
+
+        self.training_update_gtime_ms_f = 0
+        self.training_update_dt_gtime_ms_f = TRAINING_UPDATE_DT_GTAME_MS_F
 
         if len(self.arr_cars):
             self.arr_cars[0].kill()
@@ -362,18 +368,27 @@ class MapWnd(fwMapWnd):
 
         groups = (self.arr_sprites_update_camera, self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(self, 0, 300, groups, self.tool_wnd)
+            Car(self,
+                arrangement_arr['Car']['x'],
+                arrangement_arr['Car']['y'],
+                groups,
+                self.Tool_wnd)
         )
 
 
-    def training_update(self):
-        # self.updateChildWnds()    # у карты нет чайлдов
 
+    def updateTraining(self):
         self.arr_sprites_update.update()
-        self.update_camera()
+        self.updateCamera()
 
 
-    def update_camera(self):
+
+    def updateShow(self):
+        pass
+
+
+
+    def updateCamera(self):
         self.Camera.update(self.arr_cars[0].map_rectpos)
 
         # координаты окна показываемые камерой относительно карты
@@ -381,7 +396,7 @@ class MapWnd(fwMapWnd):
 
         # пересчитываем координаты в спрайтах с учетом камеры
         for sprite in self.arr_sprites_update_camera:
-            sprite.update_camera(camera_position_rect)
+            sprite.updateCamera(camera_position_rect)
 
 
 
@@ -426,7 +441,7 @@ class MapWnd(fwMapWnd):
             print("TOUCH !!")
 
 
-    def handle_MOUSEBUTTONDOWN(self, event):
+    def handle_MouseButtonDown(self, event):
         if event.button == 1:
             # нажата левая кнопка
 
@@ -452,7 +467,7 @@ class MapWnd(fwMapWnd):
 
         return True
 
-    def handle_KEYDOWN(self, event):
+    def handle_KeyDown(self, event):
         if event.key == pg.K_LEFT:
             self.arr_cars[0].setSpeering(-1)
 
@@ -467,7 +482,7 @@ class MapWnd(fwMapWnd):
 
 
 
-    def handle_KEYUP(self, event):
+    def handle_KeyUp(self, event):
         if event.key == pg.K_LEFT:
             self.arr_cars[0].setSpeering(0)
 
@@ -480,19 +495,4 @@ class MapWnd(fwMapWnd):
         elif event.key == pg.K_DOWN:
             self.arr_cars[0].setBreaking(0)
 
-
-    #
-    #
-    #
-    # def sendMessage(self, msg, param1=None,param2=None):
-    #     # if (msg == 'WM_NEW_GAME'):
-    #     #     self.newGame()
-    #     #
-    #     # elif (msg == 'WM_QUIT'):
-    #     #     pass
-    #     #
-    #     #
-    #     # else:
-    #     #     # если не обработали здесь то отправляем наверх
-    #     super().sendMessage(msg, param1, param2)
 
