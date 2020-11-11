@@ -50,6 +50,9 @@ class AppWnd(fwWindow):
         # фактический интервал может быть больше, если программа тормозит
         self.update_dt_rtime_ms_f = None
 
+        self.handleEvents_last_call_rtime_ms = None
+        self.handleEvents_dt_rtime_ms_f = None
+
 
         # установим указатель на главное окно приложения
         setMainWnd(self)
@@ -201,11 +204,13 @@ class AppWnd(fwWindow):
 
                 elif self.state == 'APP_STATE_TRAINING_PLAY':
 
-                    cur_ms = pg.time.get_ticks()
+                    now = pg.time.get_ticks()
 
-                    update_delay_ms = update_next_ms - cur_ms
-                    draw_delay_ms = draw_next_ms - cur_ms
-                    handle_events_delay_ms = handle_events_next_ms - cur_ms
+                    handle_events_next_call = self.handleEvents_last_call_rtime_ms +
+
+                    update_delay_ms = update_next_ms - now
+                    draw_delay_ms = draw_next_ms - now
+                    handle_events_delay_ms = handle_events_next_ms - now
 
                     delay_ms = min(update_delay_ms, draw_delay_ms, handle_events_delay_ms)
 
@@ -220,7 +225,7 @@ class AppWnd(fwWindow):
 
                     if handle_events_delay_ms <= 0:
                         self.handleEvents()
-                        handle_events_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__HANDLE_EVENTS_INTERVAL_MS
+                        handle_events_next_ms = pg.time.get_ticks() + TRAINING_PLAY__HANDLE_EVENTS_DT_MS
 
 
                     if draw_delay_ms <= 0:
@@ -269,15 +274,29 @@ class AppWnd(fwWindow):
 
         self.state = 'APP_STATE_TRAINING_NEW'
 
+        ######
 
-        self.draw_last_call_rtime_ms_f = 0
-        # self.draw_next_call_rtime_ms_f = 0
+        now = pg.time.get_ticks()
 
+        self.handleEvents_last_call_rtime_ms = now
+        self.handleEvents_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_HANDLE_EVENT_FPS
+
+        # на паузе update не вызывается
+        # self.update_last_call_rtime_ms = now
+        # self.update_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_UPDAT_FPS
+
+        self.draw_last_call_rtime_ms_f = now
         self.draw_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_DRAW_FPS
 
+
         # self.update_interval_ms = 16
-        self.training_update_step = 0
-        self.training_update_gtime_ms_f = 0.0
+        # self.training_update_step = 0
+        # self.training_update_gtime_ms_f = 0.0
+
+
+
+        ######
+
 
         self.Tool_wnd.newSeries()
         self.Series.newSeries()
@@ -291,8 +310,11 @@ class AppWnd(fwWindow):
             self.state == 'APP_STATE_TRAINING_PAUSE'
         ):
 
-            self.state = 'APP_STATE_TRAINING_PLAY'
             print("AppWnd.play")
+            self.state = 'APP_STATE_TRAINING_PLAY'
+
+            self.handleEvents_last_call_rtime_ms = None
+            self.handleEvents_dt_rtime_ms_f = None
 
             self.draw_dt_rtime_ms_f = 1000 / self.Tool_wnd.selectTrainingDrawSpeed.getValue()
 
@@ -303,6 +325,8 @@ class AppWnd(fwWindow):
             # запросим настройки по скорости обновления из Tool_wnd
             res = {}
             self.update_last_call_rtime_ms = 0
+
+
             self.Tool_wnd.sendMessage('WM_GET_TRAINING_PROPS', res)
             self.update_dt_rtime_ms_f = 1000 / (res['res']['update_fps'] * TRAINING_UPDATE_FPS)
 

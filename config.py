@@ -34,12 +34,11 @@ GAME_GENE_COUNT_MAX = 500
 
 # =================================================================================
 
-
-DRAW_FPS = 60  # частота кадров в сек 60
+TRAINING_PAUSE_HANDLE_EVENT_FPS = 60
 TRAINING_PAUSE_DRAW_FPS = 60
 
 
-
+DRAW_FPS = 60  # частота кадров в сек 60
 
 
 #UPDATE_HZ = 60 #
@@ -58,7 +57,7 @@ TRAINING_UPDATE_DT_GTAME_MS_F     = 1000 / TRAINING_UPDATE_FPS
 
 
 # интервал обработки HANDLE_EVENTS
-STATE_TRAINING_PLAY__HANDLE_EVENTS_INTERVAL_MS = 16
+TRAINING_PLAY__HANDLE_EVENTS_FPS = 30
 STATE_TRAINING_PLAY__UPDATE_INTERVAL_MS = 16
 STATE_TRAINING_PLAY__DRAW_INTERVAL_MS = 16
 

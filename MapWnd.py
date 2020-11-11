@@ -353,7 +353,6 @@ class MapWnd(fwMapWnd):
 
 
     def reset(self, arrangement_arr):
-        print('Map_wnd.reset')
 
         # начало новой игры (нажата кнопка new или программа только что запущена)
 
