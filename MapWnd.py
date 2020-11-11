@@ -351,7 +351,9 @@ class MapWnd(fwMapWnd):
             )
 
 
+
     def reset(self, arrangement_arr):
+        print('Map_wnd.reset')
 
         # начало новой игры (нажата кнопка new или программа только что запущена)
 
@@ -374,6 +376,10 @@ class MapWnd(fwMapWnd):
                 groups,
                 self.Tool_wnd)
         )
+
+        self.arr_cars[0].update_sensors()
+        self.updateCamera()
+
 
 
 
@@ -400,7 +406,9 @@ class MapWnd(fwMapWnd):
 
 
 
-    def drawThis(self):
+    def draw(self):
+        c = self.arr_cars[0]
+
 
         # копируем карту тайлов
         #self.drawBackground()       # оригинальная родная заливка фона -

@@ -26,14 +26,16 @@ class Series(fwWindow):
         })
         # self.addChildWnd(self.Map_wnd)
 
+
     def newSeries(self):
+        print('newSeries')
         self.generation_num = 1
         self.party_num = 1
 
         arrangement_arr = {
             'Car': {
-                'x': 300,
-                'y': 100,
+                'x': 100,
+                'y': 300,
             },
         }
 
@@ -61,7 +63,6 @@ class Series(fwWindow):
 
 
     #
-    #
     #   return True если сообщение обработано
     #   False если сообщение не обработано
     #
@@ -75,11 +76,12 @@ class Series(fwWindow):
         #     self.update()
 
 
-    def draw(self):
-        self.Map_wnd.draw()
-
     def updateTraining(self):
         self.Map_wnd.updateTraining()
 
     def updateShow(self):
         self.Map_wnd.updateShow()
+
+    def draw(self):
+        self.Map_wnd.draw()
+

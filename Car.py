@@ -7,7 +7,6 @@ from fRect import *
 from Brezenhem import Brezenhem
 import numpy as np
 
-
 #
 #
 #
@@ -55,7 +54,6 @@ class Car(pg.sprite.Sprite):
 
         # self.map_rectpos координаты центра спрайта привязанные к карте, они неизменны (для неподвижных спрайтов)
         # self.map_rectpos здесь только объявлен, будет переопределен в setPos
-        # self.map_rectpos = None
         self.map_rectpos = pg.Rect(0, 0, 0, 0)
         self.map_pos_nd2 = nd2_getMatrix((x, y), 1)
 
@@ -75,9 +73,9 @@ class Car(pg.sprite.Sprite):
         self.brezenhem = Brezenhem()
         self.is_moving = 0
         self.real_speed = 0
-        self.real_direction = 0  #реальное напраывление объекта направление для спрайта
-        self.rotate_direction = 0   #направление вращения 0 против часовой стрелки
-        self.need_direction = 0 #куда крутимся
+        self.real_direction = 0  # реальное напраывление объекта направление для спрайта
+        self.rotate_direction = 0  # направление вращения 0 против часовой стрелки
+        self.need_direction = 0  # куда крутимся
 
         self.message = message
 
@@ -99,12 +97,14 @@ class Car(pg.sprite.Sprite):
         self.K_friction = 0          # коефициент торможения (об воздузх :)       #
 
         self.course_nd2 = nd2_getMatrix((0.8, 0.2))  # матрица курса
-        self.speering_wheel_alfa = 0.0          #положение руля     0-прямой
+
+
+        self.speering_wheel_alfa = 0.0          # положение руля     0-прямой
 
         self.speering_direction = 0     # -1 0 1 куда крутим руль
-        self.MAX_SPEERING = grad2rad(30)           #максимальное отклонение руля
-        self.SPEERING_DV = grad2rad(12)   #изменение угла на руле за 1 сек
-        self.MIN_SPEERING = grad2rad(1)     #минимальное отклонение руля, если меньше него то ставим на ноль
+        self.MAX_SPEERING = grad2rad(30)           # максимальное отклонение руля
+        self.SPEERING_DV = grad2rad(12)   # изменение угла на руле за 1 сек
+        self.MIN_SPEERING = grad2rad(1)     # минимальное отклонение руля, если меньше него то ставим на ноль
 
         self.init_sensors()
 
@@ -120,8 +120,8 @@ class Car(pg.sprite.Sprite):
             grad2rad(90),
         ]
 
-        # значения сенсоров
-        self.arr_sensors_value = np.zeros(5,float)
+        # значения сенсоров - 0.0
+        self.arr_sensors_value = np.zeros(5, float)
 
         # координаты относительно машины (константа), при курсе 0
         self.arr_sensors_car_pos = np.empty(shape=[Car.SENSOR_COUNT], dtype=object, )
@@ -145,6 +145,9 @@ class Car(pg.sprite.Sprite):
         self.arr_sensors_value = np.full(shape=Car.SENSOR_COUNT, dtype=float, fill_value=Car.SENSOR_MAX_LEN)
 
 
+        self.setDirectionImage2()
+
+
     def setAcceleration(self, on):
         self.is_engine_on = on
 
@@ -162,13 +165,12 @@ class Car(pg.sprite.Sprite):
 
 
 
+    def updateCamera(self, camera_rect):
 
-    def updateCamera(self,camera_rect):
-
-        # положение автомобиля в окне
+        # положение автомобиля относительно окна
         self.wnd_rect.center = (self.map_rectpos.left - camera_rect.left, self.map_rectpos.top - camera_rect.top)
 
-        # пересчитаем положение сенсоров в окне
+        # пересчитаем положение сенсоров относ  окна
         for i in range(Car.SENSOR_COUNT):
             self.arr_sensors_wnd_pos[i] = (
                 int(self.arr_sensors_end_3mfdot[i][0]) - camera_rect.left,
@@ -177,17 +179,25 @@ class Car(pg.sprite.Sprite):
 
 
 
-    def setPos(self,new_rectpos):
+    def setPos(self, new_rectpos):
         self.map_rectpos = new_rectpos
 
 
-    def update(self):
-        self.update_movement()
-        self.update_sensors()
+
+    def update(self, **kwargs):
+
+        if kwargs['mode'] == 't':
+            self.update_movement()
+            self.update_sensors()
+
+        elif kwargs['mode'] == 's':
+            pass
+
+
 
     def update_movement(self):
 
-        #пересчитаем скорость print
+        # пересчитаем скорость print
         dts = self.map.dt / 1000
 
         ###################
@@ -202,8 +212,8 @@ class Car(pg.sprite.Sprite):
 
 
         # ускорения
-        #вектор ускорения совпадает с направлением машины
-        engine_dv = (self.engine_acceleration_dv ) if self.is_engine_on else 0
+        # вектор ускорения совпадает с направлением машины
+        engine_dv = self.engine_acceleration_dv if self.is_engine_on else 0
 
 
 
@@ -267,15 +277,16 @@ class Car(pg.sprite.Sprite):
             self.map_pos_nd2 = self.map_pos_nd2 + (self.velocity * dts) * self.course_nd2
             # print(self.map_pos_nd2)
 
-        angle = nd2_getAngle(self.course_nd2)
-        rumb_angle = PI / 16        # = 2 * PI / 32
-
-        self.setDirectionImage((int ((angle + rumb_angle / 2) / rumb_angle)) & 0x1F)
-
+        self.setDirectionImage2()
 
         # новое положение
         self.map_rectpos.topleft = (int(self.map_pos_nd2[0]), int(self.map_pos_nd2[1]))
 
+    def setDirectionImage2(self):
+        angle = nd2_getAngle(self.course_nd2)
+        rumb_angle = PI / 16        # = 2 * PI / 32
+        direction  = (int((angle + rumb_angle / 2) / rumb_angle)) & 0x1F
+        self.image = Car.arr_img_srf[direction]
 
 
     #
@@ -318,8 +329,8 @@ class Car(pg.sprite.Sprite):
 
         ######################################################
 
-        #составим спсико спрайтов краев дороги, которые попадают (втч частично) в arr_sensors_irect
-        #с этими спрайтами в дальнейшем буди искать пересечения
+        # составим спсико спрайтов краев дороги, которые попадают (втч частично) в arr_sensors_irect
+        # с этими спрайтами в дальнейшем буди искать пересечения
         #
         lst_curbs_4_all_sensors = []
 
@@ -350,12 +361,10 @@ class Car(pg.sprite.Sprite):
 
         sensor_start_point_3mf = self.map_pos_nd2
 
-        #длинна сенсра фактическая (текущее найденная длинна, после обхода всех перечений сенсора здесь будет самое короткое значение )
+        # длинна сенсра фактическая (текущее найденная длинна, после обхода всех перечений сенсора здесь будет самое короткое значение )
         arr_sensor_len_f = np.full(shape=[Car.SENSOR_COUNT], dtype=float, fill_value=float(Car.SENSOR_MAX_LEN))
 
-        #arr_sensor_end_point_f2 = np.full(shape=(Car.SENSOR_COUNT, 2), fill_value=0, dtype=float)
-
-
+        # arr_sensor_end_point_f2 = np.full(shape=(Car.SENSOR_COUNT, 2), fill_value=0, dtype=float)
 
 
 
@@ -410,7 +419,7 @@ class Car(pg.sprite.Sprite):
 
                 # если vl = 0 то сенсор и curb на коллинеарны, считаем что это
                 # CASTLE ну ввобще совпадение надо проверять отдельно , но пока этот код не написан
-                if (abs(vl) < 1e-6):
+                if abs(vl) < 1e-6:
                     continue
 
 
@@ -423,7 +432,7 @@ class Car(pg.sprite.Sprite):
                 # curb_leABC = nd2_convert_2Points_2_LineEquationABC(curb_start_2fdot,curb_end_2fdot)
 
 
-                if (sensor_leABC is None):
+                if sensor_leABC is None:
                     sensor_leABC = nd2_convert_2Points_2_LineEquationABC(sensor_start_point_3mf,sensor_end_point_f2)
 
                 # найдем пересечение прямых, содержащих отрезки
@@ -507,14 +516,14 @@ class Car(pg.sprite.Sprite):
         # определим желаемое направление движения
         self.need_direction = self.brezenhem.getSpriteDirection32()
 
-        if (self.need_direction != self.real_direction):
-            if (self.need_direction > self.real_direction):
-                if (self.need_direction - self.real_direction <= 16):
+        if self.need_direction != self.real_direction:
+            if self.need_direction > self.real_direction:
+                if self.need_direction - self.real_direction <= 16:
                     self.rotate_direction = 1
                 else:
                     self.rotate_direction = -1
             else:
-                if (self.real_direction - self.need_direction <= 16):
+                if self.real_direction - self.need_direction <= 16:
                     self.rotate_direction = -1
                 else:
                     self.rotate_direction = 1
@@ -522,6 +531,3 @@ class Car(pg.sprite.Sprite):
         self.real_speed = 0
         self.rotate_msector_s = 0          #1000
 
-
-    def setDirectionImage(self, direction):
-        self.image = Car.arr_img_srf[direction]

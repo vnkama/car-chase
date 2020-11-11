@@ -50,7 +50,6 @@ TRAINING_PAUSE_DRAW_FPS = 60
 # сколько FPS при обучении
 PAUSE_UPDATE_FPS            = 60
 
-# DRAW_FPS                    = 60
 
 TRAINING_UPDATE_FPS         = 60
 TRAINING_UPDATE_DT_GTAME_MS_F     = 1000 / TRAINING_UPDATE_FPS
