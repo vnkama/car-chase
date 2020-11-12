@@ -43,14 +43,14 @@ class AppWnd(fwWindow):
         self.draw_dt_rtime_ms_f = None
 
         # момент времени последнего вызова update
-        self.update_last_call_rtime_ms = None
+        self.update_last_call_rtime_ms_f = None
 
         # предварительо заданный интервал времени между текущим и предыдущим вызовами функции
         # задается настройками программы
         # фактический интервал может быть больше, если программа тормозит
         self.update_dt_rtime_ms_f = None
 
-        self.handleEvents_last_call_rtime_ms = None
+        self.handleEvents_last_call_rtime_ms_f = None
         self.handleEvents_dt_rtime_ms_f = None
 
 
@@ -182,79 +182,57 @@ class AppWnd(fwWindow):
 
             while self.is_mainloop_run:
 
-                if self.state == 'APP_STATE_TRAINING_NEW' \
-                        or self.state == 'APP_STATE_SHOW_PAUSE' \
-                        or self.state == 'APP_STATE_TRAINING_PAUSE':
 
+                # if self.state == 'APP_STATE_TRAINING_NEW' \
+                #         or self.state == 'APP_STATE_SHOW_PAUSE' \
+                #         or self.state == 'APP_STATE_TRAINING_PAUSE':
+                #
+                #
+                #     delay_ms = self.draw_last_call_rtime_ms_f - pg.time.get_ticks() + self.draw_dt_rtime_ms_f
+                #
+                #     if delay_ms > 0:
+                #         pg.time.wait(math.ceil(delay_ms))
+                #
+                #
+                #     self.handleEvents()
+                #     self.draw()
+                #
+                #     pg.display.update()
+                #
+                #
+                #
+                # elif self.state == 'APP_STATE_TRAINING_PLAY':
 
-                    delay_ms = self.draw_last_call_rtime_ms_f - pg.time.get_ticks() + self.draw_dt_rtime_ms_f
+                now = pg.time.get_ticks()
 
-                    if delay_ms > 0:
-                        pg.time.wait(math.ceil(delay_ms))
+                handle_events_next_call = self.handleEvents_last_call_rtime_ms_f + self.handleEvents_dt_rtime_ms_f
+                update_next_call = self.update_last_call_rtime_ms_f + self.update_dt_rtime_ms_f
+                draw_next_call = self.draw_last_call_rtime_ms_f + self.draw_dt_rtime_ms_f
 
-                    #self.draw_last_call_rtime_ms_f = pg.time.get_ticks()    # += PAUSE_DRAW_DT
-
-
-                    self.handleEvents()
-                    self.draw()
-
-                    pg.display.update()
-
-
-
-                elif self.state == 'APP_STATE_TRAINING_PLAY':
-
-                    now = pg.time.get_ticks()
-
-                    handle_events_next_call = self.handleEvents_last_call_rtime_ms +
-
-                    update_delay_ms = update_next_ms - now
-                    draw_delay_ms = draw_next_ms - now
-                    handle_events_delay_ms = handle_events_next_ms - now
-
-                    delay_ms = min(update_delay_ms, draw_delay_ms, handle_events_delay_ms)
-
+                if handle_events_next_call <= min(update_next_call, draw_next_call):
+                    delay_ms = handle_events_next_call - now
                     if delay_ms > 0:
                         pg.time.wait(delay_ms)
-
-                    now_ms = pg.time.get_ticks()
-
-                    update_delay_ms = update_next_ms - now_ms
-                    draw_delay_ms = draw_next_ms - now_ms
-                    handle_events_delay_ms = draw_next_ms - now_ms
-
-                    if handle_events_delay_ms <= 0:
-                        self.handleEvents()
-                        handle_events_next_ms = pg.time.get_ticks() + TRAINING_PLAY__HANDLE_EVENTS_DT_MS
-
-
-                    if draw_delay_ms <= 0:
-                        self.draw()
-                        pg.display.update()
-                        draw_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__UPDATE_INTERVAL_MS
-
-
-                    if update_delay_ms <= 0:
-                        self.updateTraining()
-
-
-
-                elif self.state == 'APP_STATE_SHOW_PLAY':
-                    # это не готово !
+                    self.handleEvents_last_call_rtime_ms_f = pg.time.get_ticks()
                     self.handleEvents()
-                    self.updateShowAllChilds()
-                    self.draw()
-                    pg.display.update()
+
+                elif update_next_call <= min(handle_events_next_call, draw_next_call):
+                    delay_ms = update_next_call - now
+                    if delay_ms > 0:
+                        pg.time.wait(delay_ms)
+                    self.update_last_call_rtime_ms_f = pg.time.get_ticks()
+                    self.update()
 
                 else:
-                    pass
+                    delay_ms = draw_next_call - now
+                    if delay_ms > 0:
+                        pg.time.wait(delay_ms)
+                    self.draw_last_call_rtime_ms_f = pg.time.get_ticks()
+                    self.draw()
+
+                pg.display.update()
 
 
-                # self.handleEvents()
-                # self.update()
-                # self.draw()
-                #
-                # pg.display.update()
 
         except FwError as e:
             print("\033[35m\033[1mgame.py except FwError")
@@ -278,30 +256,19 @@ class AppWnd(fwWindow):
 
         now = pg.time.get_ticks()
 
-        self.handleEvents_last_call_rtime_ms = now
-        self.handleEvents_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_HANDLE_EVENT_FPS
+        self.handleEvents_last_call_rtime_ms_f = now
+        self.handleEvents_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_HANDLE_EVENTS_FPS
 
-        # на паузе update не вызывается
-        # self.update_last_call_rtime_ms = now
-        # self.update_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_UPDAT_FPS
+        self.update_last_call_rtime_ms_f = now
+        self.update_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_UPDATE_FPS
 
         self.draw_last_call_rtime_ms_f = now
         self.draw_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_DRAW_FPS
 
 
-        # self.update_interval_ms = 16
-        # self.training_update_step = 0
-        # self.training_update_gtime_ms_f = 0.0
-
-
-
-        ######
-
-
         self.Tool_wnd.newSeries()
         self.Series.newSeries()
 
-        # self.sendMessageToChilds('WM_NEW_SERIES')
 
 
     def play(self):
@@ -310,43 +277,43 @@ class AppWnd(fwWindow):
             self.state == 'APP_STATE_TRAINING_PAUSE'
         ):
 
-            print("AppWnd.play")
+            print("AppWnd.training play")
             self.state = 'APP_STATE_TRAINING_PLAY'
-
-            self.handleEvents_last_call_rtime_ms = None
-            self.handleEvents_dt_rtime_ms_f = None
-
-            self.draw_dt_rtime_ms_f = 1000 / self.Tool_wnd.selectTrainingDrawSpeed.getValue()
-
 
             # res['res']['update_fps'] - 1 : 1x обычная скороть расчет в реальном времени, 2 : 2x двойная
             # res['res']['update_fps'] * TRAINING_UPDATE_FPS    :   1x  :  60 расчетов в секунду
             # период перерасчета в реалаьном времени
             # запросим настройки по скорости обновления из Tool_wnd
             res = {}
-            self.update_last_call_rtime_ms = 0
-
-
             self.Tool_wnd.sendMessage('WM_GET_TRAINING_PROPS', res)
-            self.update_dt_rtime_ms_f = 1000 / (res['res']['update_fps'] * TRAINING_UPDATE_FPS)
 
-            self.sendMessageToChilds('WM_PLAY')
+            self.handleEvents_dt_rtime_ms_f = 1000 / TRAINING_PLAY_HANDLE_EVENTS_FPS
+            self.update_dt_rtime_ms_f = 1000 / res['res']['update_fps']
+            self.draw_dt_rtime_ms_f = 1000 / res['res']['draw_fps']
+
+            # self.update_dt_rtime_ms_f = 1000 / TRAINING_PLAY_UPDATE_FPS
+            # self.draw_dt_rtime_ms_f = 1000 / self.Tool_wnd.selectTrainingDrawSpeed.getValue()
+
+
+            #self.sendMessageToChilds('WM_PLAY')
+            self.Tool_wnd.play()
+            #self.Series.play()
 
         elif self.state == 'APP_STATE_SHOW_PAUSE':
+            self.state = 'APP_STATE_SHOW_PLAY'
+
             pass
 
 
     def pause(self):
         print("AppWnd.pause")
         if self.state == 'APP_STATE_TRAINING_PLAY':
+            print("AppWnd.show play")
 
             self.state = 'APP_STATE_TRAINING_PAUSE'
-            self.sendMessageToChilds('WM_PAUSE')
 
 
 
-    #
-    #
     def handleEvents(self):
         for event in pg.event.get():
 
@@ -390,6 +357,14 @@ class AppWnd(fwWindow):
                     wnd.handle_KeyUp(event)
 
 
+    def update(self):
+        if self.state == 'APP_STATE_TRAINING_PLAY':
+            self.Series.updateTraining()
+
+        elif self.state == 'APP_STATE_TRAINING_PLAY':
+            self.Series.updateShow()
+
+
     #
     #
     #
@@ -407,48 +382,48 @@ class AppWnd(fwWindow):
     #     self.Map_wnd.dt = self.update_dt_ms
 
 
+
+
+
     #
     # перерасчет всех объектов при обучении сети
     #
-    def updateTraining(self):
-        self.update_last_call_rtime_ms = pg.time.get_ticks()
-
-        print(f'appWnd.updateTraining {self.update_last_call_rtime_ms}')
-
-        # self.trainingupdate_next_ms = pg.time.get_ticks() + STATE_TRAINING_PLAY__DRAW_INTERVAL_MS
-        # self.sendMessageToChilds("WM_UPDATE_TRAINING")
-
-        self.Series.updateTraining()
+    # def updateTraining(self):
+    #     self.update_last_call_rtime_ms_f = pg.time.get_ticks()
+    #
+    #     print(f'appWnd.updateTraining {self.update_last_call_rtime_ms_f}')
+    #
+    #
+    #     self.Series.updateTraining()
 
 
 
-    def updateShow(self):
-        # подкачка очередного кадра всех объектов из файла в режиме show
-        self.update_last_call_rtime_ms = pg.time.get_ticks()
-        print(f'appWnd.updateShow {self.update_last_call_rtime_ms}')
-
-        # self.sendMessageToChilds("WM_UPDATE_SHOW")
-
-        self.Series.updateShow()
+    # def updateShow(self):
+    #     # подкачка очередного кадра всех объектов из файла в режиме show
+    #     self.update_last_call_rtime_ms_f = pg.time.get_ticks()
+    #     print(f'appWnd.updateShow {self.update_last_call_rtime_ms_f}')
+    #
+    #     # self.sendMessageToChilds("WM_UPDATE_SHOW")
+    #
+    #     self.Series.updateShow()
 
 
     def draw(self):
         # super().draw()      #fwWindow
-        self.draw_last_call_rtime_ms_f = pg.time.get_ticks()
 
         # у AppWnd нет собственной графики, рисоавть нечего
         # вызовем
         self.drawAllChilds()
 
 
-    def updateTrainingAllChilds(self):
-        for child_wnd in self.child_objects:
-            child_wnd.updateTraining()
+    # def updateTrainingAllChilds(self):
+    #     for child_wnd in self.child_objects:
+    #         child_wnd.updateTraining()
 
 
-    def updateShowAllChilds(self):
-        for child_wnd in self.child_objects:
-            child_wnd.updateShow()
+    # def updateShowAllChilds(self):
+    #     for child_wnd in self.child_objects:
+    #         child_wnd.updateShow()
 
 
 
@@ -489,8 +464,6 @@ class AppWnd(fwWindow):
     def getFont(self, name):
         return self.arr_fonts.get(name.lower(), self.arr_fonts['tahoma_20'])
 
-    #
-    #
-    #
+
     def setFonts(self, arr_fonts):
         self.arr_fonts = arr_fonts

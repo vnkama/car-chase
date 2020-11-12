@@ -34,8 +34,28 @@ GAME_GENE_COUNT_MAX = 500
 
 # =================================================================================
 
-TRAINING_PAUSE_HANDLE_EVENT_FPS = 60
+# на паузе update - не вызывается, handel_events вызывается вместе с draw
+TRAINING_PAUSE_HANDLE_EVENTS_FPS = 60
+TRAINING_PAUSE_UPDATE_FPS = 1000    # факттчески не сипользуется. не используется
 TRAINING_PAUSE_DRAW_FPS = 60
+
+TRAINING_PLAY_HANDLE_EVENTS_FPS = 30
+# TRAINING_PLAY_UPDATE_FPS = 60               #
+# TRAINING_PLAY_DRAW_FPS = 60               # fps берется с select
+
+SHOW_PAUSE_HANDLE_EVENTS_FPS = 60
+SHOW_PAUSE_UPDATE_FPS = 1000    # факттчески не сипользуется. не используется
+SHOW_PAUSE_DRAW_FPS = 60
+
+SHOW_PLAY_HANDLE_EVENTS_FPS = 30
+SHOW_PLAY_UPDATE_FPS = 60                   # base
+SHOW_PLAY_DRAW_FPS = 60                     # base
+
+
+
+
+
+
 
 
 DRAW_FPS = 60  # частота кадров в сек 60
@@ -50,16 +70,11 @@ DRAW_FPS = 60  # частота кадров в сек 60
 PAUSE_UPDATE_FPS            = 60
 
 
-TRAINING_UPDATE_FPS         = 60
-TRAINING_UPDATE_DT_GTAME_MS_F     = 1000 / TRAINING_UPDATE_FPS
+# TRAINING_UPDATE_FPS         = 60
+TRAINING_UPDATE_DT_GTAME_MS_F     = 1000 / 60
 
 
 
-
-# интервал обработки HANDLE_EVENTS
-TRAINING_PLAY__HANDLE_EVENTS_FPS = 30
-STATE_TRAINING_PLAY__UPDATE_INTERVAL_MS = 16
-STATE_TRAINING_PLAY__DRAW_INTERVAL_MS = 16
 
 
 

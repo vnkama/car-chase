@@ -83,14 +83,13 @@ class ToolWnd(fwWindow):
             'text': 'Update:',
         }))
 
-        self.selectUpdateSpeed = self.addChildWnd(GuiSelect({
+        self.selectTrainingUpdateSpeed = self.addChildWnd(GuiSelect({
             'name': 'combo-test',
             'value': [
-                ("x1", 1),
-                ("x2", 2),
-                ("x5", 5),
-                ("x10", 10),
-                ("max", 1000),
+                ("x1", 60),
+                ("x2", 120),
+                ("x5", 300),
+                ("x10", 600),
             ],
             'parent_wnd': self,
             'rect': pg.Rect(65, 150, 80, 22),
@@ -172,8 +171,8 @@ class ToolWnd(fwWindow):
         # elif msg == 'WM_NEW_SERIES':
         #     self.newSeries()
 
-        elif msg == 'WM_PLAY':
-            self.play()
+        # elif msg == 'WM_PLAY':
+        #     self.play()
 
         elif msg == 'WM_PAUSE':
             self.pause()
@@ -193,7 +192,7 @@ class ToolWnd(fwWindow):
 
     def getTrainingProps(self, param1):
         param1['res'] = {
-            'update_fps': self.selectUpdateSpeed.getValue(),
+            'update_fps': self.selectTrainingUpdateSpeed.getValue(),
             'draw_fps': self.selectTrainingDrawSpeed.getValue(),
         }
 

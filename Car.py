@@ -184,9 +184,9 @@ class Car(pg.sprite.Sprite):
 
 
 
-    def update(self, **kwargs):
+    def update(self, *args):
 
-        if kwargs['mode'] == 't':
+        if args[0] == 't':
             self.update_movement()
             self.update_sensors()
 
