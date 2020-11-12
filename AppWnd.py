@@ -210,21 +210,21 @@ class AppWnd(fwWindow):
                 draw_next_call = self.draw_last_call_rtime_ms_f + self.draw_dt_rtime_ms_f
 
                 if handle_events_next_call <= min(update_next_call, draw_next_call):
-                    delay_ms = handle_events_next_call - now
+                    delay_ms = int(handle_events_next_call - now)
                     if delay_ms > 0:
                         pg.time.wait(delay_ms)
                     self.handleEvents_last_call_rtime_ms_f = pg.time.get_ticks()
                     self.handleEvents()
 
                 elif update_next_call <= min(handle_events_next_call, draw_next_call):
-                    delay_ms = update_next_call - now
+                    delay_ms = int(update_next_call - now)
                     if delay_ms > 0:
                         pg.time.wait(delay_ms)
                     self.update_last_call_rtime_ms_f = pg.time.get_ticks()
                     self.update()
 
                 else:
-                    delay_ms = draw_next_call - now
+                    delay_ms = int(draw_next_call - now)
                     if delay_ms > 0:
                         pg.time.wait(delay_ms)
                     self.draw_last_call_rtime_ms_f = pg.time.get_ticks()

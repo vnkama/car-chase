@@ -186,11 +186,11 @@ class Car(pg.sprite.Sprite):
 
     def update(self, *args):
 
-        if args[0] == 't':
+        if args[0] == 1:    # 1 - training
             self.update_movement()
             self.update_sensors()
 
-        elif kwargs['mode'] == 's':
+        elif args[0] == 's':    # 2 - show
             pass
 
 

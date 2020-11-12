@@ -112,7 +112,7 @@ class Rock(pg.sprite.Sprite):
         self.rect.top = self.map_rect.top - camera_rect.top
 
 
-    def update(self):
+    def update(self, *args):
         if self.map_rect.top > 600:
             self.dy = -3
         elif self.map_rect.top < 50:

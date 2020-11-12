@@ -383,7 +383,7 @@ class MapWnd(fwMapWnd):
 
 
     def updateTraining(self):
-        self.arr_sprites_update.update(1)    # mode='t' 't'
+        self.arr_sprites_update.update(1)       # 1 - training
         self.updateCamera()
 
 
