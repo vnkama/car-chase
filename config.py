@@ -56,8 +56,6 @@ SHOW_PLAY_DRAW_FPS = 60                     # base
 #########
 
 
-DRAW_FPS = 60  # частота кадров в сек 60
-
 
 #UPDATE_HZ = 60 #
 
@@ -70,6 +68,9 @@ DRAW_FPS = 60  # частота кадров в сек 60
 
 TRAINING_UPDATE_GTIME_FPS         = 60
 # TRAINING_UPDATE_DT_GTAME_MS_F     = 1000 / 60
+
+# количнсвтво партий в поколении
+PARTY_COUNT_IN_GENE = 5
 
 
 

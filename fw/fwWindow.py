@@ -67,8 +67,6 @@ class fwWindow:
             raise FwError()
 
 
-
-
         self.background_color = params.get('background_color', None)
         self.background_disabled_color = params.get('background_color', self.background_color)
 
@@ -82,29 +80,26 @@ class fwWindow:
 
 
 
+    #
     # как правило эту функцию следует переопределить
+    #
     def draw(self):
         self.drawThis()
         self.sendMessageToChilds('WM_DRAW')
 
 
+    #
+    # как правило эту функцию следует переопределить
+    # закрасит свой фон (если есть)
+    #
     def drawThis(self):
-        # как правило эту функцию следует переопределить
-        # закрасит свой фон (если есть)
         self.drawBackground()
 
 
 
-    # def drawChildWnds(self):
-    #     # вызовем draw очерних окон
-    #     if len(self.child_objects):
-    #         for wnd in self.child_objects:
-    #             wnd.draw()
-
-
-
-
-
+    #
+    #
+    #
     def drawBackground(self, color = None):
         if color is not None:
             self.surface.fill(color)
@@ -114,6 +109,9 @@ class fwWindow:
 
 
 
+    #
+    #
+    #
     def drawBorder(self):
         # рисуем свою рамку, если есть
         if self.border_width is not None and self.border_color is not None:
@@ -136,16 +134,20 @@ class fwWindow:
     # point - координата относительно окна приложения -> (x,y)
     #
     def isPointInWindow(self, point):
+
         return pg.Rect(
-            self.surface.get_abs_offset(),
-            self.surface.get_size()
+                self.surface.get_abs_offset(),
+                self.surface.get_size()
         ).collidepoint(point)
 
-    #
+
+
     #
     # point - координата относительно окна приложения
     # возвращает коорднаты точки point относительно даннго окна -> (x,y)
+    #
     def getOffsetInWindow(self, point):
+
         offs = self.surface.get_abs_offset() #координаты данного окна относительно приложения
         return (
             point[0] - offs[0],
@@ -154,10 +156,6 @@ class fwWindow:
 
 
 
-
-    #
-    #
-    #
     def setText(self, new_text):
         self.text = new_text
 
@@ -169,12 +167,11 @@ class fwWindow:
         return new_child
 
 
-    #
-    # функция пустая, переопределять
-    #   return True если сообщение обработано
-    #   False если сообщение не обработано
-    #
     def sendMessage(self, msg, param1=None, param2=None):
+        #
+        #   return True если сообщение обработано
+        #   False если сообщение не обработано
+        #
 
         if msg == 'WM_DRAW':
             self.draw()
@@ -182,8 +179,10 @@ class fwWindow:
         elif msg == 'WM_UPDATE':
             self.update()
 
+        else:
+            return False
 
-    #
+
     def sendMessageToChilds(self, msg, param1=None, param2=None):
         for child_wnd in self.child_objects:
             child_wnd.sendMessage(msg, param1, param2)
@@ -194,23 +193,16 @@ class fwWindow:
             child_wnd.draw()
 
 
+    # def update(self):
+    #     pass
 
-
-    def update(self):
-        pass
-
-
-
-    # def updateChildWnds(self):
-    #     for child_object in self.child_objects:
-    #         child_object.update()
 
 
 
 
     # абстарнктные обработчики событий клавиатуры и мыши
     # реальные нужно определять в классах наследниках, там где необходимы
-    def handle_MOUSEMOTION(self, event):        pass
+    def handle_MouseMotion(self, event):        pass
     def handle_MouseButtonDown(self, event):    return True       # return True - значит можно продолжать обработку дальше
     def handle_KeyDown(self, event):            pass
     def handle_KeyUp(self, event):              pass
@@ -221,6 +213,10 @@ class fwWindow:
 
     def enable(self):
         self.enabled = True
+
+    def isEnable(self):
+        return self.enabled
+
 
     def resize(self, new_rect):
         # resize работает только если есть parent_wnd

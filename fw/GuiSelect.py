@@ -73,8 +73,6 @@ class GuiSelect(GuiControl):
         #self_rectsize = self.surface.get_rect()
 
 
-
-
         X = self.closed_rectsize.w - 14
         Y = (self.closed_rectsize.h - 5) // 2
         Y = Y if Y // 2 else Y + 1
@@ -124,7 +122,7 @@ class GuiSelect(GuiControl):
         Y = self.getOffsetInWindow(event.pos)[1]
 
 
-        # координата клика Y отвносительно всплывающего спсика селекта
+        # координата клика Y относительно всплывающего спсика селекта
         Y = Y - self.closed_rectsize.h
 
         if Y < 0:

@@ -95,6 +95,10 @@ class ToolWnd(fwWindow):
             'rect': pg.Rect(65, 150, 80, 22),
         }))
 
+        self.selectTrainingUpdateSpeed.setSelectedItemByText('x10')
+
+        ##########
+
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
             'rect': pg.Rect(160, 150, 60, 22),
@@ -107,6 +111,7 @@ class ToolWnd(fwWindow):
                 ("60 fps", 60),
                 ("30 fps", 30),
                 ("10 fps", 10),
+                ("5 fps", 5),
                 ("1 fps", 1),
             ],
             'parent_wnd': self,
@@ -125,7 +130,7 @@ class ToolWnd(fwWindow):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(0, 300, 60, 32),
+            'rect': pg.Rect(8, 300, 60, 32),
             'text': 'Param 1:',
         }))
 
@@ -133,7 +138,7 @@ class ToolWnd(fwWindow):
 
         self.lbl_speed = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(61, 300, 200, 32),
+            'rect': pg.Rect(80, 300, 200, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_speed)
@@ -142,7 +147,7 @@ class ToolWnd(fwWindow):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(0, 332, 100, 32),
+            'rect': pg.Rect(8, 332, 100, 32),
             'text': 'ticks:',
         }))
 
@@ -153,6 +158,21 @@ class ToolWnd(fwWindow):
             'text': '0',
         })
         self.addChildWnd(self.lbl_ticks)
+
+        ############################################
+
+        self.addChildWnd(GuiLabel({
+            'parent_wnd': self,
+            'rect': pg.Rect(8, 364, 100, 32),
+            'text': 'Party:',
+        }))
+
+        self.lbl_party = GuiLabel({
+            'parent_wnd': self,
+            'rect': pg.Rect(80, 364, 100, 32),
+            'text': '0',
+        })
+        self.addChildWnd(self.lbl_party)
 
 
 
@@ -177,6 +197,9 @@ class ToolWnd(fwWindow):
 
         elif msg == 'WM_SET_TICKS':
             self.lbl_ticks.setText(param1)
+
+        elif msg == 'WM_SET_PARTY':
+            self.lbl_party.setText(param1)
 
         else:
             # если не обработали здесь то отправляем наверх
@@ -257,8 +280,23 @@ class ToolWnd(fwWindow):
         self.btnPause.enable()
         self.semaphorRun.setColor('green')
 
+        self.selectTrainingUpdateSpeed.disable()
+        self.selectTrainingDrawSpeed.disable()
+
     def pause(self):
         self.btnNew.enable()
         self.btnPlay.enable()
         self.btnPause.disable()
         self.semaphorRun.setColor('red')
+
+        self.selectTrainingUpdateSpeed.enable()
+        self.selectTrainingDrawSpeed.enable()
+
+    def endSeries(self):
+        self.btnNew.enable()
+        self.btnPlay.disable()
+        self.btnPause.disable()
+        self.semaphorRun.setColor('red')
+
+        self.selectTrainingUpdateSpeed.disable()
+        self.selectTrainingDrawSpeed.disable()

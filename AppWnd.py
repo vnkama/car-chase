@@ -163,6 +163,10 @@ class AppWnd(fwWindow):
         elif msg == "WM_PAUSE":
             self.pause()
 
+        elif msg == 'WM_END_SERIES':
+            self.endSeries()
+
+
 
     #
     # основной цикл приложения
@@ -253,6 +257,19 @@ class AppWnd(fwWindow):
 
 
 
+
+    def endSeries(self):
+        self.state = 'APP_STATE_TRAINING_END'
+        print("AppWnd.endSeries endSeries")
+
+        self.Tool_wnd.endSeries()
+
+        self.handleEvents_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_HANDLE_EVENTS_FPS
+        self.update_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_UPDATE_FPS
+        self.draw_dt_rtime_ms_f = 1000 / TRAINING_PAUSE_DRAW_FPS
+
+
+
     def play(self):
         if (
             self.state == 'APP_STATE_TRAINING_NEW' or
@@ -273,18 +290,13 @@ class AppWnd(fwWindow):
             self.update_dt_rtime_ms_f = 1000 / res['res']['update_fps']
             self.draw_dt_rtime_ms_f = 1000 / res['res']['draw_fps']
 
-            # self.update_dt_rtime_ms_f = 1000 / TRAINING_PLAY_UPDATE_FPS
-            # self.draw_dt_rtime_ms_f = 1000 / self.Tool_wnd.selectTrainingDrawSpeed.getValue()
-
-
-            #self.sendMessageToChilds('WM_PLAY')
             self.Tool_wnd.play()
-            #self.Series.play()
+
 
         elif self.state == 'APP_STATE_SHOW_PAUSE':
             self.state = 'APP_STATE_SHOW_PLAY'
 
-            pass
+
 
 
     def pause(self):
@@ -314,7 +326,7 @@ class AppWnd(fwWindow):
             elif event.type == pg.MOUSEMOTION:
                 # перебираем все зарегистрированные окна обработчики MOUSEMOTION
                 for wnd in self.Mousemotion_handlers_arr:
-                    wnd.handle_MOUSEMOTION(event)
+                    wnd.handle_MouseMotion(event)
 
             elif event.type == pg.MOUSEBUTTONDOWN:
                 # перебираем все зарегистрированные окна обработчики MOUSEBUTTONDOWN
@@ -369,15 +381,6 @@ class AppWnd(fwWindow):
         self.Series.draw()
 
 
-
-    # def updateTrainingAllChilds(self):
-    #     for child_wnd in self.child_objects:
-    #         child_wnd.updateTraining()
-
-
-    # def updateShowAllChilds(self):
-    #     for child_wnd in self.child_objects:
-    #         child_wnd.updateShow()
 
 
 

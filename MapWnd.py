@@ -398,6 +398,7 @@ class MapWnd(fwWindow):
 
     def updateTraining(self):
         self.training_update_step += 1
+
         self.arr_sprites_update.update(1)       # 1 - training
         self.updateCamera()
 
@@ -425,7 +426,7 @@ class MapWnd(fwWindow):
         self.Tool_wnd.sendMessage("WM_SET_TICKS", self.training_update_step)
 
 
-        c = self.arr_cars[0]
+        # c = self.arr_cars[0]
 
 
         # копируем карту тайлов
@@ -452,18 +453,39 @@ class MapWnd(fwWindow):
         )
 
         if sprite_lst:
-            self.arr_oils[0].kill()
+            print("TOUCH !!")
 
+        # sprite_lst = pg.sprite.spritecollide(
+        #     self.arr_cars[0],           # машину сталикиваем
+        #     self.arr_sprites_collide,
+        #     False,
+        #     pg.sprite.collide_mask
+        # )
+        #
+        # if sprite_lst:
+        #     print("TOUCH !!")
+
+
+    #
+    # проверяет был или нет сьезд с дороги
+    # return    : True - был сьезд
+    #           : False -не было сьезда с дороги
+    def testOffRoad(self):
+        # столкновение машины с краем дороги
         sprite_lst = pg.sprite.spritecollide(
             self.arr_cars[0],           # машину сталикиваем
-            self.arr_sprites_collide,
+            self.arr_sprites_curbs,      #с краями дороги
             False,
             pg.sprite.collide_mask
         )
 
-        #if sprite_lst:
-            #sprite_lst[0].kill()
-            #print("TOUCH !!")
+        if sprite_lst:
+            print("TOUCH !!")
+            return True
+
+        return False
+
+
 
 
     def handle_MouseButtonDown(self, event):

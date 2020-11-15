@@ -55,7 +55,7 @@ class GuiControl(fwWindow):
     def handle_MOUSEBUTTONUP(self, event):
         pass
 
-    def handle_MOUSEMOTION(self, event):
+    def handle_MouseMotion(self, event):
         #
         # обработчик перемещения мыши
         # координаты приходят абсолютные, относительно окна приложения
@@ -72,6 +72,11 @@ class GuiControl(fwWindow):
         pass
 
     def handle_MouseButtonDown(self, event):
+
+        # работаем только с включенным контролом
+        if not self.isEnable():
+            return
+
         if event.button == 1:
             # mouse LB have pressed
 
