@@ -4,7 +4,7 @@ from config import *
 from fw.functions import *
 from Vector import *
 
-from fw.fwMapWnd import fwMapWnd
+from fw.fwWindow import fwWindow
 from Tile import *
 from Car import *
 from Camera import *
@@ -16,7 +16,7 @@ import random
 #
 # окно с картой
 #
-class MapWnd(fwMapWnd):
+class MapWnd(fwWindow):
 
     def __init__(self, params):
 
@@ -25,30 +25,42 @@ class MapWnd(fwMapWnd):
         params['background_color'] = MAP_WND_BACKGROUND
         params['name'] = 'MapWnd'
 
+
+        # номер шага обучения (1-based)
+        # когда трайнинг не идет переменная тоже стоит
+        # при инициации начального положения training_step = 0
+        # в начале расчета 1го перемещения training_step ставится в  1
+        self.training_update_step = None
+        self.training_update_gtime_sec_f = None
+
+
         self.training_update_step = None
 
         # время ticks последнего или текущего вызова update, считается с 0
         # 0 - начало игры, 60 сек - внутриигровая минута.
         # время хоккейное, при паузах стоит,
-        self.training_update_gtime_ms_f = None
+        # self.training_update_gtime_ms_f = None
 
         # шаг внутриигрового времени соотвтетствубщий 1му шагу   training_update_step
         self.training_update_dt_gtime_ms_f = None
+
+        self.dt = None
+        self.arr_road_sprites = None
+
 
         super().__init__(params)        # parent - fwMapWnd
 
         self.Tool_wnd = params['Tool_wnd']    # для вывода ссобщений
 
         self.background_srf = pg.Surface(MAP_SIZE_XY)
-        self.Camera = Camera(MAP_WND_RECT.width,MAP_WND_RECT.height,MAP_SIZE_X,MAP_SIZE_Y)
-        self.dt = 0
+        self.Camera = Camera(MAP_WND_RECT.width, MAP_WND_RECT.height, MAP_SIZE_X, MAP_SIZE_Y)
 
 
         # группы спрайтов
         self.arr_sprites_update_camera = pg.sprite.Group()
         self.arr_sprites_draw = pg.sprite.Group()           # для взывова draw, карта отдельно копируемся
         self.arr_sprites_update = pg.sprite.Group()         # то что двигаетсмя
-        self.arr_sprites_collide = pg.sprite.Group()        # прверяиьт на столкновения с автомобилем
+        self.arr_sprites_collide = pg.sprite.Group()        # проверять на столкновения с автомобилем
         self.arr_sprites_curbs = pg.sprite.Group()
 
 
@@ -79,7 +91,7 @@ class MapWnd(fwMapWnd):
         )
 
         self.arr_trees.append(
-            Tree(500, 600, groups)
+            Tree(600, 300, groups)
         )
 
         self.arr_trees.append(
@@ -94,7 +106,7 @@ class MapWnd(fwMapWnd):
         self.arr_oils = []
         groups = (self.arr_sprites_update_camera, self.arr_sprites_draw)
         self.arr_oils.append(
-            Oil(400, 400, groups)
+            Oil(400, 500, groups)
         )
 
         self.arr_rocks = []
@@ -360,8 +372,8 @@ class MapWnd(fwMapWnd):
         # self.training_update_step = 60 соответствует self.training_update_gtime_ms_f = 1000.0
         # применяется для расчета втч физики
 
-        self.training_update_gtime_ms_f = 0
-        self.training_update_dt_gtime_ms_f = TRAINING_UPDATE_DT_GTAME_MS_F
+        self.training_update_gtime_sec_f = 0
+        self.dt = 1 / TRAINING_UPDATE_GTIME_FPS
 
         if len(self.arr_cars):
             self.arr_cars[0].kill()
@@ -376,6 +388,8 @@ class MapWnd(fwMapWnd):
                 self.Tool_wnd)
         )
 
+        self.arr_rocks[0].setPos(600, 400)
+
         self.arr_cars[0].update_sensors()
         self.updateCamera()
 
@@ -383,8 +397,10 @@ class MapWnd(fwMapWnd):
 
 
     def updateTraining(self):
+        self.training_update_step += 1
         self.arr_sprites_update.update(1)       # 1 - training
         self.updateCamera()
+
 
 
 
@@ -406,6 +422,9 @@ class MapWnd(fwMapWnd):
 
 
     def draw(self):
+        self.Tool_wnd.sendMessage("WM_SET_TICKS", self.training_update_step)
+
+
         c = self.arr_cars[0]
 
 
@@ -434,7 +453,6 @@ class MapWnd(fwMapWnd):
 
         if sprite_lst:
             self.arr_oils[0].kill()
-            #print("ROAD !!")
 
         sprite_lst = pg.sprite.spritecollide(
             self.arr_cars[0],           # машину сталикиваем
@@ -443,9 +461,9 @@ class MapWnd(fwMapWnd):
             pg.sprite.collide_mask
         )
 
-        if sprite_lst:
-            sprite_lst[0].kill()
-            print("TOUCH !!")
+        #if sprite_lst:
+            #sprite_lst[0].kill()
+            #print("TOUCH !!")
 
 
     def handle_MouseButtonDown(self, event):
@@ -503,3 +521,21 @@ class MapWnd(fwMapWnd):
             self.arr_cars[0].setBreaking(0)
 
 
+    def sendMessage(self, msg, param1=None, param2=None):
+        # fwWindow.sendMessage - не олпределен
+
+        if msg == 'WM_NEW_SERIES':
+            self.newGame()
+
+        elif msg == 'WM_QUIT':
+            pass
+
+        elif msg == 'WM_UPDATE_TRAINING':
+            self.updateTraining();
+
+        elif msg == 'WM_UPDATE_SHOW':
+            pass
+
+        else:
+            # если не обработали здесь то вызываем fwWindow.sendMessage
+            super().sendMessage(msg, param1, param2)

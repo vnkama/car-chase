@@ -168,11 +168,6 @@ class ToolWnd(fwWindow):
         elif msg == 'WM_GET_TRAINING_PROPS':
             self.getTrainingProps(param1)
 
-        # elif msg == 'WM_NEW_SERIES':
-        #     self.newSeries()
-
-        # elif msg == 'WM_PLAY':
-        #     self.play()
 
         elif msg == 'WM_PAUSE':
             self.pause()

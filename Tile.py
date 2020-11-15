@@ -51,8 +51,7 @@ class Tree(pg.sprite.Sprite):
         self.rect.top = self.map_rect.top - camera_rect.top
 
 
-    # def copyImg(dest_srf,dest_rect):
-    #     dest_srf.blit(Tree.surfaceImg,dest_rect)
+
 
 
 class Oil(pg.sprite.Sprite):
@@ -89,22 +88,19 @@ class Rock(pg.sprite.Sprite):
 
     image = pg.image.load("./images/rock2.png").convert_alpha()
 
-    def __init__(self,x,y,groups):
+
+    def __init__(self, x, y, groups):
         super().__init__(groups)
 
         # self.map_rect координаты првязанные к карте, они неизменны (для неподвижных спрайтов)
         # self.rect координаты привязанные к камере, они пересчитываются при скроллинге карты
 
-        self.dy = 3
+        self.dy = None
+        self.map_rect = None
+        self.rect = None
 
-        self.map_rect = pg.Rect(
-            x-Tree.SPRITE_SIZE_X/2,
-            y-Tree.SPRITE_SIZE_Y/2,
-            Tree.SPRITE_SIZE_X,
-            Tree.SPRITE_SIZE_Y
-        )
+        self.setPos(x, y)
 
-        self.rect = self.map_rect.copy()
 
 
     def updateCamera(self, camera_rect):
@@ -121,6 +117,17 @@ class Rock(pg.sprite.Sprite):
         self.map_rect.top = self.map_rect.top + self.dy
 
 
+    def setPos(self, x, y):
+        self.map_rect = pg.Rect(
+            x-Tree.SPRITE_SIZE_X/2,
+            y-Tree.SPRITE_SIZE_Y/2,
+            Tree.SPRITE_SIZE_X,
+            Tree.SPRITE_SIZE_Y
+        )
+
+        self.rect = self.map_rect.copy()
+
+        self.dy = 3
 
 #
 #

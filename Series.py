@@ -34,7 +34,7 @@ class Series(fwWindow):
 
         arrangement_arr = {
             'Car': {
-                'x': 100,
+                'x': 0,
                 'y': 300,
             },
         }
@@ -77,6 +77,7 @@ class Series(fwWindow):
 
 
     def updateTraining(self):
+
         self.Map_wnd.updateTraining()
 
     def updateShow(self):

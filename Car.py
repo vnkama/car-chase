@@ -79,7 +79,7 @@ class Car(pg.sprite.Sprite):
 
         self.message = message
 
-        self.velocity = 15.0                # сколоксть начальная
+        self.velocity = 10.0                # сколоксть начальная
 
 
 
@@ -96,7 +96,7 @@ class Car(pg.sprite.Sprite):
 
         self.K_friction = 0          # коефициент торможения (об воздузх :)       #
 
-        self.course_nd2 = nd2_getMatrix((0.8, 0.2))  # матрица курса
+        self.course_nd2 = nd2_getMatrix((0.8, 0.0))  # матрица курса
 
 
         self.speering_wheel_alfa = 0.0          # положение руля     0-прямой
@@ -186,6 +186,7 @@ class Car(pg.sprite.Sprite):
 
     def update(self, *args):
 
+
         if args[0] == 1:    # 1 - training
             self.update_movement()
             self.update_sensors()
@@ -196,9 +197,11 @@ class Car(pg.sprite.Sprite):
 
 
     def update_movement(self):
+        # print('Car.update_movement')
 
-        # пересчитаем скорость print
-        dts = self.map.dt / 1000
+
+        # пересчитаем скорость
+        dts = self.map.dt
 
         ###################
 
