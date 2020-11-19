@@ -39,7 +39,7 @@ TRAINING_PAUSE_HANDLE_EVENTS_FPS = 60
 TRAINING_PAUSE_UPDATE_FPS = 1000            # update на данный момент не вызывается на паузе
 TRAINING_PAUSE_DRAW_FPS = 60
 
-TRAINING_PLAY_HANDLE_EVENTS_FPS = 30
+TRAINING_PLAY_HANDLE_EVENTS_FPS = 60
 # TRAINING_PLAY_UPDATE_FPS = 60             #
 # TRAINING_PLAY_DRAW_FPS = 60               # fps берется с select
 
@@ -57,17 +57,11 @@ SHOW_PLAY_DRAW_FPS = 60                     # base
 
 
 
-#UPDATE_HZ = 60 #
 
 #интервал пересчета UPDATE, внутриигровое время (механика)
 
 
-# сколько FPS при обучении
-#PAUSE_UPDATE_FPS            = 60
-
-
 TRAINING_UPDATE_GTIME_FPS         = 60
-# TRAINING_UPDATE_DT_GTAME_MS_F     = 1000 / 60
 
 # количнсвтво партий в поколении
 PARTY_COUNT_IN_GENE = 5
