@@ -24,17 +24,17 @@ class Car(pg.sprite.Sprite):
 
 
     # скорость машины - 1
-    # положение руля - 1
+    # текущее положение руля - 1
     # сенсоры - SENSORS_COUNT = 5
-    # поставим 7
-    NN_INPUTS_COUNT = 7
+    # итого входов : 7
+    NN_INPUTS_COUNT = SENSORS_COUNT + 2
 
     # выходы SPEERING - воздействие на руль !!! не положение на руль а воздействие на него,
     # ACCELERATOR / BRAKE - газ /тормоз
     # итого 2 выхода
     NN_OUTPUTS_COUNT = 2
 
-    NN_HIDDEN_LAYERS_SIZE = [5,4]    # скрытые слои нейросети
+    NN_HIDDEN_LAYERS_SIZE = [5, 4]    # скрытые слои нейросети
 
 
 
@@ -142,7 +142,7 @@ class Car(pg.sprite.Sprite):
         # NN_structure имеет вид [20,10,5,2]
         # 20 - число входов, 2 число выходов, 10, 5 скрытые слои
 
-        self.network = FeedForwardNetwork(NN_structure)
+        self.NN = FeedForwardNetwork(NN_structure)
 
 
     def init_sensors(self):
@@ -157,7 +157,7 @@ class Car(pg.sprite.Sprite):
         ]
 
         # значения сенсоров - 0.0
-        self.arr_sensors_value = np.zeros(5, float)
+        self.arr_sensors_value = np.zeros(shape=(Car.SENSORS_COUNT, 1), dtype=float)
 
         # координаты относительно машины (константа), при курсе 0
         self.arr_sensors_car_pos = np.empty(shape=[Car.SENSORS_COUNT], dtype=object, )
@@ -235,6 +235,17 @@ class Car(pg.sprite.Sprite):
     def update_movement(self):
         # print('Car.update_movement')
 
+        # формируем входные данне на нйеросеть
+        # X = np.zeros(NN_INPUT_COUNTS)
+
+        X = np.hstack((
+                self.arr_sensors_value,         # сенсоры
+                [self.velocity],                # скорость
+                [self.speering_wheel_alfa],     # положение руля
+        ))
+
+        (is_engine_on_f, self.speering_direction) = self.NN.feed_forward(X)
+        self.is_engine_on = bool(is_engine_on_f)
 
         # пересчитаем скорость
         dts = self.map.dt
@@ -243,7 +254,7 @@ class Car(pg.sprite.Sprite):
 
 
         # положение руля
-        self.speering_wheel_alfa += self.speering_direction*self.SPEERING_DV * dts
+        self.speering_wheel_alfa += self.speering_direction * self.SPEERING_DV * dts
 
         # ограничим диапазон вращения руля
         self.speering_wheel_alfa = max(-self.MAX_SPEERING,min(self.speering_wheel_alfa, self.MAX_SPEERING))
@@ -253,8 +264,6 @@ class Car(pg.sprite.Sprite):
         # ускорения
         # вектор ускорения совпадает с направлением машины
         engine_dv = self.engine_acceleration_dv if self.is_engine_on else 0
-
-
 
         abs_velocity = abs(self.velocity)
 
@@ -520,7 +529,7 @@ class Car(pg.sprite.Sprite):
 
             self.arr_sensors_value[sensor_i] = arr_sensor_len_f[sensor_i]
 
-        # for sensor_i ....
+        # end for sensor_i ....
 
 
         sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])

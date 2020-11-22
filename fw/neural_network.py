@@ -24,8 +24,8 @@ class FeedForwardNetwork:
 
         self.params = {}
         self.layer_nodes = layer_nodes
-        self.hidden_activation = hidden_activation
-        self.output_activation = output_activation
+        self.hidden_activation = get_activation_by_name(hidden_activation)
+        self.output_activation = get_activation_by_name(output_activation)
         self.inputs = None
         self.out = None
 
@@ -34,6 +34,7 @@ class FeedForwardNetwork:
         # Initialize weights and bias
         for l in range(1, len(self.layer_nodes)):
             if init_method == 'uniform':
+                # генерим связи случайным образом
                 self.params['W' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], self.layer_nodes[l-1]))
                 self.params['b' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], 1))
             
@@ -43,9 +44,11 @@ class FeedForwardNetwork:
             self.params['A' + str(l)] = None
         
         
-    def feed_forward(self, X: np.ndarray) -> np.ndarray:
-        A_prev = X
-        L = len(self.layer_nodes) - 1  # len(self.params) // 2
+    def feed_forward(self, X_arr):
+        # X_arr массив входных данных
+        A_prev = X_arr
+
+        L = len(self.layer_nodes) - 1       # len(self.params) // 2
 
         # Feed hidden layers
         for l in range(1, L):
