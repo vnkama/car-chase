@@ -54,7 +54,8 @@ class FeedForwardNetwork:
         for l in range(1, L):
             W = self.params['W' + str(l)]
             b = self.params['b' + str(l)]
-            Z = np.dot(W, A_prev) + b
+            dot = np.dot(W, A_prev)
+            Z = dot + b
             A_prev = self.hidden_activation(Z)
             self.params['A' + str(l)] = A_prev
 
@@ -65,13 +66,13 @@ class FeedForwardNetwork:
         out = self.output_activation(Z)
         self.params['A' + str(L)] = out
 
-        self.out = out
-        return out
+        self.out = out.reshape(len(out))
+        return self.out
 
     # def softmax(self, X: np.ndarray) -> np.ndarray:
     #     return np.exp(X) / np.sum(np.exp(X), axis=0)
 
-def get_activation_by_name(name: str) -> ActivationFunction:
+def get_activation_by_name(name: str):
     activations = [('relu', relu),
                    ('sigmoid', sigmoid),
                    ('linear', linear),

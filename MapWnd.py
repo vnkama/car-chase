@@ -424,7 +424,7 @@ class MapWnd(fwWindow):
 
     def draw(self):
         self.Tool_wnd.sendMessage("WM_SET_TICKS", self.training_update_step)
-
+        self.arr_cars[0].printValues()
 
         # c = self.arr_cars[0]
 

@@ -77,7 +77,7 @@ class fwWindow:
 
         self.text = params.get('text',None)
         self.name = params.get('name',None)
-
+        self.font_name = params.get('font', THEME_FONT)
 
 
     #

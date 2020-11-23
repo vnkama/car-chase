@@ -8,10 +8,13 @@ from Brezenhem import Brezenhem
 from fw.neural_network import FeedForwardNetwork
 import numpy as np
 
+
+
 #
 #
 #
 class Car(pg.sprite.Sprite):
+
     CAR_RED = 2
     CAR_GREEN = 1
 
@@ -244,7 +247,14 @@ class Car(pg.sprite.Sprite):
                 [self.speering_wheel_alfa],     # положение руля
         ))
 
+        # в NN нужен формат именно (7,1) а не (7,)
+        X = X.reshape(len(X), 1)
+
         (is_engine_on_f, self.speering_direction) = self.NN.feed_forward(X)
+
+        # PRINT
+        self.printNNValues(is_engine_on_f, self.speering_direction)
+
         self.is_engine_on = bool(is_engine_on_f)
 
         # пересчитаем скорость
@@ -532,8 +542,29 @@ class Car(pg.sprite.Sprite):
         # end for sensor_i ....
 
 
-        sss = str(test[0]) + ' ' + str(test[1]) + ' ' + str(test[2]) + ' ' + str(test[3]) + ' ' + str(test[4])
-        self.message.sendMessage("WM_SET_PARAM_1", f"{sss}" )
+    def printValues(self):
+        out = {}
+        out['sensors'] = '{:4.0f} {:4.0f} {:4.0f} {:4.0f} {:4.0f}'.format(
+            self.arr_sensors_value[0],
+            self.arr_sensors_value[1],
+            self.arr_sensors_value[2],
+            self.arr_sensors_value[3],
+            self.arr_sensors_value[4],
+        )
+
+        out['speed'] = '{:4.1f}'.format(self.velocity)
+        out['speering'] = '{:5.3f}'.format(self.speering_wheel_alfa)
+
+
+        self.message.sendMessage("WM_SET_PARAM_1", out )
+
+    def printNNValues(self,is_engine_on_f, speering_direction):
+        out = {
+            '' : is_engine_on_f,
+            '': is_engine_on_f,
+
+        }
+        self.message.sendMessage("WM_SET_PARAM_2", out )
 
 
     def draw_sensors(self):

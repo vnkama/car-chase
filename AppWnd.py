@@ -80,7 +80,8 @@ class AppWnd(fwWindow):
 
         self.setFonts({
              # индекс строго в нижнем регистре
-             'arial_16': pg.font.SysFont('Arial', 16),
+            'arial_14': pg.font.SysFont('Arial', 14),
+            'arial_16': pg.font.SysFont('Arial', 16),
              'arial_20': pg.font.SysFont('Arial', 20),
              'tahoma_20': pg.font.SysFont('Tahoma', 20),
         })
