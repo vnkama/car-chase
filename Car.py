@@ -101,27 +101,28 @@ class Car(pg.sprite.Sprite):
 
         self.message = message
 
-        self.velocity = 10.0                # сколоксть начальная
+        self.engine_power = 0               # выдается нейросетью, -100..100,
+                                            # минус - задний ход, плюс - передний
 
-
-
-        self.max_velocity = 100.0          # максимальная скорость пиксель в секунду
+        self.speed = 10.0                   # скороксть начальная
+        self.max_speed = 100.0              # максимальная скорость пиксель в секунду
 
         self.CAR_LEN = 70                   # длинна машины, точнее расстояние между осями
 
         self.is_engine_on = 0
-        self.engine_acceleration_dv = 10.0   # разгон под двигателем
+        self.engine_acceleration_dv = 10.0  # разгон под двигателем
 
         self.is_braking_on = 0
         self.K_braking = 0.4
 
 
-        self.K_friction = 0          # коефициент торможения (об воздузх :)       #
+        self.K_air_friction = 0                 # коефициент торможения (об воздух :)       #
 
         self.course_nd2 = nd2_getMatrix((0.8, 0.0))  # матрица курса
 
+        self.speering_angle_want = 0            # положение руля желаемое. (задается нейросетью)
+        self.speering_angle = 0                 # положение руля фактическое
 
-        self.speering_wheel_alfa = 0.0          # положение руля     0-прямой
 
         self.speering_direction = 0     # -1 0 1 куда крутим руль
         self.MAX_SPEERING = grad2rad(30)           # максимальное отклонение руля
@@ -242,20 +243,19 @@ class Car(pg.sprite.Sprite):
         # X = np.zeros(NN_INPUT_COUNTS)
 
         X = np.hstack((
-                self.arr_sensors_value,         # сенсоры
-                [self.velocity],                # скорость
-                [self.speering_wheel_alfa],     # положение руля
+                self.arr_sensors_value,    # сенсоры
+                [self.speed],              # скорость
+                [self.speering_angle],     # положение руля
         ))
 
         # в NN нужен формат именно (7,1) а не (7,)
         X = X.reshape(len(X), 1)
 
-        (is_engine_on_f, self.speering_direction) = self.NN.feed_forward(X)
+        (self.engine_power, self.speering_angle_want) = self.NN.feed_forward(X)
 
         # PRINT
-        self.printNNValues(is_engine_on_f, self.speering_direction)
+        self.printNNValues()
 
-        self.is_engine_on = bool(is_engine_on_f)
 
         # пересчитаем скорость
         dts = self.map.dt
@@ -263,54 +263,69 @@ class Car(pg.sprite.Sprite):
         ###################
 
 
-        # положение руля
-        self.speering_wheel_alfa += self.speering_direction * self.SPEERING_DV * dts
+        # пересчитаем положение руля
+
+        # разница между желаемым и реальным положением руля, с учетом знака
+        delta_angle = self.speering_angle_want - self.speering_angle
+
+        # на какой угол сколько можем повернуть руль за один кадр (без знака)
+        speering_rotate_angle = self.SPEERING_DV * dts
+
+
+        if abs(delta_angle) < speering_rotate_angle:
+            # нужно довернуть на минимальный угол
+            self.speering_angle = self.speering_angle_want
+
+        else:
+            self.speering_angle += speering_rotate_angle * np.sign(delta_angle)
+
 
         # ограничим диапазон вращения руля
-        self.speering_wheel_alfa = max(-self.MAX_SPEERING,min(self.speering_wheel_alfa, self.MAX_SPEERING))
+        self.speering_angle = max(-self.MAX_SPEERING, min(self.speering_angle, self.MAX_SPEERING))
 
 
 
         # ускорения
         # вектор ускорения совпадает с направлением машины
-        engine_dv = self.engine_acceleration_dv if self.is_engine_on else 0
+        # engine_dv = self.engine_acceleration_dv if self.is_engine_on else 0
+        engine_dv = self.engine_power
 
-        abs_velocity = abs(self.velocity)
+        abs_speed = abs(self.speed)
 
 
-        abs_friction_dv = abs_velocity if (abs_velocity < 0.2) else (abs_velocity * self.K_friction)
-        friction_dv = math.copysign(abs_friction_dv,-1 if self.velocity >= 0 else 1) # знак наоборот
+        abs_friction_dv = abs_speed if (abs_speed < 0.2) else (abs_speed * self.K_air_friction)
+        friction_dv = math.copysign(abs_friction_dv,-1 if self.speed >= 0 else 1) # знак наоборот
 
-        if self.is_braking_on:
-            abs_braking_dv = abs_velocity if (abs_velocity < 0.9) else (abs_velocity * self.K_braking)
-            braking_dv = math.copysign(abs_braking_dv,-1 if self.velocity >= 0 else 1)      # знак наоборот
-        else:
-            braking_dv = 0
+        # торможения пока нет
+        # if self.is_braking_on:
+        #     abs_braking_dv = abs_speed if (abs_speed < 0.9) else (abs_speed * self.K_braking)
+        #     braking_dv = math.copysign(abs_braking_dv,-1 if self.speed >= 0 else 1)      # знак наоборот
+        # else:
+        #     braking_dv = 0
 
         # прирост скорости (скаляр)
-        dv = (engine_dv + braking_dv + friction_dv) * dts
+        # dv = (engine_dv + braking_dv + friction_dv) * dts
+        dv = (engine_dv + friction_dv) * dts
 
         # новая скорость (скаляр)
-        self.velocity = max(-self.max_velocity,min(self.max_velocity, self.velocity+dv))
+        self.speed = max(-self.max_speed, min(self.max_speed, self.speed + dv))
 
 
 
 
-
-
-        if abs(self.speering_wheel_alfa) > 0.001:
+        if abs(self.speering_angle) > 0.001:
             # движение по дуге
 
             # радиус поворота, скаляр
             # берем положительное значение тк скаляр
-            R_turn = self.CAR_LEN / math.tan(abs(self.speering_wheel_alfa))
+            R_turn = self.CAR_LEN / math.tan(abs(self.speering_angle))
 
             # положение заднего колеса (оно идет по дуге поворота)
             back_wheel_nd2 = nd2_getScaleMatrix(self.CAR_LEN/2) @ (nd2_getRotateMatrix180() @ self.course_nd2)
 
             # вектор от заднего колеса на центр дуги , по которй едет машина
             # вектор перпендикулярен курсу машины
-            if self.speering_wheel_alfa > 0:
+            if self.speering_angle > 0:
                 R_turn_back_nd2 =  nd2_getScaleMatrix(R_turn) @ (nd2_getRotateMatrixRight90() @ self.course_nd2)
             else:
                 R_turn_back_nd2 =  nd2_getScaleMatrix(R_turn) @ (nd2_getRotateMatrixLeft90() @ self.course_nd2)
@@ -321,7 +336,7 @@ class Car(pg.sprite.Sprite):
 
 
             # угловой пробег (скаляр). (угол из центра вращения (centr_turn_nd2) на машину в начале и конце шага
-            d_alfa = math.copysign((self.velocity * dts) / R_turn,self.speering_wheel_alfa)
+            d_alfa = math.copysign((self.speed * dts) / R_turn,self.speering_angle)
 
             # матрица поворота
             rotateMatrix_nd2 = nd2_getRotateMatrix(d_alfa)
@@ -332,7 +347,7 @@ class Car(pg.sprite.Sprite):
 
         else:
             # движение по прямой
-            self.map_pos_nd2 = self.map_pos_nd2 + (self.velocity * dts) * self.course_nd2
+            self.map_pos_nd2 = self.map_pos_nd2 + (self.speed * dts) * self.course_nd2
             # print(self.map_pos_nd2)
 
         self.setDirectionImage2()
@@ -384,7 +399,6 @@ class Car(pg.sprite.Sprite):
 
 
 
-
         ######################################################
 
         # составим спсико спрайтов краев дороги, которые попадают (втч частично) в arr_sensors_irect
@@ -395,7 +409,6 @@ class Car(pg.sprite.Sprite):
         for sprite_curb in self.map.arr_sprites_curbs:
             if arr_sensors_irect.colliderect(sprite_curb.map_rect):
                 lst_curbs_4_all_sensors.append(sprite_curb)
-
 
 
 
@@ -552,19 +565,17 @@ class Car(pg.sprite.Sprite):
             self.arr_sensors_value[4],
         )
 
-        out['speed'] = '{:4.1f}'.format(self.velocity)
-        out['speering'] = '{:5.3f}'.format(self.speering_wheel_alfa)
+        out['speed'] = '{:4.1f}'.format(self.speed)
+        out['speering'] = '{:5.3f}'.format(self.speering_angle)
 
 
         self.message.sendMessage("WM_SET_PARAM_1", out )
 
-    def printNNValues(self,is_engine_on_f, speering_direction):
-        out = {
-            '' : is_engine_on_f,
-            '': is_engine_on_f,
-
-        }
-        self.message.sendMessage("WM_SET_PARAM_2", out )
+    def printNNValues(self):
+        self.message.sendMessage("WM_SET_NN_OUT", {
+            'engine_power' : self.engine_power,
+            'speering_want': self.speering_angle_want,
+        });
 
 
     def draw_sensors(self):

@@ -134,14 +134,14 @@ class ToolWnd(fwWindow):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(8, 300, 100, 32),
+            'rect': pg.Rect(8, 290, 100, 32),
             'text': 'ticks:',
         }))
 
 
         self.lbl_ticks = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(80, 300, 100, 32),
+            'rect': pg.Rect(80, 290, 100, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_ticks)
@@ -150,46 +150,81 @@ class ToolWnd(fwWindow):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(8, 330, 100, 32),
+            'rect': pg.Rect(8, 320, 100, 32),
             'text': 'Party:',
         }))
 
         self.lbl_party = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(80, 330, 100, 32),
+            'rect': pg.Rect(80, 320, 100, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_party)
 
         ############################################
+        ############################################
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
             'rect': pg.Rect(8, 360, 60, 32),
-            'text': 'Speed:',
+            'text': 'Power:',
         }))
 
-        self.lbl_speed = GuiLabel({
+        self.lbl_power = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(80, 360, 200, 32),
+            'rect': pg.Rect(78, 360, 40, 32),
             'text': '0',
         })
-        self.addChildWnd(self.lbl_speed)
+        self.addChildWnd(self.lbl_power)
+
 
         ############################################
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(8, 390, 90, 32),
-            'text': 'Speering:',
+            'rect': pg.Rect(130, 360, 60, 32),
+            'text': 'Speed:',
         }))
 
-        self.lbl_speering = GuiLabel({
+        self.lbl_speed = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(90, 390, 200, 32),
+            'rect': pg.Rect(208, 360, 40, 32),
             'text': '0',
         })
-        self.addChildWnd(self.lbl_speering)
+        self.addChildWnd(self.lbl_speed)
+
+
+
+        ############################################
+
+        self.addChildWnd(GuiLabel({
+            'parent_wnd': self,
+            'rect': pg.Rect(8, 390, 60, 32),
+            'text': 'Speering_wat:',
+        }))
+
+        self.lbl_speering_want = GuiLabel({
+            'parent_wnd': self,
+            'rect': pg.Rect(78, 390, 40, 32),
+            'text': '0',
+        })
+        self.addChildWnd(self.lbl_speering_want)
+
+        ############################################
+
+        self.addChildWnd(GuiLabel({
+            'parent_wnd': self,
+            'rect': pg.Rect(130, 390, 60, 32),
+            'text': 'Speering_wat:',
+        }))
+
+        self.lbl_speering_fact = GuiLabel({
+            'parent_wnd': self,
+            'rect': pg.Rect(208, 390, 40, 32),
+            'text': '0',
+        })
+        self.addChildWnd(self.lbl_speering_fact)
+
 
         ############################################
 
@@ -227,7 +262,11 @@ class ToolWnd(fwWindow):
         elif msg == 'WM_SET_PARAM_1':
             self.lbl_sensors.setText(param1['sensors'])
             self.lbl_speed.setText(param1['speed'])
-            self.lbl_speering.setText(param1['speering'])
+            self.lbl_speering_fact.setText(param1['speering'])
+
+        elif msg == 'WM_SET_NN_OUT':
+            self.lbl_power.setText(param1['engine_power'])
+            self.lbl_speering_want.setText(param1['speering_want'])
 
 
         elif msg == 'WM_SET_TICKS':
