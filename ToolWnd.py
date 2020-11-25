@@ -95,7 +95,7 @@ class ToolWnd(fwWindow):
             'rect': pg.Rect(65, 150, 80, 22),
         }))
 
-        self.selectTrainingUpdateSpeed.setSelectedItemByText('x10')
+        self.selectTrainingUpdateSpeed.setSelectedItemByText('x1')
 
         ##########
 
@@ -346,6 +346,7 @@ class ToolWnd(fwWindow):
     def newSeries(self):
         self.btnNew.disable()
         self.btnPause.disable()
+        self.btnPlay.enable()
 
 
     def play(self):

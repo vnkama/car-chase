@@ -388,7 +388,7 @@ class MapWnd(fwWindow):
                 self.Tool_wnd)
         )
 
-        self.arr_rocks[0].setPos(600, 400)
+        self.arr_rocks[0].setPos(200, 400)
 
         self.arr_cars[0].update_sensors()
         self.updateCamera()
@@ -398,8 +398,13 @@ class MapWnd(fwWindow):
 
     def updateTraining(self):
         self.training_update_step += 1
-
         self.arr_sprites_update.update(1)       # 1 - training
+
+        if self.training_update_step >= 600:
+            # время истекло
+            pass
+
+
         self.updateCamera()
 
 
@@ -445,15 +450,15 @@ class MapWnd(fwWindow):
         self.arr_sprites_draw.draw(self.surface)
 
         # столкновение машины с краем дороги
-        sprite_lst = pg.sprite.spritecollide(
-            self.arr_cars[0],           # машину сталикиваем
-            self.arr_sprites_curbs,      #с краями дороги
-            False,
-            pg.sprite.collide_mask
-        )
-
-        if sprite_lst:
-            print("TOUCH !!")
+        # sprite_lst = pg.sprite.spritecollide(
+        #     self.arr_cars[0],           # машину сталикиваем
+        #     self.arr_sprites_curbs,      #с краями дороги
+        #     False,
+        #     pg.sprite.collide_mask
+        # )
+        #
+        # if sprite_lst:
+        #     print("TOUCH 11 !!")
 
         # sprite_lst = pg.sprite.spritecollide(
         #     self.arr_cars[0],           # машину сталикиваем
@@ -480,7 +485,7 @@ class MapWnd(fwWindow):
         )
 
         if sprite_lst:
-            print("TOUCH !!")
+            print("TOUCH 22 !!")
             return True
 
         return False

@@ -104,19 +104,19 @@ class Car(pg.sprite.Sprite):
         self.engine_power = 0               # выдается нейросетью, -100..100,
                                             # минус - задний ход, плюс - передний
 
-        self.speed = 10.0                   # скороксть начальная
-        self.max_speed = 100.0              # максимальная скорость пиксель в секунду
+        self.speed = 20.0                   # скороксть начальная
+        self.max_speed = 300.0              # максимальная скорость пиксель в секунду
 
         self.CAR_LEN = 70                   # длинна машины, точнее расстояние между осями
 
-        self.is_engine_on = 0
-        self.engine_acceleration_dv = 10.0  # разгон под двигателем
+        # self.is_engine_on = 0
+        # self.engine_acceleration_dv = 10.0  # разгон под двигателем
 
         self.is_braking_on = 0
         self.K_braking = 0.4
 
 
-        self.K_air_friction = 0                 # коефициент торможения (об воздух :)       #
+        self.K_air_friction = 0.005                 # коефициент торможения (об воздух :)       #
 
         self.course_nd2 = nd2_getMatrix((0.8, 0.0))  # матрица курса
 
@@ -248,10 +248,16 @@ class Car(pg.sprite.Sprite):
                 [self.speering_angle],     # положение руля
         ))
 
-        # в NN нужен формат именно (7,1) а не (7,)
+        # в NN передаем X в формате именно (7,1) а не (7,)
         X = X.reshape(len(X), 1)
 
         (self.engine_power, self.speering_angle_want) = self.NN.feed_forward(X)
+
+        self.speering_angle_want = 0
+
+        # ограничим мощность
+        self.engine_power = max(-200, min(200, self.engine_power))
+
 
         # PRINT
         self.printNNValues()
@@ -292,11 +298,10 @@ class Car(pg.sprite.Sprite):
 
         abs_speed = abs(self.speed)
 
+        abs_friction_dv = min(abs_speed, max(0.1, abs_speed ** 2 * self.K_air_friction))
+        friction_dv = -abs_friction_dv if self.speed >= 0 else abs_friction_dv
 
-        abs_friction_dv = abs_speed if (abs_speed < 0.2) else (abs_speed * self.K_air_friction)
-        friction_dv = math.copysign(abs_friction_dv,-1 if self.speed >= 0 else 1) # знак наоборот
-
-        # торможения пока нет
+        # тормоза пока нет
         # if self.is_braking_on:
         #     abs_braking_dv = abs_speed if (abs_speed < 0.9) else (abs_speed * self.K_braking)
         #     braking_dv = math.copysign(abs_braking_dv,-1 if self.speed >= 0 else 1)      # знак наоборот
@@ -305,6 +310,7 @@ class Car(pg.sprite.Sprite):
 
         # прирост скорости (скаляр)
         # dv = (engine_dv + braking_dv + friction_dv) * dts
+
         dv = (engine_dv + friction_dv) * dts
 
         # новая скорость (скаляр)

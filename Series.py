@@ -43,7 +43,7 @@ class Series(fwWindow):
 
         arrangement_arr = {
             'Car': {
-                'x': 0,
+                'x': 100,
                 'y': 300,
             },
         }
@@ -54,16 +54,17 @@ class Series(fwWindow):
 
 
     def updateTraining(self):
-
         self.Map_wnd.updateTraining()
+
 
     def updateShow(self):
         self.Map_wnd.updateShow()
 
+
     def draw(self):
         self.Map_wnd.draw()
 
-        if self.Map_wnd.testOffRoad():
+        if self.Map_wnd.testOffRoad() or 0:
             #съехали с дороги
             # конец Party
             self.endParty()
