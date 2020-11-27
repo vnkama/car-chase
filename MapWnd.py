@@ -30,11 +30,9 @@ class MapWnd(fwWindow):
         # когда трайнинг не идет переменная тоже стоит
         # при инициации начального положения training_step = 0
         # в начале расчета 1го перемещения training_step ставится в  1
-        self.training_update_step = None
         self.training_update_gtime_sec_f = None
 
 
-        self.training_update_step = None
 
         # время ticks последнего или текущего вызова update, считается с 0
         # 0 - начало игры, 60 сек - внутриигровая минута.
@@ -368,7 +366,7 @@ class MapWnd(fwWindow):
 
         # начало новой игры (нажата кнопка new или программа только что запущена)
 
-        self.training_update_step = 0
+        # self.training_update_step = 0
         # self.training_update_step = 60 соответствует self.training_update_gtime_ms_f = 1000.0
         # применяется для расчета втч физики
 
@@ -397,12 +395,8 @@ class MapWnd(fwWindow):
 
 
     def updateTraining(self):
-        self.training_update_step += 1
+        # self.training_update_step += 1
         self.arr_sprites_update.update(1)       # 1 - training
-
-        if self.training_update_step >= 600:
-            # время истекло
-            pass
 
 
         self.updateCamera()
@@ -428,7 +422,6 @@ class MapWnd(fwWindow):
 
 
     def draw(self):
-        self.Tool_wnd.sendMessage("WM_SET_TICKS", self.training_update_step)
         self.arr_cars[0].printValues()
 
         # c = self.arr_cars[0]

@@ -104,7 +104,7 @@ class Car(pg.sprite.Sprite):
         self.engine_power = 0               # выдается нейросетью, -100..100,
                                             # минус - задний ход, плюс - передний
 
-        self.speed = 20.0                   # скороксть начальная
+        self.speed = 30.0                   # скороксть начальная
         self.max_speed = 300.0              # максимальная скорость пиксель в секунду
 
         self.CAR_LEN = 70                   # длинна машины, точнее расстояние между осями
@@ -253,7 +253,7 @@ class Car(pg.sprite.Sprite):
 
         (self.engine_power, self.speering_angle_want) = self.NN.feed_forward(X)
 
-        self.speering_angle_want = 0
+        #self.speering_angle_want = 0.5
 
         # ограничим мощность
         self.engine_power = max(-200, min(200, self.engine_power))

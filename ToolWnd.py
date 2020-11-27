@@ -200,7 +200,7 @@ class ToolWnd(fwWindow):
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
             'rect': pg.Rect(8, 390, 60, 32),
-            'text': 'Speering_wat:',
+            'text': 'Speering_w:',
         }))
 
         self.lbl_speering_want = GuiLabel({
@@ -215,7 +215,7 @@ class ToolWnd(fwWindow):
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
             'rect': pg.Rect(130, 390, 60, 32),
-            'text': 'Speering_wat:',
+            'text': 'Speering_f:',
         }))
 
         self.lbl_speering_fact = GuiLabel({

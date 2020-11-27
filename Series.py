@@ -14,6 +14,9 @@ class Series(fwWindow):
         self.generation_num = None
         self.party_num = None
 
+        # номер шага обучения (1-based)
+        # когда трайнинг не идет переменная тоже стоит
+        self.frames = None
 
 
         self.Tool_wnd = params['Tool_wnd']
@@ -48,13 +51,22 @@ class Series(fwWindow):
             },
         }
 
+        self.frames = 0
         self.Map_wnd.reset(arrangement_arr)
         self.Tool_wnd.sendMessage('WM_SET_PARTY', self.party_num)
 
 
 
     def updateTraining(self):
+        self.frames += 1
+        self.Tool_wnd.sendMessage("WM_SET_TICKS", self.frames)
+
         self.Map_wnd.updateTraining()
+
+        if self.frames >= 1000 or self.Map_wnd.testOffRoad():
+            # время истекло
+            self.endParty()
+
 
 
     def updateShow(self):
@@ -64,10 +76,10 @@ class Series(fwWindow):
     def draw(self):
         self.Map_wnd.draw()
 
-        if self.Map_wnd.testOffRoad() or 0:
-            #съехали с дороги
-            # конец Party
-            self.endParty()
+        # if self.Map_wnd.testOffRoad() or 0:
+        #     #съехали с дороги
+        #     # конец Party
+        #     self.endParty()
 
     #
     #
@@ -76,7 +88,6 @@ class Series(fwWindow):
         if self.party_num < PARTY_COUNT_IN_GENE:
             # переходим к следующей партии
             self.newParty()
-
 
         else:
             # поколение завершено
