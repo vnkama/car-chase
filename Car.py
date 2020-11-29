@@ -10,6 +10,7 @@ import numpy as np
 
 
 
+
 #
 #
 #
@@ -63,6 +64,7 @@ class Car(pg.sprite.Sprite):
 
     def __init__(self, map, x, y, groups, message):
 
+
         self.arr_sensors_angles = None
         self.arr_sensors_car_pos = None
         self.arr_sensors_end_3mfdot = None
@@ -95,20 +97,21 @@ class Car(pg.sprite.Sprite):
         self.brezenhem = Brezenhem()
         self.is_moving = 0
         self.real_speed = 0
-        self.real_direction = 0  # реальное напраывление объекта направление для спрайта
-        self.rotate_direction = 0  # направление вращения 0 против часовой стрелки
-        self.need_direction = 0  # куда крутимся
+        self.real_direction = 0     # реальное напраывление объекта направление для спрайта
+        self.rotate_direction = 0   # направление вращения 0 против часовой стрелки
+        self.need_direction = 0     # куда крутимся
 
         self.message = message
 
         self.engine_power = 0               # выдается нейросетью, -100..100,
                                             # минус - задний ход, плюс - передний
 
-        self.speed = 30.0                   # скороксть начальная
+        self.speed = 0.0                   # скороксть начальная
         self.max_speed = 300.0              # максимальная скорость пиксель в секунду
 
         self.CAR_LEN = 70                   # длинна машины, точнее расстояние между осями
 
+        self.K_NN_engine_power = 100;
         # self.is_engine_on = 0
         # self.engine_acceleration_dv = 10.0  # разгон под двигателем
 
@@ -124,9 +127,9 @@ class Car(pg.sprite.Sprite):
         self.speering_angle = 0                 # положение руля фактическое
 
 
-        self.speering_direction = 0     # -1 0 1 куда крутим руль
-        self.MAX_SPEERING = grad2rad(30)           # максимальное отклонение руля
-        self.SPEERING_DV = grad2rad(12)   # изменение угла на руле за 1 сек
+        self.speering_direction = 0         # -1 0 1 куда крутим руль
+        self.MAX_SPEERING = grad2rad(30)    # максимальное отклонение руля
+        self.SPEERING_DV = grad2rad(12)     # изменение угла на руле за 1 сек
         self.MIN_SPEERING = grad2rad(1)     # минимальное отклонение руля, если меньше него то ставим на ноль
 
         self.init_sensors()
@@ -226,7 +229,6 @@ class Car(pg.sprite.Sprite):
 
     def update(self, *args):
 
-
         if args[0] == 1:    # 1 - training
             self.update_movement()
             self.update_sensors()
@@ -253,10 +255,13 @@ class Car(pg.sprite.Sprite):
 
         (self.engine_power, self.speering_angle_want) = self.NN.feed_forward(X)
 
-        #self.speering_angle_want = 0.5
+        self.engine_power *= self.K_NN_engine_power
+        print('{:12.3e}'.format(self.engine_power))
 
-        # ограничим мощность
-        self.engine_power = max(-200, min(200, self.engine_power))
+        # self.engine_power = max(0, min(200, self.engine_power))
+
+        self.speering_angle_want = (2 * self.speering_angle_want - 1) * self.MAX_SPEERING
+
 
 
         # PRINT

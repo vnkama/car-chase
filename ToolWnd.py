@@ -166,13 +166,13 @@ class ToolWnd(fwWindow):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(8, 360, 60, 32),
+            'rect': pg.Rect(8, 360, 50, 32),
             'text': 'Power:',
         }))
 
         self.lbl_power = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(78, 360, 40, 32),
+            'rect': pg.Rect(52, 360, 80, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_power)
@@ -199,13 +199,13 @@ class ToolWnd(fwWindow):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(8, 390, 60, 32),
-            'text': 'Speering_w:',
+            'rect': pg.Rect(8, 390, 50, 32),
+            'text': 'Speer w:',
         }))
 
         self.lbl_speering_want = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(78, 390, 40, 32),
+            'rect': pg.Rect(52, 390, 80, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_speering_want)
@@ -214,13 +214,13 @@ class ToolWnd(fwWindow):
 
         self.addChildWnd(GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(130, 390, 60, 32),
-            'text': 'Speering_f:',
+            'rect': pg.Rect(130, 390, 50, 32),
+            'text': 'Speer f:',
         }))
 
         self.lbl_speering_fact = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(208, 390, 40, 32),
+            'rect': pg.Rect(182, 390, 80, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_speering_fact)
@@ -265,8 +265,8 @@ class ToolWnd(fwWindow):
             self.lbl_speering_fact.setText(param1['speering'])
 
         elif msg == 'WM_SET_NN_OUT':
-            self.lbl_power.setText(param1['engine_power'])
-            self.lbl_speering_want.setText(param1['speering_want'])
+            self.lbl_power.setText('{:12.3e}'.format(param1['engine_power']))
+            self.lbl_speering_want.setText('{:12.3e}'.format(param1['speering_want']))
 
 
         elif msg == 'WM_SET_TICKS':

@@ -63,7 +63,7 @@ class Series(fwWindow):
 
         self.Map_wnd.updateTraining()
 
-        if self.frames >= 1000 or self.Map_wnd.testOffRoad():
+        if self.frames >= 600 or self.Map_wnd.testOffRoad():
             # время истекло
             self.endParty()
 

@@ -64,7 +64,7 @@ SHOW_PLAY_DRAW_FPS = 60                     # base
 TRAINING_UPDATE_GTIME_FPS         = 60
 
 # количнсвтво партий в поколении
-PARTY_COUNT_IN_GENE = 5
+PARTY_COUNT_IN_GENE = 10
 
 
 

@@ -16,10 +16,10 @@ class FeedForwardNetwork:
 
     def __init__(self,
                  layer_nodes,
-                 hidden_activation = 'relu',
+                 hidden_activation = 'sigmoid',
                  output_activation = 'sigmoid',
                  init_method = 'uniform',
-                 rnd_start_value = None
+                 rnd_start_value = 3000      # Число в интервале [0, 2**32]
     ):
 
         self.params = {}
