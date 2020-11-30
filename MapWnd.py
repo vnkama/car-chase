@@ -472,7 +472,7 @@ class MapWnd(fwWindow):
         # столкновение машины с краем дороги
         sprite_lst = pg.sprite.spritecollide(
             self.arr_cars[0],           # машину сталикиваем
-            self.arr_sprites_curbs,      #с краями дороги
+            self.arr_sprites_curbs,     #с краями дороги
             False,
             pg.sprite.collide_mask
         )
