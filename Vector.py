@@ -239,7 +239,7 @@ def d2_one():
     return [1,1]
 
 
-#детерминант матрицы
+# детерминант матрицы
 def d2_deterD2(a):
     return a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]
 
@@ -247,8 +247,6 @@ def signFloat(f):
     return (1 if (f > 1e-6) else (-1 if (f < -1e-6) else 0))
 
 
-#расстояние между двумя точками
-def d2_caclDistance2Points(p1,p2):
-    return math.sqrt(((p1[0]-p2[0]) ** 2) + ((p1[1]-p2[1]) ** 2))
-
-
+# расстояние между двумя точками
+def d2_caclDistance2Points(p1, p2):
+    return math.sqrt(((p1[0] - p2[0]) ** 2) + ((p1[1] - p2[1]) ** 2))

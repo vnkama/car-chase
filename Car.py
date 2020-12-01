@@ -62,6 +62,9 @@ class Car(pg.sprite.Sprite):
         arr_img_srf.insert(i, srf)
 
 
+    #
+    #
+    #
     def __init__(self, map, x, y, groups, message):
 
 
@@ -108,6 +111,8 @@ class Car(pg.sprite.Sprite):
 
         self.speed = 0.0                   # скороксть начальная
         self.max_speed = 300.0              # максимальная скорость пиксель в секунду
+
+        self.total_S = 0                    # пробег авто за всю party
 
         self.CAR_LEN = 70                   # длинна машины, точнее расстояние между осями
 
@@ -239,6 +244,7 @@ class Car(pg.sprite.Sprite):
 
 
     def update_movement(self):
+
         # print('Car.update_movement')
 
         # формируем входные данне на нйеросеть
@@ -256,7 +262,6 @@ class Car(pg.sprite.Sprite):
         (self.engine_power, self.speering_angle_want) = self.NN.feed_forward(X)
 
         self.engine_power *= self.K_NN_engine_power
-        print('{:12.3e}'.format(self.engine_power))
 
         # self.engine_power = max(0, min(200, self.engine_power))
 
@@ -347,11 +352,11 @@ class Car(pg.sprite.Sprite):
 
 
             # угловой пробег (скаляр). (угол из центра вращения (centr_turn_nd2) на машину в начале и конце шага
-            d_alfa = math.copysign((self.speed * dts) / R_turn,self.speering_angle)
+            d_alfa = math.copysign((self.speed * dts) / R_turn, self.speering_angle)
 
             # матрица поворота
             rotateMatrix_nd2 = nd2_getRotateMatrix(d_alfa)
-            self.map_pos_nd2 =  self.map_pos_nd2 + centr_turn_nd2 + rotateMatrix_nd2 @ nd2_getRotateMatrix180() @ centr_turn_nd2
+            self.map_pos_nd2 = self.map_pos_nd2 + centr_turn_nd2 + rotateMatrix_nd2 @ nd2_getRotateMatrix180() @ centr_turn_nd2
 
             # пересчитаем курс
             self.course_nd2 = nd2_normalize(rotateMatrix_nd2 @ self.course_nd2)
@@ -359,18 +364,41 @@ class Car(pg.sprite.Sprite):
         else:
             # движение по прямой
             self.map_pos_nd2 = self.map_pos_nd2 + (self.speed * dts) * self.course_nd2
-            # print(self.map_pos_nd2)
+
+        self.total_S += self.speed * dts
+
 
         self.setDirectionImage2()
 
         # новое положение
         self.map_rectpos.topleft = (int(self.map_pos_nd2[0]), int(self.map_pos_nd2[1]))
 
+
+
     def setDirectionImage2(self):
         angle = nd2_getAngle(self.course_nd2)
         rumb_angle = PI / 16        # = 2 * PI / 32
         direction  = (int((angle + rumb_angle / 2) / rumb_angle)) & 0x1F
         self.image = Car.arr_img_srf[direction]
+
+    #
+    # расчет фитнесс функции
+    #
+    def getFitness(self):
+        # self.map_pos_nd2      TRAINING_UPDATE_GTIME_FPS
+        cur_dist = 1e6
+        cur_i = None
+        for i, point in enumerate(self.map.arr_roadsections_axial_2idot):
+            dist = d2_caclDistance2Points(self.map_pos_nd2, point)
+            if dist < cur_dist:
+                cur_dist = dist
+                cur_i = i
+
+        return getFrames() + self.total_S * 100 + cur_i**2 * 100;
+
+
+    def getMediumSpeed(self):
+        return self.total_S * TRAINING_UPDATE_GTIME_FPS / getFrames()
 
 
     #
@@ -444,10 +472,10 @@ class Car(pg.sprite.Sprite):
 
         sensor_start_point_3mf = self.map_pos_nd2
 
-        # длинна сенсра фактическая (текущее найденная длинна, после обхода всех перечений сенсора здесь будет самое короткое значение )
+        # длинна сенсора текущая, на данный момент обхода
+        # после обхода всех перечений сенсора здесь будет самое короткое значение
         arr_sensor_len_f = np.full(shape=[Car.SENSORS_COUNT], dtype=float, fill_value=float(Car.SENSOR_MAX_LEN))
 
-        # arr_sensor_end_point_f2 = np.full(shape=(Car.SENSORS_COUNT, 2), fill_value=0, dtype=float)
 
 
 

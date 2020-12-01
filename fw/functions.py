@@ -37,6 +37,9 @@ def setMainWnd(main_wnd):
     global g_main_game
     g_main_game = main_wnd
 
+def getFrames():
+    return getAppWnd().Series.frames
+
 ########################################
 # def getControlWnd():
 #     global g_conrol_wnd

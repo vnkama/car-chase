@@ -13,6 +13,7 @@ class Series(fwWindow):
 
         self.generation_num = None
         self.party_num = None
+        self.car = None
 
         # номер шага обучения (1-based)
         # когда трайнинг не идет переменная тоже стоит
@@ -30,11 +31,13 @@ class Series(fwWindow):
         # self.addChildWnd(self.Map_wnd)
 
 
+
     def newSeries(self):
         print('newSeries')
         self.generation_num = 1
 
         self.party_num = None
+
 
         self.newParty()
 
@@ -51,9 +54,13 @@ class Series(fwWindow):
             },
         }
 
+
+
         self.frames = 0
         self.Map_wnd.reset(arrangement_arr)
         self.Tool_wnd.sendMessage('WM_SET_PARTY', self.party_num)
+
+        self.car = self.Map_wnd.arr_cars[0]     # для ускорения обращения к авто
 
 
 
@@ -63,8 +70,19 @@ class Series(fwWindow):
 
         self.Map_wnd.updateTraining()
 
-        if self.frames >= 600 or self.Map_wnd.testOffRoad():
-            # время истекло
+        # проверка на конец парти, один из следующих случаев
+        # 1. истекло 20 сек - пределная длинна партии
+        # 2. прошло минимум 5 сек и минимальная скоромть меньше 5 пикселей/сек
+        # 3. машина ударилась о край дороги
+
+
+        if (
+                self.frames >= 1200 or \
+                self.frames >= 300 and self.car.getMediumSpeed() < 5 or\
+                self.Map_wnd.testOffRoad()
+        ):
+            # парти завершена
+            print(self.car.getFitness())
             self.endParty()
 
 

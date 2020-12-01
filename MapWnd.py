@@ -128,7 +128,7 @@ class MapWnd(fwWindow):
 
     def init_road(self):
 
-        arr_roadsections_axial_2idot =  np.array(
+        self.arr_roadsections_axial_2idot =  np.array(
             [
                 [0, 300],
                 [300, 300],
@@ -191,7 +191,7 @@ class MapWnd(fwWindow):
         )
 
 
-        road_len = len(arr_roadsections_axial_2idot)
+        road_len = len(self.arr_roadsections_axial_2idot)
         # road_len = 7
 
 
@@ -200,7 +200,7 @@ class MapWnd(fwWindow):
 
         arr_roadsections_axial_turn_3mfdot = np.zeros((road_len,3),float)
         for i in range(road_len): #
-            arr_roadsections_axial_turn_3mfdot[i] = nd2_getMatrix(arr_roadsections_axial_2idot[i])
+            arr_roadsections_axial_turn_3mfdot[i] = nd2_getMatrix(self.arr_roadsections_axial_2idot[i])
 
 
         # секция дороги в виде прямоугольника (НЕ полигона !). 4 угла
