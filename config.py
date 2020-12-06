@@ -64,7 +64,26 @@ SHOW_PLAY_DRAW_FPS = 60                     # base
 TRAINING_UPDATE_GTIME_FPS         = 60
 
 # количнсвтво партий в поколении
-PARTY_COUNT_IN_GENE = 10
+POPULATION_SIZE = 10
+
+CAR_SENSORS_COUNT = 5
+
+# скорость машины - 1
+# текущее положение руля - 1
+# сенсоры - SENSORS_COUNT = 5
+# итого входов : 7
+NN_INPUTS_COUNT = CAR_SENSORS_COUNT + 2
+NN_HIDDEN_LAYERS_SIZE = [5, 4]
+NN_OUTPUTS_COUNT = 2
+
+# NN_structure имеет вид [20,10,5,2]
+# 20 - число входов, 2 число выходов, 10, 5 скрытые слои
+NN_STRUCTURE = [NN_INPUTS_COUNT] + NN_HIDDEN_LAYERS_SIZE + [NN_OUTPUTS_COUNT]
+
+
+
+# максимальное кол-во поколений в серии
+GENE_MAX_COUNT = 2
 
 
 

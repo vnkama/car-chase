@@ -379,11 +379,13 @@ class MapWnd(fwWindow):
 
         groups = (self.arr_sprites_update_camera, self.arr_sprites_update, self.arr_sprites_draw)
         self.arr_cars.append(
-            Car(self,
-                arrangement_arr['Car']['x'],
-                arrangement_arr['Car']['y'],
-                groups,
-                self.Tool_wnd)
+                Car(
+                        self,
+                        arrangement_arr['Car']['x'],
+                        arrangement_arr['Car']['y'],
+                        groups,
+                        self.Tool_wnd
+                )
         )
 
         self.arr_rocks[0].setPos(200, 400)

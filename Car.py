@@ -23,7 +23,7 @@ class Car(pg.sprite.Sprite):
     SPRITE_SIZE_Y = 80
     SPRITE_SIZE_XY = (SPRITE_SIZE_X, SPRITE_SIZE_Y)
 
-    SENSORS_COUNT = 5
+    #SENSORS_COUNT = 5
     SENSOR_MAX_LEN = 500       # максимальная длинна сенсора
 
 
@@ -31,14 +31,14 @@ class Car(pg.sprite.Sprite):
     # текущее положение руля - 1
     # сенсоры - SENSORS_COUNT = 5
     # итого входов : 7
-    NN_INPUTS_COUNT = SENSORS_COUNT + 2
+    #NN_INPUTS_COUNT = SENSORS_COUNT + 2
 
     # выходы SPEERING - воздействие на руль !!! не положение на руль а воздействие на него,
     # ACCELERATOR / BRAKE - газ /тормоз
     # итого 2 выхода
-    NN_OUTPUTS_COUNT = 2
+    #NN_OUTPUTS_COUNT = 2
 
-    NN_HIDDEN_LAYERS_SIZE = [5, 4]    # скрытые слои нейросети
+#    NN_HIDDEN_LAYERS_SIZE = [5, 4]    # скрытые слои нейросети
 
 
 
@@ -65,7 +65,13 @@ class Car(pg.sprite.Sprite):
     #
     #
     #
-    def __init__(self, map, x, y, groups, message):
+    def __init__(
+            self,
+            map,
+            x, y,
+            groups,
+            message,        # куда отправлять sendMessage, скорее всего Tool_wnd
+    ):
 
 
         self.arr_sensors_angles = None
@@ -148,13 +154,13 @@ class Car(pg.sprite.Sprite):
 
 
 
-        NN_structure = [Car.NN_INPUTS_COUNT]
-        NN_structure.extend(Car.NN_HIDDEN_LAYERS_SIZE)
-        NN_structure.append(Car.NN_OUTPUTS_COUNT)
+        # NN_structure = [NN_INPUTS_COUNT]
+        # NN_structure.extend(Car.NN_HIDDEN_LAYERS_SIZE)
+        # NN_structure.append(Car.NN_OUTPUTS_COUNT)
         # NN_structure имеет вид [20,10,5,2]
         # 20 - число входов, 2 число выходов, 10, 5 скрытые слои
 
-        self.NN = FeedForwardNetwork(NN_structure)
+        self.NN = FeedForwardNetwork(NN_STRUCTURE)
 
 
     def init_sensors(self):
@@ -169,19 +175,19 @@ class Car(pg.sprite.Sprite):
         ]
 
         # значения сенсоров - 0.0
-        self.arr_sensors_value = np.zeros(shape=(Car.SENSORS_COUNT, 1), dtype=float)
+        self.arr_sensors_value = np.zeros(shape=(CAR_SENSORS_COUNT, 1), dtype=float)
 
         # координаты относительно машины (константа), при курсе 0
-        self.arr_sensors_car_pos = np.empty(shape=[Car.SENSORS_COUNT], dtype=object, )
+        self.arr_sensors_car_pos = np.empty(shape=[CAR_SENSORS_COUNT], dtype=object, )
 
         # координаты относительно карты, с учетом курса
         self.arr_sensors_end_3mfdot = np.zeros(
-                shape=(Car.SENSORS_COUNT, nd2_getMatrixSize()),
+                shape=(CAR_SENSORS_COUNT, nd2_getMatrixSize()),
                 dtype=float
         )
 
         # координаты относительно окна
-        self.arr_sensors_wnd_pos = np.empty(shape=[Car.SENSORS_COUNT], dtype=list)
+        self.arr_sensors_wnd_pos = np.empty(shape=[CAR_SENSORS_COUNT], dtype=list)
 
         # расчитаем координаты сенсоров , относительно машины
         # курс не учитываем
@@ -190,7 +196,7 @@ class Car(pg.sprite.Sprite):
             # формируем вектор от центра машины на сенсор.
             self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(v) @ nd2_getMatrix([1, 0])
 
-        self.arr_sensors_value = np.full(shape=Car.SENSORS_COUNT, dtype=float, fill_value=Car.SENSOR_MAX_LEN)
+        self.arr_sensors_value = np.full(shape=CAR_SENSORS_COUNT, dtype=float, fill_value=Car.SENSOR_MAX_LEN)
 
 
         self.setDirectionImage2()
@@ -219,7 +225,7 @@ class Car(pg.sprite.Sprite):
         self.wnd_rect.center = (self.map_rectpos.left - camera_rect.left, self.map_rectpos.top - camera_rect.top)
 
         # пересчитаем положение сенсоров относ  окна
-        for i in range(Car.SENSORS_COUNT):
+        for i in range(CAR_SENSORS_COUNT):
             self.arr_sensors_wnd_pos[i] = (
                 int(self.arr_sensors_end_3mfdot[i][0]) - camera_rect.left,
                 int(self.arr_sensors_end_3mfdot[i][1]) - camera_rect.top
@@ -458,11 +464,11 @@ class Car(pg.sprite.Sprite):
 
 
         # инициируем массив пустыми листами
-        arr_sensors_lst_curbs = np.empty(shape=[Car.SENSORS_COUNT], dtype=list)
+        arr_sensors_lst_curbs = np.empty(shape=[CAR_SENSORS_COUNT], dtype=list)
         for i in range(arr_sensors_lst_curbs.size):
             arr_sensors_lst_curbs[i] = np.array([])
 
-        test = np.full(shape=[Car.SENSORS_COUNT], fill_value=0, dtype=int)
+        test = np.full(shape=[CAR_SENSORS_COUNT], fill_value=0, dtype=int)
 
         # общее начало отрезков-сенсоров
         car_irectpos = pg.Rect(
@@ -474,12 +480,12 @@ class Car(pg.sprite.Sprite):
 
         # длинна сенсора текущая, на данный момент обхода
         # после обхода всех перечений сенсора здесь будет самое короткое значение
-        arr_sensor_len_f = np.full(shape=[Car.SENSORS_COUNT], dtype=float, fill_value=float(Car.SENSOR_MAX_LEN))
+        arr_sensor_len_f = np.full(shape=[CAR_SENSORS_COUNT], dtype=float, fill_value=float(Car.SENSOR_MAX_LEN))
 
 
 
 
-        for sensor_i in range(Car.SENSORS_COUNT):
+        for sensor_i in range(CAR_SENSORS_COUNT):
 
             # rect сенсора
             # объеденим точку начала сенсоров (внутри авто) и тотчку конца сенсора в одном рект

@@ -1,9 +1,14 @@
 from config import *
 from fw.functions import *
 # from fw.FwError import FwError
+import numpy as np
 
 from fw.fwWindow import fwWindow
 from MapWnd import MapWnd
+from Car import *
+from fw.Population import *
+
+
 
 
 class Series(fwWindow):
@@ -14,6 +19,8 @@ class Series(fwWindow):
         self.generation_num = None
         self.party_num = None
         self.car = None
+
+        self.population = None
 
         # номер шага обучения (1-based)
         # когда трайнинг не идет переменная тоже стоит
@@ -38,10 +45,18 @@ class Series(fwWindow):
 
         self.party_num = None
 
+        np.random.RandomState(3000)
+
+        self.population = Population(POPULATION_SIZE, NN_STRUCTURE)
 
         self.newParty()
 
 
+
+    def newGeneration(self):
+        self.generation_num += 1
+        self.party_num = None
+        self.newParty()
 
 
     def newParty(self):
@@ -53,8 +68,6 @@ class Series(fwWindow):
                 'y': 300,
             },
         }
-
-
 
         self.frames = 0
         self.Map_wnd.reset(arrangement_arr)
@@ -103,13 +116,19 @@ class Series(fwWindow):
     #
     #
     def endParty(self):
-        if self.party_num < PARTY_COUNT_IN_GENE:
+        if self.party_num < POPULATION_SIZE:
             # переходим к следующей партии
             self.newParty()
 
         else:
-            # поколение завершено
-            self.parent_wnd.sendMessage('WM_END_SERIES', self.party_num)
+            # генерейшен/поколение завершено
+            if self.generation_num < GENE_MAX_COUNT:
+                self.newGeneration()
+
+            else:
+                # серия завершена
+                self.parent_wnd.sendMessage('WM_END_SERIES', self.party_num)
+
 
 
     def playShow(self):
