@@ -71,6 +71,7 @@ class Car(pg.sprite.Sprite):
             x, y,
             groups,
             message,        # куда отправлять sendMessage, скорее всего Tool_wnd
+            NN,
     ):
 
 
@@ -160,7 +161,7 @@ class Car(pg.sprite.Sprite):
         # NN_structure имеет вид [20,10,5,2]
         # 20 - число входов, 2 число выходов, 10, 5 скрытые слои
 
-        self.NN = FeedForwardNetwork(NN_STRUCTURE)
+        self.NN = NN
 
 
     def init_sensors(self):

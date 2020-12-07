@@ -117,8 +117,7 @@ class MapWnd(fwWindow):
         # формирует дорогу
         self.init_road()
 
-        self.arr_cars = []
-        # self.newGame()
+        self.car = []
 
         getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
         getAppWnd().registerHandler_KEYDOWN(self)
@@ -362,7 +361,7 @@ class MapWnd(fwWindow):
 
 
 
-    def reset(self, arrangement_arr):
+    def newParty(self, arrangement_arr):
 
         # начало новой игры (нажата кнопка new или программа только что запущена)
 
@@ -373,33 +372,32 @@ class MapWnd(fwWindow):
         self.training_update_gtime_sec_f = 0
         self.dt = 1 / TRAINING_UPDATE_GTIME_FPS
 
-        if len(self.arr_cars):
-            self.arr_cars[0].kill()
-            del (self.arr_cars[0])
+
 
         groups = (self.arr_sprites_update_camera, self.arr_sprites_update, self.arr_sprites_draw)
-        self.arr_cars.append(
-                Car(
-                        self,
-                        arrangement_arr['Car']['x'],
-                        arrangement_arr['Car']['y'],
-                        groups,
-                        self.Tool_wnd
-                )
+        self.car = Car(
+                self,
+                arrangement_arr['Car']['x'],
+                arrangement_arr['Car']['y'],
+                groups,
+                self.Tool_wnd,
+                arrangement_arr['Car']['NN'],
         )
 
         self.arr_rocks[0].setPos(200, 400)
 
-        self.arr_cars[0].update_sensors()
+        self.car.update_sensors()
         self.updateCamera()
 
 
+    def endParty(self):
+        del self.car
+        self.car = None
 
 
     def updateTraining(self):
         # self.training_update_step += 1
         self.arr_sprites_update.update(1)       # 1 - training
-
 
         self.updateCamera()
 
@@ -412,7 +410,7 @@ class MapWnd(fwWindow):
 
 
     def updateCamera(self):
-        self.Camera.update(self.arr_cars[0].map_rectpos)
+        self.Camera.update(self.car.map_rectpos)
 
         # координаты окна показываемые камерой относительно карты
         camera_position_rect = self.Camera.getPositionRect()
@@ -424,9 +422,8 @@ class MapWnd(fwWindow):
 
 
     def draw(self):
-        self.arr_cars[0].printValues()
+        self.car.printValues()
 
-        # c = self.arr_cars[0]
 
 
         # копируем карту тайлов
@@ -441,12 +438,12 @@ class MapWnd(fwWindow):
             pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
             camera_position_rect)   # из карты берем то что показывает камера
 
-        self.arr_cars[0].draw_sensors()
+        self.car.draw_sensors()
         self.arr_sprites_draw.draw(self.surface)
 
         # столкновение машины с краем дороги
         # sprite_lst = pg.sprite.spritecollide(
-        #     self.arr_cars[0],           # машину сталикиваем
+        #     self.car,           # машину сталикиваем
         #     self.arr_sprites_curbs,      #с краями дороги
         #     False,
         #     pg.sprite.collide_mask
@@ -456,7 +453,7 @@ class MapWnd(fwWindow):
         #     print("TOUCH 11 !!")
 
         # sprite_lst = pg.sprite.spritecollide(
-        #     self.arr_cars[0],           # машину сталикиваем
+        #     self.car,           # машину сталикиваем
         #     self.arr_sprites_collide,
         #     False,
         #     pg.sprite.collide_mask
@@ -473,7 +470,7 @@ class MapWnd(fwWindow):
     def testOffRoad(self):
         # столкновение машины с краем дороги
         sprite_lst = pg.sprite.spritecollide(
-            self.arr_cars[0],           # машину сталикиваем
+            self.car,           # машину сталикиваем
             self.arr_sprites_curbs,     #с краями дороги
             False,
             pg.sprite.collide_mask
@@ -510,37 +507,37 @@ class MapWnd(fwWindow):
                 # координаты клика относительно карты
                 # click_map_rect =  camera_position_rect.move(click_mapwnd_rect.topleft)
 
-                # self.arr_cars[0].setTarget(click_map_rect)
+                # self.car.setTarget(click_map_rect)
 
         return True
 
     def handle_KeyDown(self, event):
         if event.key == pg.K_LEFT:
-            self.arr_cars[0].setSpeering(-1)
+            self.car.setSpeering(-1)
 
         elif event.key == pg.K_RIGHT:
-            self.arr_cars[0].setSpeering(1)
+            self.car.setSpeering(1)
 
         elif event.key == pg.K_UP:
-            self.arr_cars[0].setAcceleration(1)
+            self.car.setAcceleration(1)
 
         elif event.key == pg.K_DOWN:
-            self.arr_cars[0].setBreaking(1)
+            self.car.setBreaking(1)
 
 
 
     def handle_KeyUp(self, event):
         if event.key == pg.K_LEFT:
-            self.arr_cars[0].setSpeering(0)
+            self.car.setSpeering(0)
 
         elif event.key == pg.K_RIGHT:
-            self.arr_cars[0].setSpeering(0)
+            self.car.setSpeering(0)
 
         elif event.key == pg.K_UP:
-            self.arr_cars[0].setAcceleration(0)
+            self.car.setAcceleration(0)
 
         elif event.key == pg.K_DOWN:
-            self.arr_cars[0].setBreaking(0)
+            self.car.setBreaking(0)
 
 
     def sendMessage(self, msg, param1=None, param2=None):
