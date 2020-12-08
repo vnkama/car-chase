@@ -29,7 +29,6 @@ class FeedForwardNetwork:
         self.inputs = None
         self.out = None
 
-        # self.rand = np.random.RandomState(rnd_start_value)
 
         # Initialize weights and bias
         for l in range(1, len(self.layer_nodes)):

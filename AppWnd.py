@@ -156,7 +156,7 @@ class AppWnd(fwWindow):
             self.quitApp()
 
         elif msg == "WM_NEW_SERIES":
-            self.newSeries()
+            self.resetSeries()
 
         elif msg == "WM_PLAY":
             self.play()
@@ -236,10 +236,21 @@ class AppWnd(fwWindow):
         print(CONSOLE_CLR_RED + "AppWnd.quitApp" + CONSOLE_CLR_RESET)
 
 
+    #
+    # обрабатывае нажатие кнопки NEW
+    # принудительно уничтожить
+    #
+    def resetSeries(self):
+        self.Series.destroySeries()
+        self.newSeries()
+
+
+
     def newSeries(self):
         print(CONSOLE_CLR_GREEN + "AppWnd.newApp" + CONSOLE_CLR_RESET)
 
         self.state = 'APP_STATE_TRAINING_NEW'
+
 
         ######
 

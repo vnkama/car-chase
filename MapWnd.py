@@ -44,6 +44,7 @@ class MapWnd(fwWindow):
 
         self.dt = None
         self.arr_road_sprites = None
+        self.car = None
 
 
         super().__init__(params)        # parent - fwMapWnd
@@ -117,7 +118,6 @@ class MapWnd(fwWindow):
         # формирует дорогу
         self.init_road()
 
-        self.car = []
 
         getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
         getAppWnd().registerHandler_KEYDOWN(self)
@@ -391,6 +391,9 @@ class MapWnd(fwWindow):
 
 
     def endParty(self):
+        # Удалим спрайт из всех групп
+        self.car.kill()
+
         del self.car
         self.car = None
 
@@ -441,26 +444,6 @@ class MapWnd(fwWindow):
         self.car.draw_sensors()
         self.arr_sprites_draw.draw(self.surface)
 
-        # столкновение машины с краем дороги
-        # sprite_lst = pg.sprite.spritecollide(
-        #     self.car,           # машину сталикиваем
-        #     self.arr_sprites_curbs,      #с краями дороги
-        #     False,
-        #     pg.sprite.collide_mask
-        # )
-        #
-        # if sprite_lst:
-        #     print("TOUCH 11 !!")
-
-        # sprite_lst = pg.sprite.spritecollide(
-        #     self.car,           # машину сталикиваем
-        #     self.arr_sprites_collide,
-        #     False,
-        #     pg.sprite.collide_mask
-        # )
-        #
-        # if sprite_lst:
-        #     print("TOUCH !!")
 
 
     #
@@ -473,7 +456,7 @@ class MapWnd(fwWindow):
             self.car,           # машину сталикиваем
             self.arr_sprites_curbs,     #с краями дороги
             False,
-            pg.sprite.collide_mask
+            pg.sprite.collide_mask,
         )
 
         if sprite_lst:

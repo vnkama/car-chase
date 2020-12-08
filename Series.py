@@ -41,29 +41,40 @@ class Series(fwWindow):
 
     def newSeries(self):
         # print('newSeries')
-        self.generation_num = 1
 
+        self.generation_num = None
         self.party_num = None
 
-        np.random.RandomState(3000)
+        # np.random.RandomState(3000)
 
         self.population = Population(
             POPULATION_SIZE,
             NN_STRUCTURE,
         )
 
-        self.newParty()
+
+        self.newGeneration()
+
+
+    #
+    # принудительно завершить серию
+    #
+    def destroySeries(self):
+        del self.population
+        self.population = None
+
+        self.Map_wnd.endParty()
 
 
 
     def newGeneration(self):
-        self.generation_num += 1
+        self.generation_num = 0 if self.generation_num is None else (self.generation_num + 1)
         self.party_num = None
         self.newParty()
 
 
     def newParty(self):
-        self.party_num = (self.party_num or 0) + 1
+        self.party_num = 0 if self.party_num is None else (self.party_num + 1)
         individ = self.population.getIndivid(self.party_num)
 
         arrangement_arr = {
@@ -78,7 +89,6 @@ class Series(fwWindow):
         self.Map_wnd.newParty(arrangement_arr)
         self.Tool_wnd.sendMessage('WM_SET_PARTY', self.party_num)
 
-        # self.car = self.Map_wnd.car     # для ускорения обращения к авто
 
 
     #
@@ -88,8 +98,7 @@ class Series(fwWindow):
 
         self.Map_wnd.endParty()
 
-
-        if self.party_num < POPULATION_SIZE:
+        if self.party_num < POPULATION_SIZE-1:
             # переходим к следующей партии
             self.newParty()
 
@@ -124,7 +133,8 @@ class Series(fwWindow):
                 self.frames >= 300 and self.Map_wnd.car.getMediumSpeed() < 5 or\
                 self.Map_wnd.testOffRoad()
         ):
-            # парти завершена
+            # партия завершена
+
             print(self.Map_wnd.car.getFitness())
             self.endParty()
 

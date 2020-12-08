@@ -17,7 +17,7 @@ class Population:
             self.NN_arr[i] = FeedForwardNetwork(NN_structure)
 
 
-    def getIndivid(self,index):
+    def getIndivid(self, index):
         return self.NN_arr[index]
 
 
