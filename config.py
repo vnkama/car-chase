@@ -63,8 +63,11 @@ SHOW_PLAY_DRAW_FPS = 60                     # base
 
 TRAINING_UPDATE_GTIME_FPS         = 60
 
-# количнсвтво партий в поколении
-POPULATION_SIZE = 10
+# максимальное кол-во поколений в серии
+GENE_MAX_COUNT = 3
+
+# размер популяции / оноже колв партий
+POPULATION_SIZE = 5
 
 CAR_SENSORS_COUNT = 5
 
@@ -82,8 +85,7 @@ NN_STRUCTURE = [NN_INPUTS_COUNT] + NN_HIDDEN_LAYERS_SIZE + [NN_OUTPUTS_COUNT]
 
 
 
-# максимальное кол-во поколений в серии
-GENE_MAX_COUNT = 2
+
 
 
 

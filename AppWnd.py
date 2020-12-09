@@ -294,7 +294,7 @@ class AppWnd(fwWindow):
             self.state = 'APP_STATE_TRAINING_PLAY'
 
             # res['res']['update_fps'] - 1 : 1x обычная скороть расчет в реальном времени, 2 : 2x двойная
-            # res['res']['update_fps'] * TRAINING_UPDATE_FPS    :   1x  :  60 расчетов в секунду
+            # res['res']['update_fps'] * TRAINING_UPDATE_FPS : 1x  :  60 расчетов в секунду
             # период перерасчета в реалаьном времени
             # запросим настройки по скорости обновления из Tool_wnd
             res = {}
@@ -390,7 +390,6 @@ class AppWnd(fwWindow):
 
         # у AppWnd нет собственной графики, рисоавть нечего
         # вызовем
-        #self.drawAllChilds()
         self.Tool_wnd.draw()
         self.Series.draw()
 

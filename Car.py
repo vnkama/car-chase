@@ -401,7 +401,11 @@ class Car(pg.sprite.Sprite):
                 cur_dist = dist
                 cur_i = i
 
-        return getFrames() + self.total_S * 100 + cur_i**2 * 100;
+        fitness = getFrames() + self.total_S * 100 + cur_i ** 2 * 100
+
+        self.NN.setFitness(fitness)
+
+        return fitness
 
 
     def getMediumSpeed(self):

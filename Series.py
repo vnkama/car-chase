@@ -69,19 +69,22 @@ class Series(fwWindow):
 
     def newGeneration(self):
         self.generation_num = 0 if self.generation_num is None else (self.generation_num + 1)
+
+        self.population.calcNextGeneration()
+
         self.party_num = None
         self.newParty()
 
 
     def newParty(self):
         self.party_num = 0 if self.party_num is None else (self.party_num + 1)
-        individ = self.population.getIndivid(self.party_num)
+        NN = self.population.getIndivid(self.party_num)
 
         arrangement_arr = {
             'Car': {
                 'x': 100,
                 'y': 300,
-                'NN': individ,
+                'NN': NN,
             },
         }
 
@@ -98,18 +101,7 @@ class Series(fwWindow):
 
         self.Map_wnd.endParty()
 
-        if self.party_num < POPULATION_SIZE-1:
-            # переходим к следующей партии
-            self.newParty()
 
-        else:
-            # генерейшен/поколение завершено
-            if self.generation_num < GENE_MAX_COUNT:
-                self.newGeneration()
-
-            else:
-                # серия завершена
-                self.parent_wnd.sendMessage('WM_END_SERIES', self.party_num)
 
 
 
@@ -121,12 +113,34 @@ class Series(fwWindow):
         self.Tool_wnd.sendMessage("WM_SET_TICKS", self.frames)
 
         self.Map_wnd.updateTraining()
+        if self.isEndParty():
 
-        # проверка на конец парти, один из следующих случаев
-        # 1. истекло 20 сек - пределная длинна партии
-        # 2. прошло минимум 5 сек и минимальная скоромть меньше 5 пикселей/сек
-        # 3. машина ударилась о край дороги
+            # посчитаеть фитнесс, запищет в NN
+            fit = self.Map_wnd.car.getFitness()
+            print(fit)
 
+            self.endParty()
+
+            if self.party_num < POPULATION_SIZE-1:
+                # переходим к следующей партии
+                self.newParty()
+
+            else:
+
+                # генерейшен/поколение завершено
+                if self.generation_num < GENE_MAX_COUNT-1:
+                    self.newGeneration()
+
+                else:
+                    # серия завершена
+                    self.parent_wnd.sendMessage('WM_END_SERIES', self.party_num)
+
+
+    # проверка на конец парти, один из следующих случаев
+    # 1. истекло 20 сек - пределная длинна партии
+    # 2. прошло минимум 5 сек и минимальная скоромть меньше 5 пикселей/сек
+    # 3. машина ударилась о край дороги
+    def isEndParty(self):
 
         if (
                 self.frames >= 1200 or \
@@ -134,9 +148,11 @@ class Series(fwWindow):
                 self.Map_wnd.testOffRoad()
         ):
             # партия завершена
+            return True
+        else:
+            return False
 
-            print(self.Map_wnd.car.getFitness())
-            self.endParty()
+
 
 
 

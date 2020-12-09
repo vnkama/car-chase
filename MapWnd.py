@@ -425,6 +425,9 @@ class MapWnd(fwWindow):
 
 
     def draw(self):
+
+
+        #if self.car is not None:
         self.car.printValues()
 
 
@@ -441,7 +444,9 @@ class MapWnd(fwWindow):
             pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
             camera_position_rect)   # из карты берем то что показывает камера
 
+        #if self.car is not None:
         self.car.draw_sensors()
+
         self.arr_sprites_draw.draw(self.surface)
 
 

@@ -28,6 +28,7 @@ class FeedForwardNetwork:
         self.output_activation = get_activation_by_name(output_activation)
         self.inputs = None
         self.out = None
+        self.fitness = None
 
 
         # Initialize weights and bias
@@ -41,8 +42,12 @@ class FeedForwardNetwork:
                 raise Exception('Implement more options, bro')
 
             self.params['A' + str(l)] = None
-        
-        
+
+
+    def setFitness(self, fitness):
+        self.fitness = fitness
+
+
     def feed_forward(self, X_arr):
         # X_arr массив входных данных
         A_prev = X_arr
