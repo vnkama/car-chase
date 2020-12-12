@@ -15,10 +15,13 @@ class Population:
         # размер популяции
         self.populatin_size = size
 
+        rng = np.random.default_rng(1000)
+
+
         self.NN_arr = np.empty([size],dtype=object)
 
         for i,v in enumerate(self.NN_arr):
-            self.NN_arr[i] = FeedForwardNetwork(NN_structure)
+            self.NN_arr[i] = FeedForwardNetwork(NN_structure, rng=rng)
 
 
     def getIndivid(self, index):

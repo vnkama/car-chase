@@ -45,7 +45,6 @@ class Series(fwWindow):
         self.generation_num = None
         self.party_num = None
 
-        # np.random.RandomState(3000)
 
         self.population = Population(
             POPULATION_SIZE,
@@ -63,7 +62,7 @@ class Series(fwWindow):
         del self.population
         self.population = None
 
-        self.Map_wnd.endParty()
+        self.Map_wnd.destroyMap()
 
 
 
@@ -90,7 +89,7 @@ class Series(fwWindow):
 
         self.frames = 0
         self.Map_wnd.newParty(arrangement_arr)
-        self.Tool_wnd.sendMessage('WM_SET_PARTY', self.party_num)
+        self.Tool_wnd.sendMessage('WM_SET_PARTY', {'party':self.party_num,'generation':self.generation_num,})
 
 
 

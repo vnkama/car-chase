@@ -19,7 +19,7 @@ class FeedForwardNetwork:
                  hidden_activation = 'sigmoid',
                  output_activation = 'sigmoid',
                  init_method = 'uniform',
-                 rnd_start_value = 3000      # Число в интервале [0, 2**32]
+                 rng = None,     # генератор случайных числе
     ):
 
         self.params = {}
@@ -30,19 +30,30 @@ class FeedForwardNetwork:
         self.out = None
         self.fitness = None
 
+        self.rng = rng or np.random.default_rng()
 
-        # Initialize weights and bias
+        # if rng is None:
+        #     self.rng = np.random.default_rng()
+        # else:
+
+
+            # Initialize weights and bias
         for l in range(1, len(self.layer_nodes)):
             if init_method == 'uniform':
                 # генерим связи случайным образом
-                self.params['W' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], self.layer_nodes[l-1]))
-                self.params['b' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], 1))
+                self.params['W' + str(l)] = self.rng.uniform(-1, 1, size=(self.layer_nodes[l], self.layer_nodes[l-1]))
+                self.params['b' + str(l)] = self.rng.uniform(-1, 1, size=(self.layer_nodes[l], 1))
+
+
+                # self.params['W' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], self.layer_nodes[l-1]))
+                # self.params['b' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], 1))
             
             else:
                 raise Exception('Implement more options, bro')
 
             self.params['A' + str(l)] = None
 
+        pass
 
     def setFitness(self, fitness):
         self.fitness = fitness
