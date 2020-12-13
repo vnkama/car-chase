@@ -66,8 +66,6 @@ TRAINING_UPDATE_GTIME_FPS         = 60
 # максимальное кол-во поколений в серии
 GENE_MAX_COUNT = 3
 
-# размер популяции / оноже колв партий
-POPULATION_SIZE = 5
 
 CAR_SENSORS_COUNT = 5
 
@@ -84,7 +82,13 @@ NN_OUTPUTS_COUNT = 2
 NN_STRUCTURE = [NN_INPUTS_COUNT] + NN_HIDDEN_LAYERS_SIZE + [NN_OUTPUTS_COUNT]
 
 
+###################################
+# размер популяции / оноже колв партий
+POPULATION_SIZE = 10
 
+# размер популяции переходящий в следующее поколение
+INDIVIDS_ALIVE_COUNT = int(POPULATION_SIZE / 2)
+INDIVIDS_SPRING_COUNT = POPULATION_SIZE - INDIVIDS_ALIVE_COUNT
 
 
 

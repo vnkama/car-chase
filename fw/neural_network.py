@@ -32,9 +32,6 @@ class FeedForwardNetwork:
 
         self.rng = rng or np.random.default_rng()
 
-        # if rng is None:
-        #     self.rng = np.random.default_rng()
-        # else:
 
 
             # Initialize weights and bias
@@ -53,7 +50,7 @@ class FeedForwardNetwork:
 
             self.params['A' + str(l)] = None
 
-        pass
+
 
     def setFitness(self, fitness):
         self.fitness = fitness

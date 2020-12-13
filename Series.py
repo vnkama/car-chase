@@ -69,7 +69,9 @@ class Series(fwWindow):
     def newGeneration(self):
         self.generation_num = 0 if self.generation_num is None else (self.generation_num + 1)
 
-        self.population.calcNextGeneration()
+        if self.generation_num:
+            # для всех кроме нулевого
+            self.population.calcNextGeneration()
 
         self.party_num = None
         self.newParty()
