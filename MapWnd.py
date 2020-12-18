@@ -375,6 +375,7 @@ class MapWnd(fwWindow):
 
 
         groups = (self.arr_sprites_update_camera, self.arr_sprites_update, self.arr_sprites_draw)
+
         self.car = Car(
                 self,
                 arrangement_arr['Car']['x'],

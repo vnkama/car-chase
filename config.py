@@ -84,14 +84,14 @@ NN_STRUCTURE = [NN_INPUTS_COUNT] + NN_HIDDEN_LAYERS_SIZE + [NN_OUTPUTS_COUNT]
 
 ###################################
 # размер популяции / оноже колв партий
-POPULATION_SIZE = 10
+POPULATION_SIZE = 6
 
 # размер популяции переходящий в следующее поколение
 INDIVIDS_ALIVE_COUNT = int(POPULATION_SIZE / 2)
-INDIVIDS_SPRING_COUNT = POPULATION_SIZE - INDIVIDS_ALIVE_COUNT
+INDIVIDS_CHILD_COUNT = POPULATION_SIZE - INDIVIDS_ALIVE_COUNT
 
 
-
+SBX_eta = 100
 
 
 
