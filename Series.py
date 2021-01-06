@@ -69,6 +69,8 @@ class Series(fwWindow):
     def newGeneration(self):
         self.generation_num = 0 if self.generation_num is None else (self.generation_num + 1)
 
+        print (f'newGeneration {self.generation_num}')
+
         if self.generation_num:
             # для всех кроме нулевого
             self.population.calcNextGeneration()
@@ -83,8 +85,8 @@ class Series(fwWindow):
 
         arrangement_arr = {
             'Car': {
-                'x': 100,
-                'y': 300,
+                'x': CAR_START_X,
+                'y': CAR_START_Y,
                 'NN': NN,
             },
         }
@@ -118,7 +120,7 @@ class Series(fwWindow):
 
             # посчитаеть фитнесс, запищет в NN
             fit = self.Map_wnd.car.getFitness()
-            print(fit)
+            print('fitness: {:07.2f}, party:{:d}'.format(fit,self.party_num))
 
             self.endParty()
 
@@ -143,12 +145,19 @@ class Series(fwWindow):
     # 3. машина ударилась о край дороги
     def isEndParty(self):
 
+
+
         if (
+                #CARFORWARD
+
                 self.frames >= 1200 or \
                 self.frames >= 300 and self.Map_wnd.car.getMediumSpeed() < 5 or\
-                self.Map_wnd.testOffRoad()
+                self.Map_wnd.testOffRoad() or\
+            self.frames >= 2000 or \
+            self.frames >= 300 and self.Map_wnd.car.getMediumSpeed() < 5
         ):
             # партия завершена
+            # print("isEndParty")
             return True
         else:
             return False

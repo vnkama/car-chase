@@ -1,5 +1,6 @@
 import pygame as pg
 
+
 # порядок загрзки pygame
 # 1. импортируем InitPygame, где вызывается pg.init(),
 # 2. подключаем разные модули, использующие pygame
@@ -186,9 +187,6 @@ class AppWnd(fwWindow):
             self.update()
 
             while self.is_mainloop_run:
-
-
-
 
                 now = pg.time.get_ticks()
 

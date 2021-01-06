@@ -95,7 +95,7 @@ class ToolWnd(fwWindow):
             'rect': pg.Rect(65, 150, 80, 22),
         }))
 
-        self.selectTrainingUpdateSpeed.setSelectedItemByText('x1')
+        self.selectTrainingUpdateSpeed.setSelectedItemByText('x10')
 
         ##########
 

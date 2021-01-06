@@ -123,7 +123,7 @@ class Car(pg.sprite.Sprite):
 
         self.CAR_LEN = 70                   # длинна машины, точнее расстояние между осями
 
-        self.K_NN_engine_power = 100;
+        self.K_NN_engine_power = 100
         # self.is_engine_on = 0
         # self.engine_acceleration_dv = 10.0  # разгон под двигателем
 
@@ -273,7 +273,7 @@ class Car(pg.sprite.Sprite):
         # self.engine_power = max(0, min(200, self.engine_power))
 
         self.speering_angle_want = (2 * self.speering_angle_want - 1) * self.MAX_SPEERING
-
+        #self.speering_angle_want = 0    # CARFORWARD
 
 
         # PRINT

@@ -10,6 +10,9 @@ from typing import Tuple
 #
 class Population:
 
+
+
+
     #
     # size - размер популяции
     def __init__(self, size, NN_structure):
@@ -19,12 +22,12 @@ class Population:
 
         self.NN_structure = NN_structure
 
-        self.rng = np.random.default_rng(1000)
+        self.rng = np.random.default_rng(RND_START_VALUE)
 
         self.individs = np.empty([POPULATION_SIZE], dtype=object)
 
         for i, v in enumerate(self.individs):
-            self.individs[i] = FeedForwardNetwork(NN_structure, rng=self.rng)
+            self.individs[i] = FeedForwardNetwork(self.NN_structure, rng=self.rng)
 
 
     def getIndivid(self, index):
@@ -32,38 +35,54 @@ class Population:
 
 
     # пересчитываем нейросети
-    # предварительно у всех сетей должен быть установлен фитнес
+    # предварительно у всех сетей должен быть посчитан фитнес
     def calcNextGeneration(self):
 
-        individs_alive = np.empty([INDIVIDS_ALIVE_COUNT], dtype=object)
+        #пустой массив под выживших особей
+        # individs_alive = np.empty([INDIVIDS_ALIVE_COUNT], dtype=object)
 
         # отберем лучших особей для перехода в следующее поколение
-        individs_alive[:INDIVIDS_ALIVE_COUNT] = \
-            self.sort_elitism(
-                    self.individs,
-                    INDIVIDS_ALIVE_COUNT,
-            )
 
-        self.rng.shuffle(individs_alive)
-        individs_spring = np.empty([0], dtype=object)
+        #individs_alive - это ссылки на объекты из self.individs
+        individs_alive = self.sort_elitism(
+                self.individs,
+                INDIVIDS_ALIVE_COUNT,
+        )
 
-        while len(individs_spring) < INDIVIDS_CHILD_COUNT:
+        # особи из которых будем выбирать родителей
+        # individs_parents, individs_alive -списки разные, но указывают на одни и теже FeedForwardNetwork
+        individs_4_parents = np.copy(individs_alive)
 
-            # так как при выполнении selectionRouletteWheel, родители удаляются из self.individs
-            # то число потомков не может быть больше числа родителей
-            parent1, parent2 = self.selectionRouletteWheel(self.individs, 2, True)
+        # перемешаем выживших
+        # self.rng.shuffle(individs_alive)
 
+        # массив потомков
+        individs_childs = np.empty([INDIVIDS_CHILD_COUNT], dtype=object)
+
+
+        for child_ind in range(0, INDIVIDS_CHILD_COUNT, 2):
+
+            # если при выполнении selectionRouletteWheel, указать, что родители удаляются из self.individs
+            # то в таком случае число потомков не может быть больше числа родителей
+            # отбираем потомков
+            parent1, parent2 = self.selectionRouletteWheel(individs_4_parents, 2, True)
+
+            #
             child1, child2 = self.crossover(parent1, parent2)
 
-            # child1 = self.mutation(child1)
-            # child2 = self.mutation(child2)
+            child1 = self.mutation(child1)
+            child2 = self.mutation(child2)
 
-            individs_spring = np.append((individs_spring, [child1], [child2]))
+            # при нечетном INDIVIDS_CHILD_COUNT , последний child записывается только child1
+            if child_ind + 2 <= INDIVIDS_CHILD_COUNT:
+                individs_childs[child_ind:child_ind+2] = (child1, child2)
+            else:
+                individs_childs[child_ind] = child1
 
 
         # сложим родителей и потомков
-        self.individs = np.append((individs_alive, individs_spring))
-
+        self.individs = np.append(individs_alive, individs_childs)
+        #self.rng.shuffle(self.individs)
 
 
     def sort_elitism(self, population, selected_count):
@@ -77,31 +96,40 @@ class Population:
 
 
     #
+
+    #
     # отбор особей прошедших в следующий тур.
     # вероятность выхода особи в следущий тур пропорциональна их фитнесс функции
     #
-    # remove_mode   : True выбранные элементы удаяются из population,
-    #               : False выбранные элементы переносятсяудаяются из population
+    # remove_mode   : True выбранные элементы удаяются из individs,
+    #               : False выбранные элементы не удаяются из individs
+    # функ-ция НЕ делает копии особей, возвращает то что содеражалось в individs
+    #
     #
     def selectionRouletteWheel(self, individs, selected_count, remove_mode=True):
-        individs_childs = np.empty(shape=(0,1), dtype=object)
+
+        individs_selected = np.empty([0], dtype=object)
         fitness_sum = sum(individ.fitness for individ in individs)
 
         for _ in range(selected_count):
             pick = self.rng.uniform(0, fitness_sum)
 
             current = 0
-            for individ in individs:
+            for i, individ in np.ndenumerate(individs):
+            #for individ in individs:
                 current += individ.fitness
                 if current > pick:
-                    fitness_sum -= individ.fitness
-                    fitness_sum = 0 if fitness_sum < 0 else fitness_sum
-                    individs_childs = np.append((individs_childs, individ))
+                    individs_selected = np.append(individs_selected, individ)
                     if remove_mode:
-                        individs.remove(individ)
+                        try:
+                            individs = np.delete(individs,i)
+                        except Exception as ex:
+                            pass
+                        fitness_sum -= individ.fitness
+                        #fitness_sum = 0 if fitness_sum < 0 else fitness_sum
                     break
 
-        return individs_childs
+        return individs_selected
 
 
 
@@ -109,35 +137,39 @@ class Population:
     #
     #
     def crossover(self, individ1, individ2):
+
+
+        child1 = FeedForwardNetwork(self.NN_structure, rng=self.rng)
+        child2 = FeedForwardNetwork(self.NN_structure, rng=self.rng)
+
         # число слоев NN
         NN_layer_count = len(self.NN_structure)
 
         # обход слоев
         for l in range(1, NN_layer_count):
 
-            individ_1_Weight = individ1.params['W' + str(l)]
+            individ_1_Weight = individ1.params['W' + str(l)]    # копирует по ссылке(без копии)
             individ_1_bias = individ1.params['b' + str(l)]
 
             individ_2_Weight = individ2.params['W' + str(l)]
             individ_2_bias = individ2.params['b' + str(l)]
 
-            # random 0...1
-            #random_crossover = self.rng.random()
-
             # выбор метода для кроссовера
             crossover_method = np.digitize(self.rng.random(), [0.5, 1.0])
+            crossover_method = 1
 
             #  simulated_binary_crossover
             if crossover_method == 0:
-                individ_1_Weight, individ_2_Weight = crossover_simulated_binary(individ_1_Weight, individ_2_Weight, SBX_eta)
-                individ_1_bias, individ_2_bias = crossover_simulated_binary(individ_1_bias, individ_2_bias, SBX_eta)
+                child1.params['W' + str(l)], child2.params['W' + str(l)] = self.crossover_simulated_binary(individ_1_Weight, individ_2_Weight, SBX_eta)
+                child1.params['b' + str(l)], child2.params['b' + str(l)] = self.crossover_simulated_binary(individ_1_bias, individ_2_bias, SBX_eta)
 
             # Single point binary crossover (SPBX)
             elif crossover_method == 1:
-                individ_1_Weight, individ_2_Weight = crossover_single_point_binary(individ_1_Weight, individ_2_Weight)
-                individ_1_bias, individ_2_bias = crossover_single_point_binary(individ_1_bias, individ_2_bias)
+                child1.params['W' + str(l)], child2.params['W' + str(l)] = self.crossover_single_point_binary(individ_1_Weight, individ_2_Weight)
+                child1.params['b' + str(l)], child2.params['b' + str(l)] = self.crossover_single_point_binary(individ_1_bias, individ_2_bias)
 
-        return individ1, individ2
+
+        return child1, child2
 
 
     #
@@ -147,16 +179,59 @@ class Population:
         # число слоев NN
         NN_layer_count = len(self.NN_structure)
 
+        rnd = self.rng.random()
+        mutation_bucket = np.digitize(rnd, [0.5, 1.0])
+
+        mutation_probabilty = 0.05
+        mutation_scale = 0.2
+
         # обход слоев
         for l in range(1, NN_layer_count):
-            pass
+            individ_Weight = individ.params['W' + str(l)]
+            individ_bias = individ.params['b' + str(l)]
 
+
+
+            if mutation_bucket == 0 or True:
+                # Mutate weights
+                self.gaussian_mutation(individ_Weight, mutation_probabilty, mutation_scale)
+
+                # Mutate bias
+                self.gaussian_mutation(individ_bias, mutation_probabilty, mutation_scale)
+
+            else:
+                self.random_uniform_mutation(individ_Weight, mutation_probabilty, -2, 2)
+
+            # Mutate bias
+                self.random_uniform_mutation(individ_bias, mutation_probabilty, -2, 2)
 
         return individ
 
 
+    def gaussian_mutation(self, chromosome_arr, mutation_probabilty, mutation_scale):
 
 
+        # булевский массив, true -соответствующаф хромосома меняется
+        mutation_arr = np.random.random(chromosome_arr.shape) < mutation_probabilty
+
+        gaussian_mutation = np.random.normal(size=chromosome_arr.shape)
+
+        gaussian_mutation[mutation_arr] *= mutation_scale
+
+        # те хромосомы на которые mutation_array=True вносим коррекцию
+        chromosome_arr[mutation_arr] += gaussian_mutation[mutation_arr]
+
+
+    def random_uniform_mutation(self, chromosome_arr, mutation_probabilty, low, high):
+
+        # булевский массив, true -соответствующаф хромосома меняется
+        mutation_arr = np.random.random(chromosome_arr.shape) < mutation_probabilty
+
+        # генерируем массив случайных чисел
+        uniform_mutation = np.random.uniform(low, high, size=chromosome_arr.shape)
+
+        # копируем только те мутировавшие гены где mutation_arr = True
+        chromosome_arr[mutation_arr] = chromosome_arr[mutation_arr] * uniform_mutation[mutation_arr]
 
     # p.177
 
@@ -165,6 +240,7 @@ class Population:
     # ячейки до выбранной - меняются местами,
     #
     def crossover_single_point_binary(
+            self,
             parent1,        # хромосома первого родителя
             parent2,        # хромосома второго родителя
             major='r'
@@ -174,8 +250,8 @@ class Population:
         offspring2 = parent2.copy()
 
         rows, cols = parent2.shape
-        row = self.rng.randint(0, rows)
-        col = self.rng.randint(0, cols)
+        row = self.rng.integers(0, rows)
+        col = self.rng.integers(0, cols)
 
         if major == 'r':
             offspring1[:row, :] = parent2[:row, :]
@@ -197,7 +273,7 @@ class Population:
 
     #
     # меняются все хромосомы попарно,
-    # но  происходит не посто обмен генами
+    # но  происходит не просто обмен генами
     # а пересчета генов по определеному закону
     #
     def crossover_simulated_binary(

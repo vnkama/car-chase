@@ -25,12 +25,29 @@ import pygame as pg     # использован pg.Rect
 
 # =================================================================================
 # количесвто особей в поколении
-GAME_GENE_SIZE  = 100
+#GAME_GENE_SIZE  = 100
 
 # максимальное количесвто поколений
-GAME_GENE_COUNT_MAX = 500
+#GAME_GENE_COUNT_MAX = 500
 
+###################################
+# размер популяции (колво партий)
+POPULATION_SIZE = 30
 
+# размер популяции переходящий в следующее поколение
+INDIVIDS_ALIVE_COUNT = int(POPULATION_SIZE / 2)
+INDIVIDS_CHILD_COUNT = POPULATION_SIZE - INDIVIDS_ALIVE_COUNT
+
+# максимальное кол-во поколений в серии
+GENE_MAX_COUNT = 50
+
+# начальное значение генератора случайных чисел
+RND_START_VALUE = 1000
+
+# =================================================================================
+
+CAR_START_X = 0
+CAR_START_Y = 400
 
 # =================================================================================
 
@@ -63,8 +80,7 @@ SHOW_PLAY_DRAW_FPS = 60                     # base
 
 TRAINING_UPDATE_GTIME_FPS         = 60
 
-# максимальное кол-во поколений в серии
-GENE_MAX_COUNT = 3
+
 
 
 CAR_SENSORS_COUNT = 5
@@ -82,13 +98,7 @@ NN_OUTPUTS_COUNT = 2
 NN_STRUCTURE = [NN_INPUTS_COUNT] + NN_HIDDEN_LAYERS_SIZE + [NN_OUTPUTS_COUNT]
 
 
-###################################
-# размер популяции / оноже колв партий
-POPULATION_SIZE = 6
 
-# размер популяции переходящий в следующее поколение
-INDIVIDS_ALIVE_COUNT = int(POPULATION_SIZE / 2)
-INDIVIDS_CHILD_COUNT = POPULATION_SIZE - INDIVIDS_ALIVE_COUNT
 
 
 SBX_eta = 100

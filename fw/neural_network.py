@@ -4,6 +4,8 @@ from typing import List, Callable, NewType, Optional
 
 ActivationFunction = NewType('ActivationFunction', Callable[[np.ndarray], np.ndarray])
 
+
+# на сигмоиде возникало переполнение : np.exp(arg) при arg > 700
 sigmoid = ActivationFunction(lambda X: 1.0 / (1.0 + np.exp(-X)))
 tanh = ActivationFunction(lambda X: np.tanh(X))
 relu = ActivationFunction(lambda X: np.maximum(0, X))
@@ -41,10 +43,6 @@ class FeedForwardNetwork:
                 self.params['W' + str(l)] = self.rng.uniform(-1, 1, size=(self.layer_nodes[l], self.layer_nodes[l-1]))
                 self.params['b' + str(l)] = self.rng.uniform(-1, 1, size=(self.layer_nodes[l], 1))
 
-
-                # self.params['W' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], self.layer_nodes[l-1]))
-                # self.params['b' + str(l)] = np.random.uniform(-1, 1, size=(self.layer_nodes[l], 1))
-            
             else:
                 raise Exception('Implement more options, bro')
 
@@ -68,6 +66,12 @@ class FeedForwardNetwork:
             b = self.params['b' + str(l)]
             dot = np.dot(W, A_prev)
             Z = dot + b
+
+            # при значении более 700 np.exp возвращает варнинг
+            # это актуально для sigmoid, с другими функциями активации не тестировал
+            Z[Z > 700] = 700
+            Z[Z < -700] = -700
+
             A_prev = self.hidden_activation(Z)
             self.params['A' + str(l)] = A_prev
 
@@ -75,6 +79,12 @@ class FeedForwardNetwork:
         W = self.params['W' + str(L)]
         b = self.params['b' + str(L)]
         Z = np.dot(W, A_prev) + b
+
+        # при значении более 700 np.exp возвращает варнинг
+        # это актуально для sigmoid, с другими функциями активации не тестировал
+        Z[Z > 700] = 700
+        Z[Z < -700] = -700
+
         out = self.output_activation(Z)
         self.params['A' + str(L)] = out
 
