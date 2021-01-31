@@ -11,6 +11,11 @@ import numpy as np
 
 
 
+import time     # DURATION
+g_end_time = None
+
+
+
 #
 #
 #
@@ -37,9 +42,6 @@ class Car(pg.sprite.Sprite):
     # ACCELERATOR / BRAKE - газ /тормоз
     # итого 2 выхода
     #NN_OUTPUTS_COUNT = 2
-
-#    NN_HIDDEN_LAYERS_SIZE = [5, 4]    # скрытые слои нейросети
-
 
 
 
@@ -80,6 +82,9 @@ class Car(pg.sprite.Sprite):
         self.arr_sensors_end_3mfdot = None
         self.arr_sensors_wnd_pos = None
         self.arr_sensors_value = None
+
+        self.end_time = None
+
 
         super().__init__(groups)
 
@@ -141,7 +146,7 @@ class Car(pg.sprite.Sprite):
 
         self.speering_direction = 0         # -1 0 1 куда крутим руль
         self.MAX_SPEERING = grad2rad(30)    # максимальное отклонение руля
-        self.SPEERING_DV = grad2rad(12)     # изменение угла на руле за 1 сек
+        self.SPEERING_DV = grad2rad(20)     # изменение угла на руле за 1 сек
         self.MIN_SPEERING = grad2rad(1)     # минимальное отклонение руля, если меньше него то ставим на ноль
 
         self.init_sensors()
@@ -168,11 +173,13 @@ class Car(pg.sprite.Sprite):
 
         # углы положения сенсоров
         self.arr_sensors_angles = [
-            grad2rad(-90),
             grad2rad(-45),
+            grad2rad(-20),
+            grad2rad(-8),
             grad2rad(0),
+            grad2rad(8),
+            grad2rad(20),
             grad2rad(45),
-            grad2rad(90),
         ]
 
         # значения сенсоров - 0.0
@@ -192,10 +199,10 @@ class Car(pg.sprite.Sprite):
 
         # расчитаем координаты сенсоров , относительно машины
         # курс не учитываем
-        for ai, v in np.ndenumerate(self.arr_sensors_angles):
+        for ai, angle in np.ndenumerate(self.arr_sensors_angles):
             i = ai[0]
             # формируем вектор от центра машины на сенсор.
-            self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(v) @ nd2_getMatrix([1, 0])
+            self.arr_sensors_car_pos[i] = nd2_getScaleMatrix(Car.SENSOR_MAX_LEN) @ nd2_getRotateMatrix(angle) @ nd2_getMatrix([1, 0])
 
         self.arr_sensors_value = np.full(shape=CAR_SENSORS_COUNT, dtype=float, fill_value=Car.SENSOR_MAX_LEN)
 
@@ -251,8 +258,7 @@ class Car(pg.sprite.Sprite):
 
 
     def update_movement(self):
-
-        # print('Car.update_movement')
+       # print('Car.update_movement')
 
         # формируем входные данне на нйеросеть
         # X = np.zeros(NN_INPUT_COUNTS)
@@ -266,7 +272,11 @@ class Car(pg.sprite.Sprite):
         # в NN передаем X в формате именно (7,1) а не (7,)
         X = X.reshape(len(X), 1)
 
+
         (self.engine_power, self.speering_angle_want) = self.NN.feed_forward(X)
+
+
+
 
         self.engine_power *= self.K_NN_engine_power
 
@@ -276,8 +286,13 @@ class Car(pg.sprite.Sprite):
         #self.speering_angle_want = 0    # CARFORWARD
 
 
+
+
         # PRINT
         self.printNNValues()
+
+
+
 
 
         # пересчитаем скорость
@@ -382,6 +397,9 @@ class Car(pg.sprite.Sprite):
 
 
 
+
+
+
     def setDirectionImage2(self):
         angle = nd2_getAngle(self.course_nd2)
         rumb_angle = PI / 16        # = 2 * PI / 32
@@ -401,7 +419,7 @@ class Car(pg.sprite.Sprite):
                 cur_dist = dist
                 cur_i = i
 
-        fitness = getFrames() + self.total_S * 100 + cur_i ** 2 * 100
+        fitness = getAppWnd().Series.frames + self.total_S * 100 + cur_i ** 2 * 100
 
         self.NN.setFitness(fitness)
 
@@ -409,7 +427,7 @@ class Car(pg.sprite.Sprite):
 
 
     def getMediumSpeed(self):
-        return self.total_S * TRAINING_UPDATE_GTIME_FPS / getFrames()
+        return self.total_S * TRAINING_UPDATE_GTIME_FPS / getAppWnd().Series.frames
 
 
     #
@@ -430,19 +448,20 @@ class Car(pg.sprite.Sprite):
         ############################################################
         #
         # определим прямоугольник (его края парралелны карте) в который попадают все сенcоры
-        # (сенсор - это отрезок, имеющий конкретную длинну
+        # сенсор - это отрезок, имеющий конкретную длинну, начинается на машине
+        # чтобы определить такой прямоугольник надо накрыть все концы сенсоров и их общее начало (в машине)
 
 
         arr_x = self.arr_sensors_end_3mfdot[..., 0]
         arr_y = self.arr_sensors_end_3mfdot[..., 1]
 
-        x1 = np.amin(arr_x)
-        x2 = np.amax(arr_x)
-        y1 = np.amin(arr_y)
-        y2 = np.amax(arr_y)
+        x1 = min(np.amin(arr_x), self.map_pos_nd2[0])
+        x2 = max(np.amax(arr_x), self.map_pos_nd2[0])
+        y1 = min(np.amin(arr_y), self.map_pos_nd2[1])
+        y2 = max(np.amax(arr_y), self.map_pos_nd2[1])
 
         # arr_sensors_irect -
-        # rect закрывающий ВСЕ сенсоры-отрезки разом
+        # rect закрывающий ВСЕ сенсоры-отрезки разом, машину не накрывает. только концы сенсоров
         # УВЕЛИЧИМ НА 2 ПИКСЕЛЯ ВО ВСЕ СТОРОНЫ чтобы убрать краевые эффекты
         # было до увеличения arr_sensors_irect = pg.Rect(x1,y1,x2-x1+1,y2-y1+1)
         arr_sensors_irect = pg.Rect(x1 - 2, y1 - 2, x2 - x1 + 3, y2 - y1 + 3)
@@ -629,17 +648,21 @@ class Car(pg.sprite.Sprite):
 
     def draw_sensors(self):
         # print('draw_sensors')
-        for ai, sensor_wnd_pos in np.ndenumerate(self.arr_sensors_wnd_pos):
-            i = ai[0]  # индекс
 
-            if sensor_wnd_pos is not None:
+
+        # for ai, sensor_wnd_pos in np.ndenumerate(self.arr_sensors_wnd_pos):
+        for j in range(CAR_SENSORS_COUNT):
+            #i = ai[0]  # индекс
+
+            if self.arr_sensors_wnd_pos[j] is not None:
                 pg.draw.line(
                     self.map.surface,
                     (255, 0, 128, 128),
                     self.wnd_rect.center,
-                    sensor_wnd_pos,
+                    self.arr_sensors_wnd_pos[j],
                     1,
                 )
+
 
 
 

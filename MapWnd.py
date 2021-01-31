@@ -11,14 +11,15 @@ from Camera import *
 
 import random
 
-
+import time     # DURATION
+g_end_time = None
 
 #
 # окно с картой
 #
 class MapWnd(fwWindow):
 
-    def __init__(self, params):
+    def __init__(self, params, random_generator):
 
 
         params['rect'] = MAP_WND_RECT
@@ -46,6 +47,7 @@ class MapWnd(fwWindow):
         self.arr_road_sprites = None
         self.car = None
 
+        self.random_generator = random_generator
 
         super().__init__(params)        # parent - fwMapWnd
 
@@ -62,7 +64,57 @@ class MapWnd(fwWindow):
         self.arr_sprites_collide = pg.sprite.Group()        # проверять на столкновения с автомобилем
         self.arr_sprites_curbs = pg.sprite.Group()
 
+        self.drawBackground()
 
+
+
+
+        # нарисуем деревья
+
+        self.arr_trees = []
+        groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_collide)
+
+        self.arr_trees.append(
+            Tree(100, 100, groups)
+        )
+
+        self.arr_trees.append(
+            Tree(660, 450, groups)
+        )
+
+        self.arr_trees.append(
+            Tree(1000, 150, groups)
+        )
+
+        self.arr_trees.append(
+            Tree(1500, 180, groups)
+        )
+
+
+        self.arr_oils = []
+        groups = (self.arr_sprites_update_camera, self.arr_sprites_draw)
+        self.arr_oils.append(
+            Oil(340, 570, groups)
+        )
+
+        # self.arr_rocks = []
+        # groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
+        # self.arr_rocks.append(
+        #     Rock(600, 400, groups)
+        # )
+
+
+
+        # формирует дорогу
+        #self.init_road(0)
+
+
+        getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
+        getAppWnd().registerHandler_KEYDOWN(self)
+        getAppWnd().registerHandler_KEYUP(self)
+
+
+    def drawBackground(self):
         # тайловая карта
         # тайлы двух видов, определяются случайно
         # тайлы спрайтами не являются, а копируеются один раз прямо на фон
@@ -80,117 +132,135 @@ class MapWnd(fwWindow):
 
 
 
-        # нарисуем деревья
+    def init_road(self, road_ind):
 
-        self.arr_trees = []
-        groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_collide)
-
-        self.arr_trees.append(
-            Tree(100, 100, groups)
-        )
-
-        self.arr_trees.append(
-            Tree(600, 300, groups)
-        )
-
-        self.arr_trees.append(
-            Tree(1000, 150, groups)
-        )
-
-        self.arr_trees.append(
-            Tree(1500, 180, groups)
-        )
+        print(f'init_road {road_ind}')
 
 
-        self.arr_oils = []
-        groups = (self.arr_sprites_update_camera, self.arr_sprites_draw)
-        self.arr_oils.append(
-            Oil(400, 500, groups)
-        )
+        if road_ind == 0:
+            self.arr_roadsections_axial_2idot =  np.array(
+                [
+                    [0, 400],
+                    [100, 405],
+                    [200, 390],
+                    [300, 410],
+                    [400, 395],
 
-        self.arr_rocks = []
-        groups = (self.arr_sprites_update_camera,self.arr_sprites_update, self.arr_sprites_draw)
-        self.arr_rocks.append(
-            Rock(600, 400, groups)
-        )
+                    [500, 350],
+                    [600, 290],
+                    [700, 285],
+                    [800, 270],
+                    [900, 300],
 
+                    [1000, 300],
+                    [1100, 360],
+                    [1200, 400],
+                    [1300, 420],
+                    [1400, 440],
 
-        # формирует дорогу
-        self.init_road()
+                    [1500, 440],
+                    [1600, 400],
+                    [1700, 360],
+                    [1800, 330],
+                    [1900, 320],
+                    #
+                    # [2100, 240],
+                    # [2250, 270],
+                ],
+                int
+            )
 
+            arr_roadsections_width_i =  np.array(
+                [
+                    150,
+                    150,
+                    150,
+                    150,
+                    150,
 
-        getAppWnd().registerHandler_MOUSEBUTTONDOWN(self)
-        getAppWnd().registerHandler_KEYDOWN(self)
-        getAppWnd().registerHandler_KEYUP(self)
+                    150,
+                    150,
+                    150,
+                    150,
+                    150,
 
+                    150,
+                    150,
+                    150,
+                    130,
+                    120,
+                    #
+                    120,
+                    120,
+                    130,
+                    140,
+                    150,
+                    #
+                    # 150,
+                    # 150,
+                ],
+                int
+            )
+        elif road_ind == 1:
+            self.arr_roadsections_axial_2idot = np.array(
+                    [
+                        [0, 400],
+                        [100, 410],
+                        [200, 390],
+                        [300, 410],
+                        [400, 390],
 
+                        [500, 380],
+                        [600, 400],
+                        [700, 395],
+                        [800, 392],
+                        [900, 380],
 
-    def init_road(self):
+                        [1000, 400],
+                        [1100, 401],
+                        [1200, 400],
+                        [1300, 401],
+                        [1400, 400],
 
-        self.arr_roadsections_axial_2idot =  np.array(
-            [
-                [0, 400],
-                [100, 405],
-                [200, 390],
-                [300, 410],
-                [400, 395],
+                        [1500, 401],
+                        [1600, 395],
+                        [1700, 405],
+                        [1800, 410],
+                        [1900, 400]
 
-                [500, 350],
-                [600, 290],
-                [700, 285],
-                [800, 270],
-                [900, 300],
+                    ],
+                    int
+            )
 
-                [1000, 300],
-                [1100, 360],
-                [1200, 400],
-                [1300, 420],
-                [1400, 440],
+            arr_roadsections_width_i = np.array(
+                    [
+                        150,
+                        150,
+                        150,
+                        150,
+                        150,
 
-                [1500, 440],
-                [1600, 400],
-                [1700, 360],
-                [1800, 330],
-                [1900, 320],
-                #
-                # [2100, 240],
-                # [2250, 270],
-            ],
-            int
-        )
+                        150,
+                        150,
+                        150,
+                        150,
+                        150,
 
-        arr_roadsections_width_i =  np.array(
-            [
-                150,
-                150,
-                150,
-                150,
-                150,
+                        150,
+                        150,
+                        150,
+                        130,
+                        120,
+                        #
+                        120,
+                        120,
+                        130,
+                        140,
+                        150
 
-                150,
-                150,
-                150,
-                150,
-                150,
-
-                150,
-                150,
-                150,
-                130,
-                120,
-                #
-                120,
-                120,
-                130,
-                140,
-                150,
-                #
-                # 150,
-                # 150,
-            ],
-            int
-        )
-
+                    ],
+                    int
+            )
 
         road_len = len(self.arr_roadsections_axial_2idot)
 
@@ -220,16 +290,17 @@ class MapWnd(fwWindow):
 
 
 
-        # матрицы поворота
+        # матрицы поворота, константы, просто готовим
         matrix_rotate_left = nd2_getRotateMatrixLeft90()
         matrix_rotate_right = nd2_getRotateMatrixRight90()
 
 
         arr_roadsections_corners_3mf = np.zeros((road_len-1,4,3),float)
 
-                            # вектора-направляения [x y 0], это направления участков дороги.
-                            # направления из точки [road_len] нет - некуда направлять
-                            # arr_roadsections_direction = np.zeros((road_len-1,3),float)
+        # вектора-направляения [x y 0], это направления участков дороги.
+        # направления из точки [road_len] нет - некуда направлять
+        # arr_roadsections_direction = np.zeros((road_len-1,3),float)
+
         for i in range(road_len-1):
             # вектора-направляения [x y 0], направления участков дороги, считается вдоль осевой.
             roadsection_axis_3mf = arr_roadsections_axial_turn_3mfdot[i+1] - arr_roadsections_axial_turn_3mfdot[i]
@@ -321,8 +392,11 @@ class MapWnd(fwWindow):
 
         # рисуем полигоны на дороге
 
+        self.arr_sprites_curbs.empty()
+        groups = (self.arr_sprites_update_camera, self.arr_sprites_draw, self.arr_sprites_curbs)
+
+
         for i in range(road_len - 1):
-            # for arr_roadsection in arr_roadsections_corners_3mf:
             arr_roadsection = arr_roadsections_corners_3mf[i]
             # цикл для каждого 4х угольного полигона дороги
             # arr_roadsection - содержит 4 угла полигона
@@ -338,7 +412,6 @@ class MapWnd(fwWindow):
                     polygon_corners
                 )
 
-            groups = (self.arr_sprites_update_camera, self.arr_sprites_draw,self.arr_sprites_curbs)
 
 
             # ставим спрайт на левую сторону дороги
@@ -375,8 +448,8 @@ class MapWnd(fwWindow):
         self.dt = 1 / TRAINING_UPDATE_GTIME_FPS
 
 
-
         groups = (self.arr_sprites_update_camera, self.arr_sprites_update, self.arr_sprites_draw)
+
 
         self.car = Car(
                 self,
@@ -387,10 +460,11 @@ class MapWnd(fwWindow):
                 arrangement_arr['Car']['NN'],
         )
 
-        self.arr_rocks[0].setPos(200, 400)
+        # self.arr_rocks[0].setPos(200, 400)  #ROCK
 
         self.car.update_sensors()
         self.updateCamera()
+
 
 
     def endParty(self):
@@ -400,6 +474,8 @@ class MapWnd(fwWindow):
 
         del self.car
         self.car = None
+
+
 
     def destroyMap(self):
         if self.car is not None:
@@ -412,8 +488,8 @@ class MapWnd(fwWindow):
 
     def updateTraining(self):
         # self.training_update_step += 1
-        self.arr_sprites_update.update(1)       # 1 - training
 
+        self.arr_sprites_update.update(1)       # 1 - training
         self.updateCamera()
 
 
@@ -450,16 +526,24 @@ class MapWnd(fwWindow):
         # координаты окна показываемые камерой относительно карты
         camera_position_rect = self.Camera.getPositionRect()
 
+
+
         # копируем фон(тайловая карта)
         self.surface.blit(          # копируем в окно MapWnd
             self.background_srf,    # копируем из карты
             pg.Rect(0,0,0,0),       # копируем на все окно MapWnd
             camera_position_rect)   # из карты берем то что показывает камера
 
-        if self.car is not None:
-            self.car.draw_sensors()
 
-        self.arr_sprites_draw.draw(self.surface)
+
+        if self.car is not None:
+            self.car.draw_sensors()     # 25 mks
+
+
+
+        self.arr_sprites_draw.draw(self.surface)        # 250mks
+
+
 
 
 
@@ -469,9 +553,17 @@ class MapWnd(fwWindow):
     #           : False -не было сьезда с дороги
     def testOffRoad(self):
         # столкновение машины с краем дороги
+
+        sprite_collided_rect_lst = pg.sprite.spritecollide(
+            self.car,                   # машину сталикиваем
+            self.arr_sprites_curbs,     # с краями дороги
+            False,
+            pg.sprite.collide_rect,
+        )
+
         sprite_lst = pg.sprite.spritecollide(
-            self.car,           # машину сталикиваем
-            self.arr_sprites_curbs,     #с краями дороги
+            self.car,                   # машину сталикиваем
+            sprite_collided_rect_lst,     # с краями дороги
             False,
             pg.sprite.collide_mask,
         )

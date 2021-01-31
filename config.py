@@ -83,14 +83,14 @@ TRAINING_UPDATE_GTIME_FPS         = 60
 
 
 
-CAR_SENSORS_COUNT = 5
+CAR_SENSORS_COUNT = 7
 
 # скорость машины - 1
 # текущее положение руля - 1
 # сенсоры - SENSORS_COUNT = 5
 # итого входов : 7
 NN_INPUTS_COUNT = CAR_SENSORS_COUNT + 2
-NN_HIDDEN_LAYERS_SIZE = [5, 4]
+NN_HIDDEN_LAYERS_SIZE = [7, 5]
 NN_OUTPUTS_COUNT = 2
 
 # NN_structure имеет вид [20,10,5,2]

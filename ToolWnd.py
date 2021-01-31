@@ -90,12 +90,14 @@ class ToolWnd(fwWindow):
                 ("x2", 120),
                 ("x5", 300),
                 ("x10", 600),
+                ("x20", 1200),
+                ("x50", 3000),
             ],
             'parent_wnd': self,
             'rect': pg.Rect(65, 150, 80, 22),
         }))
 
-        self.selectTrainingUpdateSpeed.setSelectedItemByText('x10')
+        self.selectTrainingUpdateSpeed.setSelectedItemByText('x20')
 
         ##########
 
@@ -110,6 +112,7 @@ class ToolWnd(fwWindow):
             'value': [
                 ("60 fps", 60),
                 ("30 fps", 30),
+                ("20 fps", 20),
                 ("10 fps", 10),
                 ("5 fps", 5),
                 ("1 fps", 1),
@@ -117,6 +120,7 @@ class ToolWnd(fwWindow):
             'parent_wnd': self,
             'rect': pg.Rect(200, 150, 80, 22),
         }))
+        self.selectTrainingDrawSpeed.setSelectedItemByText('30 fps')
 
         # -------------------------------------
         row = 200
@@ -202,7 +206,7 @@ class ToolWnd(fwWindow):
 
         self.lbl_power = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(52, row, 80, 32),
+            'rect': pg.Rect(70, row, 80, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_power)
@@ -237,7 +241,7 @@ class ToolWnd(fwWindow):
 
         self.lbl_speering_want = GuiLabel({
             'parent_wnd': self,
-            'rect': pg.Rect(52, row, 80, 32),
+            'rect': pg.Rect(70, row, 80, 32),
             'text': '0',
         })
         self.addChildWnd(self.lbl_speering_want)
@@ -298,11 +302,13 @@ class ToolWnd(fwWindow):
         elif msg == 'WM_SET_PARAM_1':
             self.lbl_sensors.setText(param1['sensors'])
             self.lbl_speed.setText(param1['speed'])
-            self.lbl_speering_fact.setText(param1['speering'])
+            a = float(param1['speering']) * 57.29
+            self.lbl_speering_fact.setText('{:3.1f}'.format(a)) # правая
 
         elif msg == 'WM_SET_NN_OUT':
-            self.lbl_power.setText('{:12.3e}'.format(param1['engine_power']))
-            self.lbl_speering_want.setText('{:12.3e}'.format(param1['speering_want']))
+            self.lbl_power.setText('{:4.1f}'.format(param1['engine_power']))
+            a = float(param1['speering_want']) * 57.29
+            self.lbl_speering_want.setText('{:3.1f}'.format(a))
 
 
         elif msg == 'WM_SET_TICKS':

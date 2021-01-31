@@ -22,6 +22,11 @@ from ToolWnd import ToolWnd
 from MapWnd import MapWnd
 
 
+import time     # DURATION
+g_end_time = None
+
+
+
 
 #
 #
@@ -115,10 +120,6 @@ class AppWnd(fwWindow):
 
 
 
-
-        self.initTiming()
-
-
         self.state = None
         self.newSeries()
 
@@ -131,21 +132,6 @@ class AppWnd(fwWindow):
     def __del__(self):
         pg.quit()
 
-
-    def initTiming(self):
-        #############################
-        # УДАЛИТЬ
-
-        self.update_last_call_ms = 0
-        self.update_dt_ms = 0
-
-        # self.training_draw_call_rtime_ms = None
-        # self.training_draw_dt_rtime_ms_f = None
-
-
-        # self.draw_last_call_ms = 0
-        # self.draw_interval_ms = 16
-        #############################
 
 
 
@@ -176,10 +162,6 @@ class AppWnd(fwWindow):
 
     def run(self):
 
-        update_next_ms = 0
-        draw_next_ms = 0
-        handle_events_next_ms = 0
-
 
         try:
 
@@ -200,24 +182,28 @@ class AppWnd(fwWindow):
                         pg.time.wait(delay_ms)
                     self.handleEvents_last_call_rtime_ms_f = pg.time.get_ticks()
 
-
                     self.handleEvents()
+
+
 
                 elif update_next_call <= min(handle_events_next_call, draw_next_call):
                     delay_ms = int(update_next_call - now)
                     if delay_ms > 0:
                         pg.time.wait(delay_ms)
                     self.update_last_call_rtime_ms_f = pg.time.get_ticks()
+
                     self.update()
+
 
                 else:
                     delay_ms = int(draw_next_call - now)
                     if delay_ms > 0:
                         pg.time.wait(delay_ms)
                     self.draw_last_call_rtime_ms_f = pg.time.get_ticks()
+
                     self.draw()
 
-                pg.display.update()
+                    pg.display.update()
 
 
 
@@ -374,7 +360,7 @@ class AppWnd(fwWindow):
 
     def update(self):
         if self.state == 'APP_STATE_TRAINING_PLAY':
-            self.Series.updateTraining()
+            self.Series.updateTraining()                # DURATION 800 ms
 
         elif self.state == 'APP_STATE_SHOW_PLAY':
             self.Series.updateShow()
@@ -388,8 +374,13 @@ class AppWnd(fwWindow):
 
         # у AppWnd нет собственной графики, рисоавть нечего
         # вызовем
-        self.Tool_wnd.draw()
-        self.Series.draw()
+
+
+        self.Tool_wnd.draw()        # DURATION 300 mks
+        self.Series.draw()        # DURATION 700 mks
+
+
+
 
 
 

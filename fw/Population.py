@@ -11,18 +11,17 @@ from typing import Tuple
 class Population:
 
 
-
-
     #
     # size - размер популяции
-    def __init__(self, size, NN_structure):
+    def __init__(self, size, NN_structure, random_generator):
 
         # размер популяции
         self.population_size = size
 
         self.NN_structure = NN_structure
 
-        self.rng = np.random.default_rng(RND_START_VALUE)
+        self.rng = random_generator
+
 
         self.individs = np.empty([POPULATION_SIZE], dtype=object)
 
@@ -38,8 +37,6 @@ class Population:
     # предварительно у всех сетей должен быть посчитан фитнес
     def calcNextGeneration(self):
 
-        #пустой массив под выживших особей
-        # individs_alive = np.empty([INDIVIDS_ALIVE_COUNT], dtype=object)
 
         # отберем лучших особей для перехода в следующее поколение
 
@@ -85,6 +82,10 @@ class Population:
         #self.rng.shuffle(self.individs)
 
 
+
+    #
+    #
+    #
     def sort_elitism(self, population, selected_count):
         A = sorted(
                 population,
@@ -126,7 +127,6 @@ class Population:
                         except Exception as ex:
                             pass
                         fitness_sum -= individ.fitness
-                        #fitness_sum = 0 if fitness_sum < 0 else fitness_sum
                     break
 
         return individs_selected
@@ -138,7 +138,6 @@ class Population:
     #
     def crossover(self, individ1, individ2):
 
-
         child1 = FeedForwardNetwork(self.NN_structure, rng=self.rng)
         child2 = FeedForwardNetwork(self.NN_structure, rng=self.rng)
 
@@ -147,26 +146,28 @@ class Population:
 
         # обход слоев
         for l in range(1, NN_layer_count):
+            W_ind = 'W' + str(l)
+            b_ind = 'b' + str(l)
 
-            individ_1_Weight = individ1.params['W' + str(l)]    # копирует по ссылке(без копии)
-            individ_1_bias = individ1.params['b' + str(l)]
+            individ_1_Weight = individ1.params[W_ind]    # копирует по ссылке(без копии)
+            individ_1_bias = individ1.params[b_ind]
 
-            individ_2_Weight = individ2.params['W' + str(l)]
-            individ_2_bias = individ2.params['b' + str(l)]
+            individ_2_Weight = individ2.params[W_ind]
+            individ_2_bias = individ2.params[b_ind]
 
             # выбор метода для кроссовера
             crossover_method = np.digitize(self.rng.random(), [0.5, 1.0])
-            crossover_method = 1
+            crossover_method = 0
 
             #  simulated_binary_crossover
             if crossover_method == 0:
-                child1.params['W' + str(l)], child2.params['W' + str(l)] = self.crossover_simulated_binary(individ_1_Weight, individ_2_Weight, SBX_eta)
-                child1.params['b' + str(l)], child2.params['b' + str(l)] = self.crossover_simulated_binary(individ_1_bias, individ_2_bias, SBX_eta)
+                child1.params[W_ind], child2.params[W_ind] = self.crossover_simulated_binary(individ_1_Weight, individ_2_Weight, SBX_eta)
+                child1.params[b_ind], child2.params[b_ind] = self.crossover_simulated_binary(individ_1_bias, individ_2_bias, SBX_eta)
 
             # Single point binary crossover (SPBX)
             elif crossover_method == 1:
-                child1.params['W' + str(l)], child2.params['W' + str(l)] = self.crossover_single_point_binary(individ_1_Weight, individ_2_Weight)
-                child1.params['b' + str(l)], child2.params['b' + str(l)] = self.crossover_single_point_binary(individ_1_bias, individ_2_bias)
+                child1.params[W_ind], child2.params[W_ind] = self.crossover_single_point_binary(individ_1_Weight, individ_2_Weight)
+                child1.params[b_ind], child2.params[b_ind] = self.crossover_single_point_binary(individ_1_bias, individ_2_bias)
 
 
         return child1, child2
@@ -207,7 +208,9 @@ class Population:
 
         return individ
 
-
+    #
+    #
+    #
     def gaussian_mutation(self, chromosome_arr, mutation_probabilty, mutation_scale):
 
 
@@ -221,7 +224,9 @@ class Population:
         # те хромосомы на которые mutation_array=True вносим коррекцию
         chromosome_arr[mutation_arr] += gaussian_mutation[mutation_arr]
 
-
+    #
+    #
+    #
     def random_uniform_mutation(self, chromosome_arr, mutation_probabilty, low, high):
 
         # булевский массив, true -соответствующаф хромосома меняется
@@ -233,7 +238,7 @@ class Population:
         # копируем только те мутировавшие гены где mutation_arr = True
         chromosome_arr[mutation_arr] = chromosome_arr[mutation_arr] * uniform_mutation[mutation_arr]
 
-    # p.177
+
 
     #
     # на хромосоме выбирается ячейка,

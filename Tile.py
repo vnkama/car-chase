@@ -149,19 +149,16 @@ class Curb(pg.sprite.Sprite):
         self.start_2fdot = p0_xy
         self.end_2fdot = p1_xy
 
-        #print(self.start_2fdot,self.end_2fdot)
-
-
         # размер спрайта
         size_xy = (
             int(abs(p0_xy[0]-p1_xy[0]) + 1),
             int(abs(p0_xy[1]-p1_xy[1]) + 1)
         )
-        self.map_rect = pg.Rect(pos_xy,size_xy)
+        self.map_rect = pg.Rect(pos_xy, size_xy)
         self.rect = self.map_rect.copy()
 
-
         self.image = pg.Surface(size_xy)
+
         self.image.set_alpha(0)   #0- прозрачный
 
         COLORKEY = (255,255,255)
